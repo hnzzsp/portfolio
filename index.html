@@ -132,30 +132,42 @@ p{margin:0 0 1em}
   .burger{display:grid}
 }
 
-/* 主题选择面板 */
+/* 主题选择面板：弹出 / 收起带位移缩放过渡，不再是生硬的 display 切换 */
 .theme-pop{
   position:absolute;right:var(--pad);top:60px;width:312px;z-index:60;
-  background:var(--surface);border:1px solid var(--line);border-radius:10px;
-  box-shadow:0 22px 60px rgba(0,0,0,.18);padding:12px;display:none;
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  box-shadow:0 22px 60px rgba(0,0,0,.18);padding:12px;
+  opacity:0;visibility:hidden;transform:translateY(-8px) scale(.97);transform-origin:top right;
+  transition:opacity .2s ease,transform .28s cubic-bezier(.32,1.12,.42,1),visibility .2s;
 }
-.theme-pop.open{display:block}
+.theme-pop.open{opacity:1;visibility:visible;transform:none}
 .theme-pop h4{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:2px 6px 10px;font-family:var(--font-body);font-weight:700}
 .theme-pop .tip{font-size:12px;color:var(--text-dim);line-height:1.6;margin:8px 6px 2px;padding-top:10px;border-top:1px solid var(--line)}
 .trow{
   position:relative;display:flex;align-items:center;gap:12px;width:100%;padding:10px 10px 10px 14px;cursor:pointer;
-  background:transparent;border:0;border-radius:8px;color:var(--text);
-  font:inherit;text-align:left;transition:background .15s;
+  background:transparent;border:0;border-radius:10px;color:var(--text);
+  font:inherit;text-align:left;
+  transition:background .18s ease,transform .18s ease;
 }
-.trow:hover{background:var(--bg-soft)}
+.trow:hover{background:var(--bg-soft);transform:translateX(3px)}
+.trow:active{transform:translateX(3px) scale(.985)}
 .trow[aria-checked="true"]{background:var(--bg-soft)}
 .trow[aria-checked="true"]::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;background:var(--accent);border-radius:2px}
 .trow[aria-checked="true"] .tname::after{content:"✓";margin-left:6px;color:var(--accent);font-weight:800}
-.tsw{width:42px;height:26px;border:1px solid var(--line);display:flex;flex-shrink:0;overflow:hidden;border-radius:5px}
-.tsw i{flex:1}
+.tsw{width:42px;height:26px;border:1px solid var(--line);display:flex;flex-shrink:0;overflow:hidden;border-radius:5px;transition:box-shadow .22s ease,border-color .22s ease}
+.trow[aria-checked="true"] .tsw{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
 .tname{font-size:14px;line-height:1.35;font-weight:600}
 .tname small{display:block;font-weight:400;font-size:11.5px;color:var(--text-dim);margin-top:2px}
+/* 主题切换瞬间的全局颜色过渡：切换时挂上，450ms 后摘除 */
+@media (prefers-reduced-motion: no-preference){
+  html.tf, html.tf body, html.tf *{
+    transition:background-color .38s ease,color .38s ease,border-color .38s ease,
+               fill .38s ease,stroke .38s ease,box-shadow .38s ease !important;
+  }
+}
 @media (max-width:520px){
-  .theme-pop{right:12px;left:12px;width:auto}
+  .theme-pop{right:12px;left:12px;width:auto;transform-origin:top center}
+}
 }
 /* 风格按钮文字标签 */
 .iconbtn .lbl{font-size:13px;font-weight:700;margin-left:6px}
@@ -983,6 +995,12 @@ body.editing [data-shot]{cursor:pointer}
   function setTheme(t, save){
     if (THEMES.indexOf(t) === -1) t = 'swiss';
     choice = t;
+    /* 切换瞬间挂全局颜色过渡，450ms 后摘除（避免常驻 * 过渡拖累其它动画） */
+    if (root.setAttribute){
+      root.classList.add('tf');
+      clearTimeout(root._tfT);
+      root._tfT = setTimeout(function(){ root.classList.remove('tf'); }, 450);
+    }
     root.setAttribute('data-theme', resolve(t));
     Array.prototype.forEach.call(pop.querySelectorAll('.trow'), function(r){
       r.setAttribute('aria-checked', String(r.dataset.set === t));
