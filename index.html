@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="swiss">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SUN · 视觉传达设计 / 品牌视觉 · UI · 设计工程 — 个人作品集</title>
+<meta name="description" content="视觉传达专业，方向为品牌视觉、版式设计与界面设计；能独立完成从设计稿到静态站点上线的全链路，熟悉 Figma、HTML/CSS 与 Python 自动化。">
+<meta name="author" content="SUN">
+<meta property="og:title" content="SUN · 个人作品集">
+<meta property="og:description" content="视觉传达设计 / 品牌视觉 · UI · 设计工程。面向招聘方，30 秒读完核心信息。">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23111'/%3E%3Ctext x='16' y='22' font-family='Helvetica,Arial' font-size='15' font-weight='700' fill='%23fff' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+
+<!--
+  ============================================================
+   发布前必须替换的内容（搜索 TODO 即可定位）
+   1. 姓名：全文 "SUN" → 你的真实姓名 / 拼音
+   2. 邮箱、微信、电话
+   3. 学校全称与就读时间
+   4. 项目经历里的具体数据（收录数量、访问量等）
+   5. 作品图片：把 .shot 里的占位块换成 <img src="assets/xxx.jpg">
+   6. og:image（可选，建议 1200×630 截图）
+  ============================================================
+-->
+
+<style>
+/* ============ 主题变量：四套风格 ============ */
+:root{
+  --maxw:1180px;
+  --pad:clamp(20px,5vw,56px);
+  --radius:0px;
+  --font-display:"Helvetica Neue",Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+  --font-body:"Helvetica Neue",Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+  --display-weight:800;
+  --tracking:-.02em;
+  --shadow:0 1px 0 rgba(0,0,0,.06);
+}
+/* 1. 瑞士国际主义（默认） */
+[data-theme="swiss"]{
+  --bg:#ffffff; --bg-soft:#f2f2f0; --surface:#ffffff;
+  --text:#111111; --text-dim:#5c5c57; --line:#dcdcd7;
+  --accent:#d81e05; --accent-ink:#ffffff;
+  --radius:0px;
+  --font-display:"Helvetica Neue",Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+  --font-body:"Helvetica Neue",Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+  --display-weight:800; --tracking:-.03em;
+}
+/* 2. 专业简约蓝灰 */
+[data-theme="calm"]{
+  --bg:#fbfcfd; --bg-soft:#eef2f7; --surface:#ffffff;
+  --text:#16202c; --text-dim:#5a6b7d; --line:#dee5ee;
+  --accent:#2563eb; --accent-ink:#ffffff;
+  --radius:12px;
+  --display-weight:700; --tracking:-.01em;
+}
+/* 3. 暖调人文米杏 */
+[data-theme="warm"]{
+  --bg:#faf7f2; --bg-soft:#f1ebe1; --surface:#fffdfa;
+  --text:#2a2521; --text-dim:#6b6259; --line:#e4d9c8;
+  --accent:#2f6b4f; --accent-ink:#ffffff;
+  --radius:6px;
+  --font-display:"Songti SC","Noto Serif SC",Georgia,"Times New Roman",serif;
+  --font-body:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  --display-weight:700; --tracking:0em;
+}
+/* 4. 深色科技感 */
+[data-theme="tech"]{
+  --bg:#0e1116; --bg-soft:#161b22; --surface:#151a21;
+  --text:#e6edf3; --text-dim:#9aa7b4; --line:#2a323d;
+  --accent:#7ee787; --accent-ink:#0b0f14;
+  --radius:8px;
+  --display-weight:700; --tracking:-.01em;
+}
+
+/* ============ 基础 ============ */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:88px;-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:var(--font-body);font-size:16px;line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  transition:background .25s ease,color .25s ease;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:var(--display-weight);letter-spacing:var(--tracking);line-height:1.1;margin:0}
+p{margin:0 0 1em}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+::selection{background:var(--accent);color:var(--accent-ink)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--pad)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ============ 顶部导航 ============ */
+.hdr{
+  position:sticky;top:0;z-index:50;
+  background:var(--bg);
+  background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:saturate(160%) blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.hdr-in{display:flex;align-items:center;gap:20px;height:64px}
+.brand{font-family:var(--font-display);font-weight:800;letter-spacing:-.02em;font-size:18px;display:flex;align-items:center;gap:9px}
+.brand .dot{width:10px;height:10px;background:var(--accent);border-radius:50%}
+.nav{display:flex;gap:4px;margin-left:auto}
+.nav a{
+  padding:8px 12px;border-radius:var(--radius);font-size:14.5px;color:var(--text-dim);
+  font-weight:500;transition:color .18s,background .18s;white-space:nowrap;
+}
+.nav a:hover{color:var(--text);background:var(--bg-soft)}
+.nav a.on{color:var(--text);font-weight:700}
+.nav a.on::after{content:"";display:block;height:2px;background:var(--accent);margin-top:3px;border-radius:2px}
+.hdr-tools{display:flex;align-items:center;gap:8px}
+.iconbtn{
+  width:38px;height:38px;display:grid;place-items:center;cursor:pointer;
+  background:transparent;border:1px solid var(--line);border-radius:var(--radius);
+  color:var(--text);font-size:15px;transition:border-color .18s,background .18s;
+}
+.iconbtn:hover{border-color:var(--accent);background:var(--bg-soft)}
+.burger{display:none}
+@media (max-width:880px){
+  .nav{
+    position:fixed;inset:64px 0 auto 0;flex-direction:column;gap:0;
+    background:var(--bg);border-bottom:1px solid var(--line);
+    padding:8px var(--pad) 18px;transform:translateY(-120%);
+    transition:transform .28s ease;box-shadow:0 12px 30px rgba(0,0,0,.08);
+  }
+  .nav.open{transform:translateY(0)}
+  .nav a{padding:13px 0;font-size:16px;border-bottom:1px solid var(--line)}
+  .nav a.on::after{display:none}
+  .nav a.on{color:var(--accent)}
+  .burger{display:grid}
+}
+
+/* 主题选择面板 */
+.theme-pop{
+  position:absolute;right:var(--pad);top:60px;width:250px;z-index:60;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:0 18px 50px rgba(0,0,0,.16);padding:10px;display:none;
+}
+.theme-pop.open{display:block}
+.theme-pop h4{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);margin:4px 6px 10px;font-family:var(--font-body);font-weight:700}
+.trow{
+  display:flex;align-items:center;gap:11px;width:100%;padding:9px 8px;cursor:pointer;
+  background:transparent;border:0;border-radius:var(--radius);color:var(--text);
+  font:inherit;text-align:left;transition:background .15s;
+}
+.trow:hover{background:var(--bg-soft)}
+.trow[aria-checked="true"]{background:var(--bg-soft);font-weight:700}
+.tsw{width:34px;height:22px;border:1px solid var(--line);display:flex;flex-shrink:0;overflow:hidden}
+.tsw i{flex:1}
+.tname{font-size:14px;line-height:1.3}
+.tname small{display:block;font-weight:400;font-size:11.5px;color:var(--text-dim)}
+
+/* ============ Hero ============ */
+.hero{padding:clamp(48px,9vw,110px) 0 clamp(40px,7vw,72px);border-bottom:1px solid var(--line)}
+.eyebrow{
+  font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--text-dim);
+  font-weight:700;margin-bottom:22px;display:flex;align-items:center;gap:12px;
+}
+.eyebrow::before{content:"";width:38px;height:2px;background:var(--accent)}
+h1.big{font-size:clamp(46px,11vw,132px);line-height:.92;margin-bottom:6px}
+h1.big .en{display:block}
+h1.big .zh{display:block;font-size:clamp(20px,4.4vw,40px);letter-spacing:.02em;color:var(--text-dim);font-weight:600;margin-top:14px}
+.hero-grid{display:grid;grid-template-columns:1.35fr .65fr;gap:clamp(28px,5vw,64px);align-items:start;margin-top:clamp(28px,5vw,48px)}
+.lede{font-size:clamp(17px,2.1vw,21px);line-height:1.72;color:var(--text);max-width:62ch}
+.lede strong{background:color-mix(in srgb,var(--accent) 22%,transparent);background:linear-gradient(transparent 62%,color-mix(in srgb,var(--accent) 26%,transparent) 0)}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 30px;list-style:none;padding:0}
+.tags li{
+  font-size:13px;font-weight:600;padding:6px 13px;border:1px solid var(--line);
+  border-radius:999px;color:var(--text-dim);background:var(--surface);
+}
+.cta{display:flex;flex-wrap:wrap;gap:12px}
+.btn{
+  display:inline-flex;align-items:center;gap:9px;padding:13px 24px;font-size:15px;font-weight:700;
+  border:1px solid var(--accent);border-radius:var(--radius);cursor:pointer;font-family:inherit;
+  transition:transform .12s ease,background .18s,color .18s;
+}
+.btn:active{transform:translateY(1px)}
+.btn-fill{background:var(--accent);color:var(--accent-ink)}
+.btn-fill:hover{filter:brightness(1.08)}
+.btn-ghost{background:transparent;color:var(--text);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+/* 名片侧栏 */
+.card{border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);padding:22px}
+.card h3{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-dim);font-family:var(--font-body);font-weight:700;margin-bottom:16px}
+.mono{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px}
+.avatar{
+  width:56px;height:56px;flex-shrink:0;background:var(--accent);color:var(--accent-ink);
+  display:grid;place-items:center;font-family:var(--font-display);font-weight:800;font-size:22px;
+  border-radius:var(--radius);
+}
+.mono div{font-size:14px;line-height:1.6}
+.mono b{display:block;font-size:16px}
+.meta-list{list-style:none;padding:0;margin:0;font-size:14px}
+.meta-list li{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-top:1px solid var(--line);color:var(--text-dim)}
+.meta-list li span:last-child{color:var(--text);font-weight:600;text-align:right}
+.meta-list li a:hover{color:var(--accent);text-decoration:underline}
+
+/* ============ 通用区块 ============ */
+section{padding:clamp(56px,8vw,104px) 0;border-bottom:1px solid var(--line)}
+.sec-head{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;margin-bottom:clamp(30px,4vw,46px)}
+.sec-num{font-family:var(--font-display);font-size:13px;font-weight:800;color:var(--accent);letter-spacing:.08em}
+h2.sec-title{font-size:clamp(30px,5.4vw,58px)}
+.sec-sub{color:var(--text-dim);font-size:15px;max-width:58ch;margin-left:auto}
+@media (max-width:760px){.sec-sub{margin-left:0}}
+
+/* 关于 */
+.about-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:clamp(28px,5vw,60px)}
+.prose p{font-size:16.5px;color:var(--text);margin-bottom:1.1em}
+.prose p:last-child{margin-bottom:0}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+.stat{background:var(--bg);padding:20px 18px}
+.stat b{display:block;font-family:var(--font-display);font-size:clamp(28px,4vw,40px);font-weight:800;line-height:1;letter-spacing:-.02em}
+.stat small{display:block;margin-top:8px;font-size:12.5px;color:var(--text-dim);line-height:1.5}
+@media (max-width:900px){
+  .about-grid,.hero-grid{grid-template-columns:1fr}
+  .hero-grid{gap:32px}
+  .stats{grid-template-columns:1fr 1fr}
+}
+
+/* 技能 */
+.skills{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:clamp(18px,3vw,30px)}
+.skill{border:1px solid var(--line);padding:24px;background:var(--surface);border-radius:var(--radius)}
+.skill h3{font-size:18px;margin-bottom:6px}
+.skill .note{font-size:13px;color:var(--text-dim);margin-bottom:18px;line-height:1.6}
+.bar{margin-bottom:14px}
+.bar-top{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:6px;font-weight:600}
+.bar-top em{font-style:normal;color:var(--text-dim);font-weight:500;font-size:12.5px}
+.track{height:6px;background:var(--bg-soft);border-radius:99px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .9s cubic-bezier(.2,.7,.2,1)}
+.kws{display:flex;flex-wrap:wrap;gap:7px;list-style:none;padding:0;margin:6px 0 0}
+.kws li{font-size:12.5px;padding:5px 11px;background:var(--bg-soft);border-radius:var(--radius);color:var(--text-dim)}
+
+/* 项目 */
+.projects{display:grid;gap:clamp(22px,3.5vw,34px)}
+.proj{
+  display:grid;grid-template-columns:minmax(0,320px) 1fr;gap:clamp(20px,3vw,36px);
+  border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);
+  padding:clamp(20px,2.6vw,30px);transition:border-color .2s,transform .2s;
+}
+.proj:hover{border-color:var(--accent)}
+.shot{
+  aspect-ratio:4/3;background:var(--bg-soft);
+  background:
+    repeating-linear-gradient(45deg,transparent 0 10px,color-mix(in srgb,var(--accent) 9%,transparent) 10px 20px),
+    var(--bg-soft);
+  border:1px solid var(--line);display:grid;place-items:center;border-radius:var(--radius);
+  font-size:12px;color:var(--text-dim);text-align:center;padding:12px;line-height:1.6;
+}
+.proj-body h3{font-size:clamp(21px,2.6vw,29px);margin-bottom:8px}
+.proj-role{font-size:13px;color:var(--accent);font-weight:700;margin-bottom:14px;letter-spacing:.02em}
+.star{list-style:none;padding:0;margin:0 0 16px;font-size:15px}
+.star li{display:grid;grid-template-columns:56px 1fr;gap:12px;padding:7px 0;border-top:1px solid var(--line);line-height:1.65}
+.star li:first-child{border-top:0}
+.star dt{font-weight:800;color:var(--accent);font-size:13px;letter-spacing:.06em;font-family:var(--font-display);padding-top:2px}
+.star dd{margin:0;color:var(--text-dim)}
+.star dd b{color:var(--text);font-weight:600}
+@media (max-width:820px){
+  .proj{grid-template-columns:1fr}
+  .shot{aspect-ratio:16/9}
+}
+
+/* 时间线 */
+.tl{list-style:none;padding:0;margin:0;position:relative}
+.tl::before{content:"";position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.tl li{position:relative;padding:0 0 30px 34px}
+.tl li:last-child{padding-bottom:0}
+.tl li::before{content:"";position:absolute;left:0;top:8px;width:16px;height:16px;border-radius:50%;background:var(--bg);border:3px solid var(--accent)}
+.tl .when{font-size:12.5px;font-weight:800;letter-spacing:.08em;color:var(--accent);font-family:var(--font-display)}
+.tl h3{font-size:19px;margin:5px 0 6px}
+.tl p{font-size:15px;color:var(--text-dim);margin:0}
+
+/* 联系 */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,4vw,48px);align-items:start}
+@media (max-width:860px){.contact-grid{grid-template-columns:1fr}}
+.clist{list-style:none;padding:0;margin:0}
+.clist li{border-top:1px solid var(--line)}
+.clist li:first-child{border-top:0}
+.clist a,.clist .row{
+  display:flex;align-items:center;gap:14px;padding:15px 4px;transition:padding-left .18s,color .18s;
+}
+.clist a:hover{padding-left:12px;color:var(--accent)}
+.clist .k{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-dim);font-weight:700;width:64px;flex-shrink:0}
+.clist .v{font-weight:600;font-size:15.5px;word-break:break-all}
+.clist .cp{
+  margin-left:auto;font-size:12px;font-weight:700;color:var(--text-dim);border:1px solid var(--line);
+  padding:4px 10px;border-radius:99px;flex-shrink:0;background:transparent;cursor:pointer;font-family:inherit;
+}
+.clist .cp:hover{border-color:var(--accent);color:var(--accent)}
+.hintbox{border:1px dashed var(--line);padding:18px 20px;font-size:13.5px;color:var(--text-dim);line-height:1.7;border-radius:var(--radius);background:var(--surface)}
+.hintbox b{color:var(--text)}
+
+/* 页脚 */
+footer{padding:38px 0;color:var(--text-dim);font-size:13.5px}
+.foot-in{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between}
+.topbtn{border:1px solid var(--line);background:transparent;color:var(--text);padding:9px 16px;border-radius:var(--radius);cursor:pointer;font:inherit;font-size:13px;font-weight:600}
+.topbtn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* 入场动画 */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+  .reveal{opacity:1;transform:none}
+  html{scroll-behavior:auto}
+}
+
+/* ============ 打印 / 导出 PDF（HR 常用） ============ */
+@media print{
+  .hdr,.theme-pop,.cta,.topbtn,.cp,.burger,.iconbtn,.hintbox{display:none!important}
+  body{background:#fff;color:#000;font-size:11pt;line-height:1.55}
+  section{padding:16pt 0;border-bottom:1px solid #ccc;page-break-inside:avoid}
+  .hero{padding-top:0}
+  h1.big{font-size:34pt}
+  h2.sec-title{font-size:20pt}
+  .proj,.skill,.card{border:1px solid #ccc;page-break-inside:avoid}
+  .reveal{opacity:1!important;transform:none!important}
+  a[href^="http"]::after{content:" (" attr(href) ")";font-size:8pt;color:#555}
+  .stats{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="wrap hdr-in">
+    <a class="brand" href="#top"><span class="dot" aria-hidden="true"></span>SUN · PORTFOLIO</a>
+    <nav class="nav" id="nav" aria-label="主导航">
+      <a href="#about">简介</a>
+      <a href="#skills">技能专长</a>
+      <a href="#projects">项目经历</a>
+      <a href="#timeline">教育与实践</a>
+      <a href="#contact">联系方式</a>
+    </nav>
+    <div class="hdr-tools">
+      <button class="iconbtn" id="themeBtn" aria-haspopup="true" aria-expanded="false" title="切换视觉风格">◐</button>
+      <button class="iconbtn burger" id="burger" aria-label="打开菜单" aria-expanded="false">☰</button>
+    </div>
+  </div>
+</header>
+
+<div class="theme-pop" id="themePop" role="radiogroup" aria-label="视觉风格">
+  <h4>视觉风格</h4>
+  <button class="trow" data-set="swiss" role="radio" aria-checked="true">
+    <span class="tsw"><i style="background:#fff"></i><i style="background:#111"></i><i style="background:#d81e05"></i></span>
+    <span class="tname">瑞士国际主义<small>网格秩序 · 大字标题 · 红黑</small></span>
+  </button>
+  <button class="trow" data-set="calm" role="radio" aria-checked="false">
+    <span class="tsw"><i style="background:#fbfcfd"></i><i style="background:#16202c"></i><i style="background:#2563eb"></i></span>
+    <span class="tname">专业简约蓝灰<small>最稳 · 阅读成本最低</small></span>
+  </button>
+  <button class="trow" data-set="warm" role="radio" aria-checked="false">
+    <span class="tsw"><i style="background:#faf7f2"></i><i style="background:#2a2521"></i><i style="background:#2f6b4f"></i></span>
+    <span class="tname">暖调人文米杏<small>有温度 · 衬线标题</small></span>
+  </button>
+  <button class="trow" data-set="tech" role="radio" aria-checked="false">
+    <span class="tsw"><i style="background:#0e1116"></i><i style="background:#e6edf3"></i><i style="background:#7ee787"></i></span>
+    <span class="tname">深色科技感<small>冲击力强 · 偏互联网</small></span>
+  </button>
+</div>
+
+<main id="top">
+
+  <!-- ============ HERO ============ -->
+  <div class="hero">
+    <div class="wrap">
+      <p class="eyebrow">视觉传达设计 · 品牌视觉 / 界面 / 设计工程</p>
+      <h1 class="big">
+        <span class="en">SUN</span>
+        <span class="zh">设计做得好，也能把它做出来、跑上线</span>
+      </h1>
+      <div class="hero-grid">
+        <div>
+          <p class="lede">
+            视觉传达专业在读，方向是<strong>品牌视觉、版式与界面设计</strong>。
+            独立搭建并上线过一个公开的设计资源聚合站，从信息架构、视觉规范、前端实现到自动部署全链路自理。
+            习惯把重复劳动写成脚本——交付的是<strong>能打开的链接</strong>，不只是一张图。
+          </p>
+          <ul class="tags">
+            <li>品牌视觉</li><li>版式与海报</li><li>字体排印</li><li>UI 界面</li>
+            <li>Figma</li><li>HTML / CSS</li><li>Python 自动化</li><li>静态站点部署</li>
+          </ul>
+          <div class="cta">
+            <a class="btn btn-fill" href="#projects">查看项目经历 ↓</a>
+            <button class="btn btn-ghost" id="printBtn" type="button">下载简历 PDF</button>
+            <a class="btn btn-ghost" href="#contact">联系我</a>
+          </div>
+        </div>
+        <aside class="card">
+          <h3>Quick Facts</h3>
+          <div class="mono">
+            <div class="avatar" aria-hidden="true">S</div>
+            <div>
+              <b>SUN</b>
+              视觉传达设计<br>
+              <span style="color:var(--text-dim)">求职方向：品牌视觉 / UI 设计 / 设计运营</span>
+            </div>
+          </div>
+          <ul class="meta-list">
+            <li><span>所在城市</span><span>河南 · 郑州</span></li>
+            <li><span>到岗状态</span><span>可实习 / 可远程</span></li>
+            <li><span>学历</span><span>大专在读</span></li>
+            <li><span>GitHub</span><span><a href="https://github.com/hnzzsp" target="_blank" rel="noopener">hnzzsp</a></span></li>
+            <li><span>已上线作品</span><span><a href="https://hnzzsp.github.io/design-library/" target="_blank" rel="noopener">design-library ↗</a></span></li>
+          </ul>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 简介 ============ -->
+  <section id="about" class="reveal">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-num">01</span>
+        <h2 class="sec-title">个人简介</h2>
+        <p class="sec-sub">三句话讲清楚：我是谁、我关注什么、我能多干一点什么。</p>
+      </div>
+      <div class="about-grid">
+        <div class="prose">
+          <p>
+            我是视觉传达专业出身的设计新人。比起堆装饰，我更在意<strong>信息怎么被快速读懂</strong>——
+            版式层级、栅格秩序、字体排印与可读性，是我判断一张稿子好不好的第一标准。
+            这套标准也直接影响了我做界面的方式：先建立秩序，再做表达。
+          </p>
+          <p>
+            设计之外，我习惯把重复劳动交给工具。浏览器书签同步、素材批量处理、静态站点自动发布，
+            都被我写成了可复用的脚本。所以我能一个人走完<strong>设计 → 前端 → 部署</strong>的完整链路，
+            不需要把交付卡在"等我找人帮忙上线"这一步。
+          </p>
+          <p>
+            我也会主动做技术侧的问题排查：曾用性能采样与源码阅读定位过设计工具插件的掉帧原因，
+            并沉淀成可复用的诊断脚本与文档。遇到问题先定位再动手，是我做事的默认顺序。
+          </p>
+          <p style="color:var(--text-dim);font-size:15px">
+            正在寻找实习 / 初级岗位。方向：品牌视觉设计、UI 设计、设计运营。
+          </p>
+        </div>
+        <div class="stats">
+          <div class="stat"><b>1</b><small>个独立搭建并公开上线的产品<br>（设计资源聚合站）</small></div>
+          <div class="stat"><b>3+</b><small>个自用工具脚本<br>书签同步 / 批量改图 / 自动部署</small></div>
+          <div class="stat"><b>100%</b><small>全链路自理<br>设计、前端、发布全由本人完成</small></div>
+          <div class="stat"><b>持续</b><small>自学前后端与自动化<br>用 AI 工具链提效</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 技能 ============ -->
+  <section id="skills" class="reveal">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-num">02</span>
+        <h2 class="sec-title">技能专长</h2>
+        <p class="sec-sub">按岗位需求分组，关键词为主，方便快速检索与比对。</p>
+      </div>
+      <div class="skills">
+
+        <div class="skill">
+          <h3>设计工具</h3>
+          <p class="note">主力在 Figma，熟悉组件化、自动布局与变体，能维护可复用的设计系统。</p>
+          <div class="bar"><div class="bar-top"><span>Figma</span><em>主力 · 组件化 / 自动布局</em></div><div class="track"><div class="fill" data-pct="90"></div></div></div>
+          <div class="bar"><div class="bar-top"><span>Photoshop</span><em>图像处理 / 合成</em></div><div class="track"><div class="fill" data-pct="78"></div></div></div>
+          <div class="bar"><div class="bar-top"><span>Illustrator</span><em>矢量 / 标志与插画</em></div><div class="track"><div class="fill" data-pct="66"></div></div></div>
+          <div class="bar"><div class="bar-top"><span>InDesign</span><em>画册与多页排版</em></div><div class="track"><div class="fill" data-pct="48"></div></div></div>
+        </div>
+
+        <div class="skill">
+          <h3>视觉与品牌</h3>
+          <p class="note">科班训练的核心部分，偏重秩序感与信息层级的建立。</p>
+          <ul class="kws">
+            <li>版式设计</li><li>海报与画册</li><li>字体排印</li><li>栅格系统</li>
+            <li>品牌 VI 基础</li><li>标志设计</li><li>信息层级</li><li>色彩与规范</li>
+          </ul>
+        </div>
+
+        <div class="skill">
+          <h3>前端与站点</h3>
+          <p class="note">能把设计稿落成真实可访问的页面，而不是止于高保真图。</p>
+          <div class="bar"><div class="bar-top"><span>HTML / CSS</span><em>响应式 / 语义化</em></div><div class="track"><div class="fill" data-pct="74"></div></div></div>
+          <div class="bar"><div class="bar-top"><span>静态站点部署</span><em>GitHub Pages / API 发布</em></div><div class="track"><div class="fill" data-pct="70"></div></div></div>
+          <ul class="kws" style="margin-top:16px">
+            <li>响应式布局</li><li>Flex / Grid</li><li>打印样式（导出 PDF）</li><li>无障碍基础</li><li>SEO meta</li>
+          </ul>
+        </div>
+
+        <div class="skill">
+          <h3>效率与自动化</h3>
+          <p class="note">把重复劳动脚本化，是我和纯执行型设计师最大的区别。</p>
+          <div class="bar"><div class="bar-top"><span>Python</span><em>Pillow 批处理 / 数据同步</em></div><div class="track"><div class="fill" data-pct="62"></div></div></div>
+          <ul class="kws" style="margin-top:16px">
+            <li>Python 脚本</li><li>Pillow 图像处理</li><li>ffmpeg 音视频处理</li>
+            <li>Node.js 基础</li><li>AI 辅助工作流</li><li>性能排查</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 项目 ============ -->
+  <section id="projects" class="reveal">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-num">03</span>
+        <h2 class="sec-title">项目经历</h2>
+        <p class="sec-sub">统一按「背景 → 行动 → 结果」叙述，方便快速扫读产出价值。</p>
+      </div>
+      <div class="projects">
+
+        <!-- 项目 1 -->
+        <article class="proj">
+          <div class="shot">TODO：替换为项目截图<br>（建议 4:3，宽度 ≥ 1200px）</div>
+          <div class="proj-body">
+            <h3>设计资源聚合站 design-library</h3>
+            <p class="proj-role">独立开发 · 设计 / 前端 / 部署 · 已公开上线</p>
+            <ul class="star">
+              <li><dt>背景</dt><dd>个人收藏的设计素材长期散落在浏览器书签里，检索困难、无法分享，也无法作为作品对外展示。</dd></li>
+              <li><dt>行动</dt><dd>设计信息架构与检索动线，确定卡片式栅格与响应式断点；用 HTML/CSS 实现静态站点；写脚本从 Edge 书签自动同步数据；因网络限制改用 <b>GitHub REST API 做增量发布</b>，绕开不可用的 git push，每次同步只产生 1 个 commit。</dd></li>
+              <li><dt>结果</dt><dd>站点公开可访问（<a href="https://hnzzsp.github.io/design-library/" target="_blank" rel="noopener" style="color:var(--accent)">hnzzsp.github.io/design-library ↗</a>），移动端与桌面端均可用；后续维护只需本地改文件 + 一条命令发布。</dd></li>
+            </ul>
+            <ul class="kws">
+              <li>信息架构</li><li>响应式前端</li><li>Python</li><li>GitHub Pages</li><li>自动化发布</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 项目 2 -->
+        <article class="proj">
+          <div class="shot">TODO：替换为性能对比图<br>或帧率采样截图</div>
+          <div class="proj-body">
+            <h3>设计工具插件性能排查与修复</h3>
+            <p class="proj-role">独立排查 · 源码级定位 · 沉淀为可复用脚本与文档</p>
+            <ul class="star">
+              <li><dt>背景</dt><dd>日常使用的 Figma 汉化增强版在框选、拖动时严重掉帧，直接影响设计效率。</dd></li>
+              <li><dt>行动</dt><dd>先做进程级 CPU 采样区分 renderer / GPU 瓶颈，再阅读注入模块源码，定位到两组 MutationObserver 问题：全量 TreeWalker 扫描 body、零节流的页面监听配合 debounce 导致每约 200ms 全树 querySelector 并触发强制重排。随后编写<b>幂等补丁脚本</b>，支持一键切换原生模式做二分验证与回滚。</dd></li>
+              <li><dt>结果</dt><dd>形成可重复执行的诊断与修复工具，并输出完整的排查记录文档；同类工具的性能问题此后可快速定位。</dd></li>
+            </ul>
+            <ul class="kws">
+              <li>性能诊断</li><li>JavaScript</li><li>源码阅读</li><li>技术文档</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 项目 3 -->
+        <article class="proj">
+          <div class="shot">TODO：替换为处理前后对比图</div>
+          <div class="proj-body">
+            <h3>素材批处理与图片工具链</h3>
+            <p class="proj-role">个人工具 · Python + Pillow + ffmpeg</p>
+            <ul class="star">
+              <li><dt>背景</dt><dd>站点需要批量处理大量素材：统一尺寸、转格式、压缩、清理水印，手动逐个处理耗时且易出错。</dd></li>
+              <li><dt>行动</dt><dd>用 Python + Pillow 编写批处理脚本，配合 ffmpeg 处理音视频素材；全部依赖安装在<b>隔离的虚拟环境</b>中，不污染系统环境，换机可直接复现。</dd></li>
+              <li><dt>结果</dt><dd>重复劳动脚本化，批量处理从"手动逐个点"变成一条命令；工具链可迁移到后续任何素材项目。</dd></li>
+            </ul>
+            <ul class="kws">
+              <li>Python</li><li>Pillow</li><li>ffmpeg</li><li>工程规范</li>
+            </ul>
+          </div>
+        </article>
+
+        <!-- 项目 4（占位，必须替换） -->
+        <article class="proj">
+          <div class="shot">TODO：替换为课程作业 / 参赛作品<br>建议放最能打的 2–3 个</div>
+          <div class="proj-body">
+            <h3>视觉设计作品集（待补充）</h3>
+            <p class="proj-role">TODO：课程项目 / 比赛 / 自主练习</p>
+            <ul class="star">
+              <li><dt>背景</dt><dd>TODO：这个项目要解决什么问题？为谁而做？</dd></li>
+              <li><dt>行动</dt><dd>TODO：你做了哪些具体设计决策？为什么这么定版式 / 色彩 / 字体？</dd></li>
+              <li><dt>结果</dt><dd>TODO：最终产出是什么？有没有反馈、评分、采用情况？</dd></li>
+            </ul>
+            <ul class="kws"><li>TODO 标签</li><li>海报 / VI / UI</li></ul>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 时间线 ============ -->
+  <section id="timeline" class="reveal">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-num">04</span>
+        <h2 class="sec-title">教育与实践</h2>
+        <p class="sec-sub">按时间倒序，一眼看清成长路径。</p>
+      </div>
+      <ul class="tl">
+        <li>
+          <span class="when">2026 · 09</span>
+          <h3>个人作品站与素材站迁移至 GitHub Pages</h3>
+          <p>把站点发布从依赖临时沙箱的方案，迁移到 GitHub Pages 长期托管，实现公开可访问、可持续维护；改用 API 增量提交解决网络限制问题。</p>
+        </li>
+        <li>
+          <span class="when">2025 — 至今</span>
+          <h3>独立开发：设计资源聚合站与个人工具脚本</h3>
+          <p>一个人完成产品的信息架构、视觉设计、前端实现与部署运维；同时把书签同步、批量改图、自动发布等重复工作脚本化。</p>
+        </li>
+        <li>
+          <span class="when">持续</span>
+          <h3>自学前端、自动化与 AI 工作流</h3>
+          <p>围绕"把设计落地成可用产品"这条线自学 HTML/CSS、Python 与部署流程，并将 AI 工具纳入日常设计与开发流程提效。</p>
+        </li>
+        <li>
+          <span class="when">教育背景</span>
+          <h3>视觉传达设计 · 大专在读</h3>
+          <p>TODO：填写学校全称与就读时间（如 2024.09 — 2027.06）。主修课程：TODO：版式设计 / 字体设计 / 品牌设计 / 包装设计 等。</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 联系 ============ -->
+  <section id="contact" class="reveal">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-num">05</span>
+        <h2 class="sec-title">联系方式</h2>
+        <p class="sec-sub">点击即可复制，或直接打印本页作为简历投递。</p>
+      </div>
+      <div class="contact-grid">
+        <div>
+          <ul class="clist">
+            <li>
+              <a href="mailto:your.email@example.com">
+                <span class="k">邮箱</span>
+                <span class="v" data-copy="your.email@example.com">your.email@example.com</span>
+                <button class="cp" data-copy="your.email@example.com" type="button">复制</button>
+              </a>
+            </li>
+            <li>
+              <div class="row">
+                <span class="k">微信</span>
+                <span class="v">TODO_wechat_id</span>
+                <button class="cp" data-copy="TODO_wechat_id" type="button">复制</button>
+              </div>
+            </li>
+            <li>
+              <div class="row">
+                <span class="k">电话</span>
+                <span class="v">TODO：138-0000-0000</span>
+                <button class="cp" data-copy="TODO：138-0000-0000" type="button">复制</button>
+              </div>
+            </li>
+            <li>
+              <a href="https://github.com/hnzzsp" target="_blank" rel="noopener">
+                <span class="k">GitHub</span><span class="v">github.com/hnzzsp</span><span class="cp">↗</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://hnzzsp.github.io/design-library/" target="_blank" rel="noopener">
+                <span class="k">作品站</span><span class="v">hnzzsp.github.io/design-library</span><span class="cp">↗</span>
+              </a>
+            </li>
+            <li>
+              <div class="row">
+                <span class="k">城市</span><span class="v">河南 · 郑州（可远程 / 可到岗）</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="hintbox">
+          <b>投递提示</b><br>
+          本页支持直接导出 PDF：点击右上角菜单或「下载简历 PDF」，在打印对话框中选择「另存为 PDF」，
+          即可获得一份排版完整、联系方式齐全的单页简历。<br><br>
+          <b>需要你补充的 5 处（搜索页面源码里的 TODO）：</b><br>
+          1. 真实姓名与英文名<br>
+          2. 邮箱 / 微信 / 电话<br>
+          3. 学校全称与就读时间<br>
+          4. 第 4 个项目（建议放最能打的课程或参赛作品）<br>
+          5. 项目截图（替换 .shot 占位块）
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-in">
+    <span>© <span id="yr">2026</span> SUN · 视觉传达设计作品集 · 最后更新 <span id="upd">2026-09-12</span></span>
+    <button class="topbtn" id="topBtn" type="button">回到顶部 ↑</button>
+  </div>
+</footer>
+
+<div aria-live="polite" class="sr" id="live"></div>
+
+<script>
+(function(){
+  var root = document.documentElement;
+
+  /* ---------- 主题切换 ---------- */
+  var THEMES = ['swiss','calm','warm','tech'];
+  var pop = document.getElementById('themePop');
+  var btn = document.getElementById('themeBtn');
+
+  function setTheme(t, save){
+    if (THEMES.indexOf(t) === -1) t = 'swiss';
+    root.setAttribute('data-theme', t);
+    Array.prototype.forEach.call(pop.querySelectorAll('.trow'), function(r){
+      r.setAttribute('aria-checked', String(r.dataset.set === t));
+    });
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta){ meta = document.createElement('meta'); meta.name='theme-color'; document.head.appendChild(meta); }
+    meta.content = getComputedStyle(root).getPropertyValue('--bg').trim() || '#ffffff';
+    if (save){ try{ localStorage.setItem('pf-theme', t); }catch(e){} }
+  }
+
+  var saved = null;
+  try{ saved = localStorage.getItem('pf-theme'); }catch(e){}
+  if (!saved && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) saved = 'tech';
+  setTheme(saved || 'swiss', false);
+
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    var open = pop.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+  });
+  pop.addEventListener('click', function(e){
+    var r = e.target.closest('.trow');
+    if (r) setTheme(r.dataset.set, true);
+  });
+  document.addEventListener('click', function(e){
+    if (!pop.contains(e.target) && e.target !== btn){
+      pop.classList.remove('open'); btn.setAttribute('aria-expanded','false');
+    }
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape'){ pop.classList.remove('open'); btn.setAttribute('aria-expanded','false'); }
+  });
+
+  /* ---------- 移动端菜单 ---------- */
+  var nav = document.getElementById('nav');
+  var burger = document.getElementById('burger');
+  burger.addEventListener('click', function(){
+    var open = nav.classList.toggle('open');
+    burger.setAttribute('aria-expanded', String(open));
+    burger.textContent = open ? '✕' : '☰';
+  });
+  nav.addEventListener('click', function(e){
+    if (e.target.tagName === 'A'){
+      nav.classList.remove('open');
+      burger.setAttribute('aria-expanded','false');
+      burger.textContent = '☰';
+    }
+  });
+
+  /* ---------- 导航高亮 ---------- */
+  var links = Array.prototype.slice.call(nav.querySelectorAll('a'));
+  var secs = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  function highlight(){
+    var y = window.scrollY + 120, cur = -1;
+    secs.forEach(function(s,i){ if (s && s.offsetTop <= y) cur = i; });
+    links.forEach(function(a,i){ a.classList.toggle('on', i === cur); });
+  }
+  window.addEventListener('scroll', highlight, {passive:true});
+  highlight();
+
+  /* ---------- 入场动画 + 技能条 ---------- */
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (!en.isIntersecting) return;
+      en.target.classList.add('in');
+      Array.prototype.forEach.call(en.target.querySelectorAll('.fill'), function(f){
+        f.style.width = (f.dataset.pct || 0) + '%';
+      });
+      io.unobserve(en.target);
+    });
+  }, {threshold:.12});
+  Array.prototype.forEach.call(document.querySelectorAll('.reveal'), function(el){ io.observe(el); });
+
+  /* ---------- 复制 ---------- */
+  var live = document.getElementById('live');
+  document.addEventListener('click', function(e){
+    var b = e.target.closest('.cp[data-copy]');
+    if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    var txt = b.dataset.copy;
+    var done = function(ok){
+      var old = b.textContent;
+      b.textContent = ok ? '已复制' : '请手动复制';
+      live.textContent = ok ? '已复制：' + txt : '复制失败：' + txt;
+      setTimeout(function(){ b.textContent = old; }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){done(true);}, function(){done(false);});
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = txt; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select();
+      try{ done(document.execCommand('copy')); }catch(err){ done(false); }
+      document.body.removeChild(ta);
+    }
+  });
+
+  /* ---------- 打印 / 导出 PDF ---------- */
+  var oldTitle = document.title;
+  function doPrint(){
+    document.title = 'SUN-视觉传达设计-作品集';
+    window.print();
+    setTimeout(function(){ document.title = oldTitle; }, 1000);
+  }
+  document.getElementById('printBtn').addEventListener('click', doPrint);
+
+  /* ---------- 回到顶部 ---------- */
+  document.getElementById('topBtn').addEventListener('click', function(){
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  /* ---------- 年份 ---------- */
+  document.getElementById('yr').textContent = new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
