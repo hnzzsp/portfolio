@@ -487,19 +487,50 @@ body.editing [data-shot]{cursor:pointer}
 
 /* ============ 左侧章节导航（PC 大屏） + 底部 dock（手机） ============ */
 .pf-rail{
-  position:fixed;left:24px;top:50%;transform:translateY(-50%);z-index:40;
-  display:none;flex-direction:column;gap:2px;
+  position:fixed;left:28px;top:50%;transform:translateY(-50%);z-index:40;
+  display:none;flex-direction:column;gap:6px;
   transition:opacity .25s ease;
 }
 .pf-rail a{
-  display:flex;align-items:center;gap:10px;padding:7px 10px;
-  font-size:12.5px;color:var(--text-dim);text-decoration:none;border-radius:999px;
+  display:flex;align-items:center;gap:12px;padding:9px 12px;
+  font-size:14px;color:var(--text-dim);text-decoration:none;border-radius:999px;
   transition:color .2s ease,transform .2s ease;
 }
-.pf-rail a .dot{width:6px;height:6px;border-radius:50%;background:var(--line);transition:.22s ease;flex-shrink:0}
-.pf-rail a:hover{color:var(--text);transform:translateX(3px)}
-.pf-rail a.on{color:var(--accent);font-weight:700;transform:translateX(3px)}
-.pf-rail a.on .dot{background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+.pf-rail a .dot{width:9px;height:9px;border-radius:50%;background:var(--line);transition:.22s ease;flex-shrink:0}
+.pf-rail a:hover{color:var(--text);transform:translateX(4px)}
+.pf-rail a.on{color:var(--accent);font-weight:700;transform:translateX(4px)}
+.pf-rail a.on .dot{background:var(--accent);box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 16%,transparent)}
+
+/* ============ 右侧风格快捷栏（PC 大屏）：点一下即换，悬停出名字 ============ */
+.pf-swatch{
+  position:fixed;right:26px;top:50%;transform:translateY(-50%);z-index:40;
+  display:none;flex-direction:column;gap:10px;padding:11px 9px;
+  background:color-mix(in srgb,var(--bg) 86%,transparent);
+  backdrop-filter:saturate(160%) blur(12px);
+  border:1px solid var(--line);border-radius:999px;
+  box-shadow:0 10px 30px rgba(0,0,0,.10);
+  transition:opacity .25s ease;
+}
+.pf-swatch button{
+  width:32px;height:32px;border-radius:50%;border:1px solid var(--line);
+  cursor:pointer;padding:0;overflow:hidden;display:flex;position:relative;
+  background:transparent;
+  transition:transform .22s cubic-bezier(.32,1.2,.42,1),box-shadow .22s ease,border-color .22s ease;
+}
+.pf-swatch button i{flex:1;display:block}
+.pf-swatch button .half{flex:1;display:block;background:linear-gradient(135deg,#f6f6f4 50%,#1a1a1a 50%)}
+.pf-swatch button:hover{transform:scale(1.18)}
+.pf-swatch button.on{border-color:var(--accent);transform:scale(1.12);box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--accent)}
+.pf-swatch button::after{
+  content:attr(data-name);position:absolute;right:calc(100% + 14px);top:50%;
+  transform:translateY(-50%) translateX(6px);
+  background:var(--text);color:var(--bg);font-size:11.5px;font-weight:600;
+  padding:5px 11px;border-radius:7px;white-space:nowrap;
+  opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;
+}
+.pf-swatch button:hover::after{opacity:1;transform:translateY(-50%)}
+
+/* ============ 底部 dock（手机） ============ */
 .pf-dock{
   position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:44;
   display:none;gap:2px;padding:6px;
@@ -520,6 +551,7 @@ body.editing [data-shot]{cursor:pointer}
 @media (max-width:360px){.pf-dock a{padding:8px 6px;font-size:11px}}
 @media (min-width:1200px){
   .pf-rail{display:flex}
+  .pf-swatch{display:flex}
   .hdr .nav{display:none}          /* 左侧 rail 顶替顶部横向导航 */
   .hdr-tools{margin-left:auto}
 }
@@ -527,7 +559,7 @@ body.editing [data-shot]{cursor:pointer}
   .pf-dock{display:flex}
   body{padding-bottom:64px}        /* 给 dock 留出空间，不挡 footer */
 }
-@media print{.pf-rail,.pf-dock{display:none!important}}
+@media print{.pf-rail,.pf-dock,.pf-swatch{display:none!important}}
 
 /* ============ 顶部视图滑块：作品集 / 简历 / 着陆页 ============ */
 .pf-vbar{
@@ -972,6 +1004,7 @@ body.editing [data-shot]{cursor:pointer}
 </footer>
 
 <nav class="pf-rail" id="pfRail" aria-label="章节导航（侧边）"></nav>
+<nav class="pf-swatch" id="pfSwatch" aria-label="视觉风格快捷切换"></nav>
 <nav class="pf-dock" id="pfDock" aria-label="章节导航（底部）"></nav>
 
 <div aria-live="polite" class="sr" id="live"></div>
@@ -1005,10 +1038,38 @@ body.editing [data-shot]{cursor:pointer}
     Array.prototype.forEach.call(pop.querySelectorAll('.trow'), function(r){
       r.setAttribute('aria-checked', String(r.dataset.set === t));
     });
+    if (window.__pfSwatchSync) window.__pfSwatchSync(t);
     var meta = document.querySelector('meta[name="theme-color"]');
     if (!meta){ meta = document.createElement('meta'); meta.name='theme-color'; document.head.appendChild(meta); }
     meta.content = getComputedStyle(root).getPropertyValue('--bg').trim() || '#ffffff';
     if (save){ try{ localStorage.setItem('pf-theme', t); }catch(e){} }
+  }
+
+  /* ---------- 右侧风格快捷栏（PC 大屏）：点色板即切换 ---------- */
+  var SWATCHES = [
+    { t: 'swiss', n: '瑞士国际主义', c: ['#ffffff', '#111111', '#d81e05'] },
+    { t: 'calm',  n: '专业简约蓝灰', c: ['#fbfcfd', '#16202c', '#2563eb'] },
+    { t: 'warm',  n: '暖调人文米杏', c: ['#faf7f2', '#2a2521', '#2f6b4f'] },
+    { t: 'tech',  n: '深色科技感',   c: ['#0e1116', '#e6edf3', '#7ee787'] },
+    { t: 'auto',  n: '跟随系统',     auto: true }
+  ];
+  var swatch = document.getElementById('pfSwatch');
+  if (swatch){
+    swatch.innerHTML = SWATCHES.map(function(x){
+      var inner = x.auto ? '<span class="half"></span>'
+        : x.c.map(function(c){ return '<i style="background:' + c + '"></i>'; }).join('');
+      return '<button type="button" data-t="' + x.t + '" data-name="' + x.n + '" aria-label="' + x.n + '" title="' + x.n + '">' + inner + '</button>';
+    }).join('');
+    swatch.addEventListener('click', function(e){
+      var b = e.target.closest ? e.target.closest('button[data-t]') : null;
+      if (b) setTheme(b.dataset.t, true);
+    });
+    window.__pfSwatchSync = function(t){
+      Array.prototype.forEach.call(swatch.querySelectorAll('button'), function(b){
+        b.classList.toggle('on', b.dataset.t === t);
+      });
+    };
+    window.__pfSwatchSync(choice);
   }
 
   var saved = null;
@@ -2074,7 +2135,8 @@ rail.innerHTML=links; dock.innerHTML=links;
 function stageOn(){ var st=document.getElementById('pfVstage'); return !!(st&&st.classList.contains('on')); }
 function spy(){
   var hidden=stageOn();
-  [rail,dock].forEach(function(c){
+  [rail,dock,document.getElementById('pfSwatch')].forEach(function(c){
+    if(!c) return;
     c.style.opacity=hidden?'0':'';
     c.style.pointerEvents=hidden?'none':'';
   });
