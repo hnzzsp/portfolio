@@ -1955,7 +1955,12 @@ function syncStyleSel(){
 /* ---- 平滑过渡 ---- */
 function toNative(){
   stage.classList.remove('show');
-  setTimeout(function(){ if(cur==='portfolio') stage.classList.remove('on'); },320);
+  setTimeout(function(){
+    if(cur==='portfolio'){
+      stage.classList.remove('on');
+      try{ window.dispatchEvent(new CustomEvent('pf-view-change')); }catch(e){}
+    }
+  },320);
   natives.forEach(function(el){ el.classList.remove('gone'); });
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){ natives.forEach(function(el){ el.classList.remove('out'); }); });
