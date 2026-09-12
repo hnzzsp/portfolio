@@ -1764,9 +1764,10 @@ function apply(v){
 }
 
 /* ---- 点击 ---- */
+var suppressClick=0;   /* 指针已处理过的这一次交互，别让 click 再走一遍 */
 segs().forEach(function(b){
   b.addEventListener('click',function(){
-    if(dragMoved) return;      /* 刚才是拖动，不当作点击 */
+    if(Date.now()-suppressClick<500) return;
     if(b.dataset.v===cur && cur==='portfolio') return;
     apply(b.dataset.v);
     scrollToBar();
@@ -1784,7 +1785,8 @@ var drag=null, dragMoved=false;
 function pd(e){
   if(e.button){ return; }
   var i=idxOf(cur), s=segs()[i];
-  drag={x0:e.clientX, base:s.offsetLeft-4, w:s.offsetWidth, idx:i};
+  var hit=e.target&&e.target.closest?e.target.closest('.pf-seg'):null;
+  drag={x0:e.clientX, base:s.offsetLeft-4, w:s.offsetWidth, idx:i, seg:hit?hit.dataset.v:null};
   dragMoved=false;
   sw.classList.add('dragging');
   try{ sw.setPointerCapture(e.pointerId); }catch(err){}
@@ -1801,7 +1803,12 @@ function pu(e){
   if(!drag) return;
   var dx=(e.clientX||0)-drag.x0, d=drag; drag=null;
   sw.classList.remove('dragging');
-  if(!dragMoved){ setKnob(idxOf(cur)); return; }
+  if(!dragMoved){
+    /* 没位移 = 单击某一档（指针捕获会吃掉 click，所以在这里直接切） */
+    setKnob(idxOf(cur));
+    if(d.seg && d.seg!==cur){ suppressClick=Date.now(); apply(d.seg); scrollToBar(); }
+    return;
+  }
   var cx=d.base+dx+d.w/2, best=0, bd=Infinity;
   segs().forEach(function(s,ix){
     var c=s.offsetLeft-4+s.offsetWidth/2, diff=Math.abs(c-cx);
