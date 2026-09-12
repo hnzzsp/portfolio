@@ -1395,6 +1395,19 @@ function gotoDetail(i){
 
 /* ---------- 编辑模式：上传 / 替换 / 删除 / 排序 ---------- */
 function needData(){ if(!DATA){toast('数据文件未加载，无法保存修改','err');return false;} return true; }
+/* 编辑模式的数据加载：本地 data.json 优先，读不到（预览面板 / 构建窗口期）走仓库 API 兜底。
+   之前编辑模式从没加载过 DATA，导致上传 / 保存 / 删除 / 排序全部报「数据文件未加载」。 */
+function loadEditData(){
+  if(DATA) return Promise.resolve(DATA);
+  return fetch('data.json?t='+Date.now(),{cache:'no-store'})
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .catch(function(){
+      return fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/data.json?ref='+BRANCH,
+        {headers:{'Accept':'application/vnd.github.raw'}})
+        .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
+    })
+    .then(function(d){ DATA=d; return d; });
+}
 function bindEdit(){
   if(!EDIT) return;
   document.body.classList.add('editing');
@@ -1457,6 +1470,7 @@ function bindEdit(){
 var picker=null,pickI=-1;
 function pickFile(i){
   if(!needData())return;
+  if(!getTok()){toast('尚未设置 GitHub 令牌：请先在后台 / 生成器里设置一次（同一浏览器共用）','err');return;}
   pickI=i;
   if(!picker){
     picker=document.createElement('input'); picker.type='file'; picker.accept='image/jpeg,image/png,image/webp,image/gif';
@@ -1609,7 +1623,15 @@ buildBar();
 bindOnce();
 window.__pfRendered=function(){renderAll();};
 renderAll();
-if(EDIT&&getTok()){/* 已具备编辑条件 */}
+if(EDIT){
+  /* 编辑模式必须先把数据拿到手：加载成功后重渲染，上传 / 保存 / 删除 / 排序才可用 */
+  loadEditData().then(function(){
+    renderAll();
+    toast('编辑数据已就绪，可以上传与保存','ok');
+  }).catch(function(err){
+    toast('数据加载失败，编辑功能不可用：'+err.message+'（稍后刷新重试）','err');
+  });
+}
 })();
 </script>
 
