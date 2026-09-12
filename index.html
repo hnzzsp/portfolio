@@ -13,13 +13,11 @@
 
 <!--
   ============================================================
-   发布前必须替换的内容（搜索 TODO 即可定位）
-   1. 姓名：全文 "SUN" → 你的真实姓名 / 拼音
-   2. 邮箱、微信、电话
-   3. 学校全称与就读时间
-   4. 项目经历里的具体数据（收录数量、访问量等）
-   5. 作品图片：把 .shot 里的占位块换成 <img src="assets/xxx.jpg">
-   6. og:image（可选，建议 1200×630 截图）
+   内容来源说明
+   - 页面内所有文字/联系方式默认写在 HTML 里（无 JS 也能看、利于 SEO）
+   - 加载成功后会用 data.json 覆盖渲染，data.json 由后台管理页维护
+   - 后台入口：/admin.html  （密码见 admin.html 顶部 ADMIN_CONFIG）
+   - 仍需在后台补的内容：真实姓名、学校全称、第 4 个项目、项目截图
   ============================================================
 -->
 
@@ -365,19 +363,19 @@ footer{padding:38px 0;color:var(--text-dim);font-size:13.5px}
   <!-- ============ HERO ============ -->
   <div class="hero">
     <div class="wrap">
-      <p class="eyebrow">视觉传达设计 · 品牌视觉 / 界面 / 设计工程</p>
+      <p class="eyebrow" id="js-eyebrow">视觉传达设计 · 品牌视觉 / 界面 / 设计工程</p>
       <h1 class="big">
-        <span class="en">SUN</span>
-        <span class="zh">设计做得好，也能把它做出来、跑上线</span>
+        <span class="en" id="js-enName">SUN</span>
+        <span class="zh" id="js-zhTitle">设计做得好，也能把它做出来、跑上线</span>
       </h1>
       <div class="hero-grid">
         <div>
-          <p class="lede">
+          <p class="lede" id="js-lede">
             视觉传达专业在读，方向是<strong>品牌视觉、版式与界面设计</strong>。
             独立搭建并上线过一个公开的设计资源聚合站，从信息架构、视觉规范、前端实现到自动部署全链路自理。
             习惯把重复劳动写成脚本——交付的是<strong>能打开的链接</strong>，不只是一张图。
           </p>
-          <ul class="tags">
+          <ul class="tags" id="js-tags">
             <li>品牌视觉</li><li>版式与海报</li><li>字体排印</li><li>UI 界面</li>
             <li>Figma</li><li>HTML / CSS</li><li>Python 自动化</li><li>静态站点部署</li>
           </ul>
@@ -390,14 +388,14 @@ footer{padding:38px 0;color:var(--text-dim);font-size:13.5px}
         <aside class="card">
           <h3>Quick Facts</h3>
           <div class="mono">
-            <div class="avatar" aria-hidden="true">S</div>
+            <div class="avatar" aria-hidden="true" id="js-avatar">S</div>
             <div>
-              <b>SUN</b>
-              视觉传达设计<br>
-              <span style="color:var(--text-dim)">求职方向：品牌视觉 / UI 设计 / 设计运营</span>
+              <b id="js-name">SUN</b>
+              <span id="js-role">视觉传达设计</span><br>
+              <span style="color:var(--text-dim)" id="js-intent">求职方向：品牌视觉 / UI 设计 / 设计运营</span>
             </div>
           </div>
-          <ul class="meta-list">
+          <ul class="meta-list" id="js-facts">
             <li><span>所在城市</span><span>河南 · 郑州</span></li>
             <li><span>到岗状态</span><span>可实习 / 可远程</span></li>
             <li><span>学历</span><span>大专在读</span></li>
@@ -418,7 +416,7 @@ footer{padding:38px 0;color:var(--text-dim);font-size:13.5px}
         <p class="sec-sub">三句话讲清楚：我是谁、我关注什么、我能多干一点什么。</p>
       </div>
       <div class="about-grid">
-        <div class="prose">
+        <div class="prose" id="js-about">
           <p>
             我是视觉传达专业出身的设计新人。比起堆装饰，我更在意<strong>信息怎么被快速读懂</strong>——
             版式层级、栅格秩序、字体排印与可读性，是我判断一张稿子好不好的第一标准。
@@ -437,7 +435,7 @@ footer{padding:38px 0;color:var(--text-dim);font-size:13.5px}
             正在寻找实习 / 初级岗位。方向：品牌视觉设计、UI 设计、设计运营。
           </p>
         </div>
-        <div class="stats">
+        <div class="stats" id="js-stats">
           <div class="stat"><b>1</b><small>个独立搭建并公开上线的产品<br>（设计资源聚合站）</small></div>
           <div class="stat"><b>3+</b><small>个自用工具脚本<br>书签同步 / 批量改图 / 自动部署</small></div>
           <div class="stat"><b>100%</b><small>全链路自理<br>设计、前端、发布全由本人完成</small></div>
@@ -455,7 +453,7 @@ footer{padding:38px 0;color:var(--text-dim);font-size:13.5px}
         <h2 class="sec-title">技能专长</h2>
         <p class="sec-sub">按岗位需求分组，关键词为主，方便快速检索与比对。</p>
       </div>
-      <div class="skills">
+      <div class="skills" id="js-skills">
 
         <div class="skill">
           <h3>设计工具</h3>
@@ -507,7 +505,7 @@ footer{padding:38px 0;color:var(--text-dim);font-size:13.5px}
         <h2 class="sec-title">项目经历</h2>
         <p class="sec-sub">统一按「背景 → 行动 → 结果」叙述，方便快速扫读产出价值。</p>
       </div>
-      <div class="projects">
+      <div class="projects" id="js-projects">
 
         <!-- 项目 1 -->
         <article class="proj">
@@ -587,7 +585,7 @@ footer{padding:38px 0;color:var(--text-dim);font-size:13.5px}
         <h2 class="sec-title">教育与实践</h2>
         <p class="sec-sub">按时间倒序，一眼看清成长路径。</p>
       </div>
-      <ul class="tl">
+      <ul class="tl" id="js-timeline">
         <li>
           <span class="when">2026 · 09</span>
           <h3>个人作品站与素材站迁移至 GitHub Pages</h3>
@@ -622,26 +620,26 @@ footer{padding:38px 0;color:var(--text-dim);font-size:13.5px}
       </div>
       <div class="contact-grid">
         <div>
-          <ul class="clist">
+          <ul class="clist" id="js-contact">
             <li>
-              <a href="mailto:your.email@example.com">
+              <a href="mailto:hnzzsp@163.com">
                 <span class="k">邮箱</span>
-                <span class="v" data-copy="your.email@example.com">your.email@example.com</span>
-                <button class="cp" data-copy="your.email@example.com" type="button">复制</button>
+                <span class="v" data-copy="hnzzsp@163.com">hnzzsp@163.com</span>
+                <button class="cp" data-copy="hnzzsp@163.com" type="button">复制</button>
               </a>
             </li>
             <li>
               <div class="row">
                 <span class="k">微信</span>
-                <span class="v">TODO_wechat_id</span>
-                <button class="cp" data-copy="TODO_wechat_id" type="button">复制</button>
+                <span class="v">JIAXIN-V_U</span>
+                <button class="cp" data-copy="JIAXIN-V_U" type="button">复制</button>
               </div>
             </li>
             <li>
               <div class="row">
                 <span class="k">电话</span>
-                <span class="v">TODO：138-0000-0000</span>
-                <button class="cp" data-copy="TODO：138-0000-0000" type="button">复制</button>
+                <span class="v">15238076886</span>
+                <button class="cp" data-copy="15238076886" type="button">复制</button>
               </div>
             </li>
             <li>
@@ -665,12 +663,8 @@ footer{padding:38px 0;color:var(--text-dim);font-size:13.5px}
           <b>投递提示</b><br>
           本页支持直接导出 PDF：点击右上角菜单或「下载简历 PDF」，在打印对话框中选择「另存为 PDF」，
           即可获得一份排版完整、联系方式齐全的单页简历。<br><br>
-          <b>需要你补充的 5 处（搜索页面源码里的 TODO）：</b><br>
-          1. 真实姓名与英文名<br>
-          2. 邮箱 / 微信 / 电话<br>
-          3. 学校全称与就读时间<br>
-          4. 第 4 个项目（建议放最能打的课程或参赛作品）<br>
-          5. 项目截图（替换 .shot 占位块）
+          <b>后台管理入口</b>：本域名下的 <code>/admin.html</code>，
+          登录后可直接修改联系方式与全部展示文案，保存约 1 分钟生效，无需改代码、无需重新部署。
         </div>
       </div>
     </div>
@@ -680,7 +674,7 @@ footer{padding:38px 0;color:var(--text-dim);font-size:13.5px}
 
 <footer>
   <div class="wrap foot-in">
-    <span>© <span id="yr">2026</span> SUN · 视觉传达设计作品集 · 最后更新 <span id="upd">2026-09-12</span></span>
+    <span>© <span id="yr">2026</span> <span id="js-footerName">SUN</span> · <span id="js-footerSuffix">视觉传达设计作品集</span> · 最后更新 <span id="upd">2026-09-12</span></span>
     <button class="topbtn" id="topBtn" type="button">回到顶部 ↑</button>
   </div>
 </footer>
@@ -811,6 +805,133 @@ footer{padding:38px 0;color:var(--text-dim);font-size:13.5px}
 
   /* ---------- 年份 ---------- */
   document.getElementById('yr').textContent = new Date().getFullYear();
+})();
+</script>
+
+<!-- 内容数据渲染：data.json 由后台 /admin.html 维护，加载失败则保留 HTML 里的静态内容 -->
+<script>
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function set(id, val){ var el = $(id); if (el && val != null) el.innerHTML = val; }
+  function arr(v){ return Object.prototype.toString.call(v) === '[object Array]' ? v : []; }
+
+  function renderTags(list){
+    var el = $('js-tags'); if (!el) return;
+    el.innerHTML = arr(list).map(function(t){ return '<li>' + t + '</li>'; }).join('');
+  }
+
+  function renderFacts(list){
+    var el = $('js-facts'); if (!el) return;
+    el.innerHTML = arr(list).map(function(f){
+      var v = f.href ? '<a href="' + f.href + '" target="_blank" rel="noopener">' + f.v + '</a>' : f.v;
+      return '<li><span>' + f.k + '</span><span>' + v + '</span></li>';
+    }).join('');
+  }
+
+  function renderAbout(a){
+    if (!a) return;
+    var p = $('js-about');
+    if (p && arr(a.paragraphs).length){
+      p.innerHTML = arr(a.paragraphs).map(function(t){ return '<p>' + t + '</p>'; }).join('');
+    }
+    var s = $('js-stats');
+    if (s && arr(a.stats).length){
+      s.innerHTML = arr(a.stats).map(function(x){
+        return '<div class="stat"><b>' + x.num + '</b><small>' + x.label + '</small></div>';
+      }).join('');
+    }
+  }
+
+  function renderSkills(list){
+    var el = $('js-skills'); if (!el || !arr(list).length) return;
+    el.innerHTML = arr(list).map(function(g){
+      var bars = arr(g.bars).map(function(b){
+        return '<div class="bar"><div class="bar-top"><span>' + b.label + '</span><em>' + (b.note || '') +
+               '</em></div><div class="track"><div class="fill" data-pct="' + (b.pct || 0) +
+               '" style="width:' + (b.pct || 0) + '%"></div></div></div>';
+      }).join('');
+      var kws = arr(g.kws).length
+        ? '<ul class="kws">' + arr(g.kws).map(function(k){ return '<li>' + k + '</li>'; }).join('') + '</ul>'
+        : '';
+      return '<div class="skill"><h3>' + g.name + '</h3><p class="note">' + (g.note || '') + '</p>' +
+             bars + kws + '</div>';
+    }).join('');
+  }
+
+  function renderProjects(list){
+    var el = $('js-projects'); if (!el || !arr(list).length) return;
+    el.innerHTML = arr(list).map(function(p){
+      var kws = arr(p.kws).length
+        ? '<ul class="kws">' + arr(p.kws).map(function(k){ return '<li>' + k + '</li>'; }).join('') + '</ul>'
+        : '';
+      return '<article class="proj">' +
+        '<div class="shot">' + (p.shot || '') + '</div>' +
+        '<div class="proj-body"><h3>' + p.title + '</h3>' +
+        '<p class="proj-role">' + (p.role || '') + '</p>' +
+        '<ul class="star">' +
+          (p.bg  ? '<li><dt>背景</dt><dd>' + p.bg  + '</dd></li>' : '') +
+          (p.act ? '<li><dt>行动</dt><dd>' + p.act + '</dd></li>' : '') +
+          (p.res ? '<li><dt>结果</dt><dd>' + p.res + '</dd></li>' : '') +
+        '</ul>' + kws + '</div></article>';
+    }).join('');
+  }
+
+  function renderTimeline(list){
+    var el = $('js-timeline'); if (!el || !arr(list).length) return;
+    el.innerHTML = arr(list).map(function(t){
+      return '<li><span class="when">' + t.when + '</span><h3>' + t.title + '</h3><p>' + t.desc + '</p></li>';
+    }).join('');
+  }
+
+  function renderContact(c){
+    var el = $('js-contact'); if (!el || !c) return;
+    var row = function(k, v){
+      return '<li><div class="row"><span class="k">' + k + '</span><span class="v">' + v +
+             '</span><button class="cp" data-copy="' + v + '" type="button">复制</button></div></li>';
+    };
+    el.innerHTML =
+      '<li><a href="mailto:' + c.email + '"><span class="k">邮箱</span><span class="v" data-copy="' + c.email +
+        '">' + c.email + '</span><button class="cp" data-copy="' + c.email + '" type="button">复制</button></a></li>' +
+      row('微信', c.wechat) +
+      row('电话', c.phone) +
+      '<li><a href="' + c.githubUrl + '" target="_blank" rel="noopener"><span class="k">GitHub</span><span class="v">' +
+        c.github + '</span><span class="cp">↗</span></a></li>' +
+      '<li><a href="' + c.siteUrl + '" target="_blank" rel="noopener"><span class="k">作品站</span><span class="v">' +
+        c.site + '</span><span class="cp">↗</span></a></li>' +
+      '<li><div class="row"><span class="k">城市</span><span class="v">' + c.city + '</span></div></li>';
+  }
+
+  function render(d){
+    if (!d) return;
+    if (d.profile){
+      var p = d.profile;
+      set('js-eyebrow', p.eyebrow);
+      set('js-enName', p.enName);
+      set('js-zhTitle', p.zhTitle);
+      set('js-lede', p.lede);
+      set('js-avatar', p.avatarText);
+      set('js-name', p.name);
+      set('js-role', p.role);
+      set('js-intent', p.intent);
+      renderTags(p.tags);
+      renderFacts(p.facts);
+    }
+    renderAbout(d.about);
+    renderSkills(d.skills);
+    renderProjects(d.projects);
+    renderTimeline(d.timeline);
+    renderContact(d.contact);
+    if (d.footer){
+      set('js-footerName', d.footer.name);
+      set('js-footerSuffix', d.footer.suffix);
+    }
+    if (d.meta && d.meta.updated) set('upd', d.meta.updated);
+  }
+
+  fetch('data.json?t=' + Date.now(), {cache:'no-store'})
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(render)
+    .catch(function(){ /* 加载失败就用 HTML 里的静态内容 */ });
 })();
 </script>
 </body>

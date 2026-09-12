@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>后台管理 · 个人作品集</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23111'/%3E%3Ctext x='16' y='22' font-family='Helvetica,Arial' font-size='15' font-weight='700' fill='%23fff' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#ffffff; --bg-soft:#f2f2f0; --surface:#ffffff;
+  --text:#111; --dim:#5c5c57; --line:#dcdcd7;
+  --accent:#d81e05; --ok:#0a7d3c; --warn:#b3541e;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font:15px/1.7 "Helvetica Neue",Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:900px;margin:0 auto;padding:0 24px}
+a{color:var(--accent)}
+code{font-family:var(--mono);font-size:.9em;background:var(--bg-soft);padding:1px 5px}
+
+/* 顶栏 */
+.bar{border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:20}
+.bar .wrap{display:flex;align-items:center;gap:14px;height:60px;flex-wrap:wrap}
+.bar h1{font-size:16px;margin:0;letter-spacing:-.01em}
+.bar .sp{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{font-size:12px;color:var(--dim);border:1px solid var(--line);padding:4px 10px;border-radius:99px}
+
+/* 卡片 */
+.card{border:1px solid var(--line);padding:22px 24px;margin:20px 0;background:var(--surface)}
+.card > h2{
+  font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+  margin:0 0 16px;font-weight:700;
+}
+.card > h2 small{text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px}
+
+label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}
+label:first-of-type{margin-top:0}
+input[type=text],input[type=password],input[type=number],textarea,select{
+  width:100%;padding:10px 12px;border:1px solid var(--line);background:var(--bg);
+  font:inherit;font-size:14px;color:var(--text);border-radius:0;
+}
+textarea{min-height:76px;resize:vertical;line-height:1.65}
+input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--accent)}
+.hint{font-size:12.5px;color:var(--dim);margin-top:6px;line-height:1.6}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media (max-width:640px){.row2,.row3{grid-template-columns:1fr}}
+
+button{
+  font:inherit;font-size:14px;font-weight:700;padding:10px 20px;cursor:pointer;
+  border:1px solid var(--text);background:var(--text);color:#fff;border-radius:0;
+}
+button:hover{opacity:.86}
+button.ghost{background:transparent;color:var(--text);border-color:var(--line)}
+button.ghost:hover{border-color:var(--accent);color:var(--accent)}
+button.danger{background:transparent;color:var(--warn);border-color:var(--line);padding:6px 12px;font-size:13px}
+button.danger:hover{border-color:var(--warn)}
+button.mini{padding:5px 11px;font-size:12.5px}
+
+/* 可重复条目 */
+.item{border:1px solid var(--line);padding:16px;margin-bottom:14px;background:var(--bg)}
+.item .ih{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.item .ih b{font-size:13px;letter-spacing:.06em;color:var(--dim)}
+.item .ih .sp{margin-left:auto}
+
+.msg{padding:12px 16px;border:1px solid var(--line);margin:16px 0;font-size:14px;display:none}
+.msg.on{display:block}
+.msg.ok{border-color:var(--ok);color:var(--ok);background:#f2faf5}
+.msg.err{border-color:var(--warn);color:var(--warn);background:#fdf6f2}
+
+#login{max-width:420px;margin:12vh auto;padding:28px;border:1px solid var(--line)}
+#login h2{margin:0 0 6px;font-size:22px}
+#login p{color:var(--dim);font-size:13.5px;margin:0 0 20px}
+.hide{display:none!important}
+footer{border-top:1px solid var(--line);margin-top:40px;padding:20px 0 40px;color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+
+<!--
+  ============================================================
+   后台配置区（ADMIN_CONFIG）
+   - PASS_SHA256：登录密码的 SHA-256 哈希。改密码见页面底部「修改密码」。
+     生成哈希：python -c "import hashlib;print(hashlib.sha256('你的密码'.encode()).hexdigest())"
+   - 本文件会发布到公开站点，哈希不可逆但可被离线暴力破解，密码请足够强。
+  ============================================================
+-->
+
+<div class="bar">
+  <div class="wrap">
+    <h1>作品集 · 后台管理</h1>
+    <span class="pill" id="sitePill">hnzzsp/portfolio</span>
+    <div class="sp">
+      <a class="pill" href="./" target="_blank" rel="noopener">查看前台 ↗</a>
+      <button class="ghost mini" id="logoutBtn" type="button">退出</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 登录 ========== -->
+<div class="wrap">
+  <div id="login">
+    <h2>管理员登录</h2>
+    <p>此页面不对外公开链接，仅本人使用。</p>
+    <form id="loginForm">
+      <label for="pw">管理密码</label>
+      <input type="password" id="pw" autocomplete="current-password" placeholder="请输入管理密码" autofocus>
+      <div style="margin-top:18px"><button type="submit">登录</button></div>
+      <div class="msg err" id="loginErr"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ========== 编辑区 ========== -->
+<div class="wrap hide" id="panel">
+
+  <div class="msg" id="msg"></div>
+
+  <div class="card">
+    <h2>GitHub 访问令牌 <small>用于保存时提交文件</small></h2>
+    <label for="tok">Personal Access Token（需 repo 权限）</label>
+    <input type="password" id="tok" autocomplete="off" placeholder="ghp_xxxxxxxxxxxx">
+    <p class="hint">
+      令牌只保存在当前浏览器标签页的内存里（sessionStorage），<b>不会写入任何文件、不会进仓库</b>；
+      关闭标签页即失效。可在 GitHub → Settings → Developer settings → Personal access tokens 生成。
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>联系方式</h2>
+    <div class="row2">
+      <div><label>邮箱</label><input type="text" data-p="contact.email"></div>
+      <div><label>电话</label><input type="text" data-p="contact.phone"></div>
+    </div>
+    <div class="row2">
+      <div><label>微信</label><input type="text" data-p="contact.wechat"></div>
+      <div><label>城市</label><input type="text" data-p="contact.city"></div>
+    </div>
+    <div class="row2">
+      <div><label>GitHub 显示名</label><input type="text" data-p="contact.github"></div>
+      <div><label>GitHub 链接</label><input type="text" data-p="contact.githubUrl"></div>
+    </div>
+    <div class="row2">
+      <div><label>作品站显示名</label><input type="text" data-p="contact.site"></div>
+      <div><label>作品站链接</label><input type="text" data-p="contact.siteUrl"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>首页抬头（Hero）</h2>
+    <div class="row2">
+      <div><label>显示名（英文/拼音）</label><input type="text" data-p="profile.enName"></div>
+      <div><label>头像字母</label><input type="text" data-p="profile.avatarText"></div>
+    </div>
+    <label>眉标（小字）</label><input type="text" data-p="profile.eyebrow">
+    <label>主标题（中文大字）</label><input type="text" data-p="profile.zhTitle">
+    <label>导语段落</label><textarea data-p="profile.lede"></textarea>
+    <p class="hint">支持简单 HTML：<code>&lt;strong&gt;加粗&lt;/strong&gt;</code>、<code>&lt;br&gt;换行</code></p>
+    <label>能力标签（每行一个）</label><textarea data-p="profile.tags" data-type="lines"></textarea>
+    <div class="row2">
+      <div><label>姓名（Quick Facts）</label><input type="text" data-p="profile.name"></div>
+      <div><label>职位</label><input type="text" data-p="profile.role"></div>
+    </div>
+    <label>求职方向</label><input type="text" data-p="profile.intent">
+  </div>
+
+  <div class="card">
+    <h2>Quick Facts <small>右侧信息卡</small></h2>
+    <div id="factsBox"></div>
+    <button class="ghost mini" type="button" id="addFact">+ 添加一行</button>
+  </div>
+
+  <div class="card">
+    <h2>个人简介</h2>
+    <div id="aboutBox"></div>
+    <button class="ghost mini" type="button" id="addPara">+ 添加段落</button>
+  </div>
+
+  <div class="card">
+    <h2>关键数据 <small>4 个统计块</small></h2>
+    <div id="statsBox"></div>
+    <button class="ghost mini" type="button" id="addStat">+ 添加一块</button>
+  </div>
+
+  <div class="card">
+    <h2>技能专长</h2>
+    <div id="skillsBox"></div>
+    <button class="ghost mini" type="button" id="addSkill">+ 添加分组</button>
+  </div>
+
+  <div class="card">
+    <h2>项目经历</h2>
+    <div id="projectsBox"></div>
+    <button class="ghost mini" type="button" id="addProject">+ 添加项目</button>
+  </div>
+
+  <div class="card">
+    <h2>教育与实践</h2>
+    <div id="timelineBox"></div>
+    <button class="ghost mini" type="button" id="addTime">+ 添加一条</button>
+  </div>
+
+  <div class="card">
+    <h2>页脚</h2>
+    <div class="row2">
+      <div><label>姓名</label><input type="text" data-p="footer.name"></div>
+      <div><label>后缀说明</label><input type="text" data-p="footer.suffix"></div>
+    </div>
+    <label>最后更新日期</label><input type="text" data-p="meta.updated">
+  </div>
+
+  <div class="card" style="border-color:var(--accent)">
+    <h2>保存</h2>
+    <p class="hint" style="margin:0 0 14px">
+      保存会把 <code>data.json</code> 直接提交到仓库 <code>main</code> 分支，
+      GitHub Pages 重新构建后前台自动生效，通常 <b>1 分钟内</b>，无需改代码、无需本地部署。
+    </p>
+    <label>提交说明（可选）</label>
+    <input type="text" id="commitMsg" placeholder="例如：更新联系方式">
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+      <button type="button" id="saveBtn">保存并发布</button>
+      <button class="ghost" type="button" id="reloadBtn">放弃修改，重新载入</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>修改管理密码</h2>
+    <div class="row2">
+      <div><label>新密码</label><input type="password" id="np1" autocomplete="new-password"></div>
+      <div><label>再输一次</label><input type="password" id="np2" autocomplete="new-password"></div>
+    </div>
+    <p class="hint">
+      提交后会改写 <code>admin.html</code> 里的 <code>PASS_SHA256</code> 常量并重新发布，
+      同样不需要你手动改代码。<b>新密码请务必自己记住</b>——忘了只能本地重新生成一份 admin.html。
+    </p>
+    <div style="margin-top:14px"><button class="ghost" type="button" id="pwBtn">提交新密码</button></div>
+  </div>
+
+  <div class="card">
+    <h2>数据与存储说明</h2>
+    <p class="hint" style="margin:0">
+      · <b>展示数据</b>：存在仓库根目录 <code>data.json</code>，公开可读，前台加载它渲染页面。<br>
+      · <b>管理密码</b>：只存哈希，写在本页顶部 <code>ADMIN_CONFIG.PASS_SHA256</code>。<br>
+      · <b>GitHub 令牌</b>：只在当前标签页内存中，关闭即失效，不落盘、不进仓库。<br>
+      · <b>登录状态</b>：sessionStorage，关闭标签页自动退出。<br>
+      · 如果 <code>data.json</code> 加载失败，前台会自动回退到 index.html 里的静态内容，不会白屏。
+    </p>
+  </div>
+
+</div>
+
+<footer><div class="wrap">个人作品集后台 · 本页已设置 noindex，不参与搜索收录</div></footer>
+
+<script>
+/* ================= 配置 ================= */
+var ADMIN_CONFIG = {
+  OWNER: 'hnzzsp',
+  REPO: 'portfolio',
+  BRANCH: 'main',
+  DATA_PATH: 'data.json',
+  ADMIN_PATH: 'admin.html',
+  PASS_SHA256: '37a0034fb1fae0f18836a858af9b95b2215835b2b67923b69cfc3dfbeb65b40e',
+  SESSION_KEY: 'pfAdminAuthed'
+};
+
+var API = 'https://api.github.com';
+var DATA = null;   // 当前编辑中的数据对象
+var DATA_SHA = ''; // data.json 的 blob sha，更新时必需
+
+/* ================= 工具 ================= */
+function $(id){ return document.getElementById(id); }
+function arr(v){ return Object.prototype.toString.call(v) === '[object Array]' ? v : []; }
+function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function msg(text, kind){
+  var el = $('msg');
+  el.className = 'msg on ' + (kind || '');
+  el.textContent = text;
+  el.scrollIntoView({behavior:'smooth', block:'center'});
+}
+function sha256(str){
+  if (window.crypto && crypto.subtle){
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)).then(function(buf){
+      return Array.prototype.map.call(new Uint8Array(buf), function(b){
+        return ('0' + b.toString(16)).slice(-2);
+      }).join('');
+    });
+  }
+  return Promise.reject(new Error('当前环境不支持 crypto.subtle，请用 https 或 localhost 访问本页。'));
+}
+function b64enc(str){
+  var bytes = new TextEncoder().encode(str), bin = '';
+  for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+function b64dec(b64){
+  var bin = atob(b64.replace(/\n/g, '')), bytes = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+function gh(method, path, body){
+  var token = $('tok').value.trim();
+  if (!token) return Promise.reject(new Error('请先填写 GitHub 访问令牌'));
+  var headers = {
+    'Authorization': 'Bearer ' + token,
+    'Accept': 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+    'Content-Type': 'application/json'
+  };
+  return fetch(API + path, {
+    method: method,
+    headers: headers,
+    body: body ? JSON.stringify(body) : undefined
+  }).then(function(r){
+    return r.json().then(function(j){
+      if (!r.ok) throw new Error((j && j.message) || ('HTTP ' + r.status));
+      return j;
+    });
+  });
+}
+
+/* ================= 登录 ================= */
+var authed = sessionStorage.getItem(ADMIN_CONFIG.SESSION_KEY) === '1';
+function showPanel(){
+  $('login').classList.add('hide');
+  $('panel').classList.remove('hide');
+}
+if (authed) showPanel();
+
+$('loginForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var v = $('pw').value;
+  sha256(v).then(function(h){
+    if (h === ADMIN_CONFIG.PASS_SHA256){
+      sessionStorage.setItem(ADMIN_CONFIG.SESSION_KEY, '1');
+      $('pw').value = '';
+      showPanel();
+      loadData();
+    } else {
+      $('loginErr').className = 'msg err on';
+      $('loginErr').textContent = '密码不正确。';
+    }
+  }).catch(function(err){
+    $('loginErr').className = 'msg err on';
+    $('loginErr').textContent = err.message;
+  });
+});
+$('logoutBtn').addEventListener('click', function(){
+  sessionStorage.removeItem(ADMIN_CONFIG.SESSION_KEY);
+  location.reload();
+});
+
+/* ================= 载入数据 ================= */
+function loadData(){
+  var p = ADMIN_CONFIG.DATA_PATH + '?t=' + Date.now();   // 相对路径：兼容部署在子目录下
+  fetch(p, {cache:'no-store'}).then(function(r){ return r.json(); }).then(function(d){
+    DATA = d;
+    buildAll();
+    fillStatic();
+  }).catch(function(e){ msg('读取 data.json 失败：' + e.message, 'err'); });
+}
+
+/* ================= 表单构建 ================= */
+function inputHtml(path, value, type){
+  var v = esc(value);
+  if (type === 'area'){
+    return '<textarea data-p="' + path + '" style="min-height:64px">' + v + '</textarea>';
+  }
+  return '<input type="text" data-p="' + path + '" value="' + v + '">';
+}
+
+function buildFacts(){
+  var box = $('factsBox');
+  box.innerHTML = arr(DATA.profile.facts).map(function(f, i){
+    return '<div class="item"><div class="ih"><b>第 ' + (i + 1) + ' 行</b>' +
+      '<span class="sp"></span><button class="danger" type="button" data-del="facts" data-i="' + i + '">删除</button></div>' +
+      '<div class="row3">' +
+      '<div><label>标签</label>' + inputHtml('profile.facts.' + i + '.k', f.k) + '</div>' +
+      '<div><label>值</label>' + inputHtml('profile.facts.' + i + '.v', f.v) + '</div>' +
+      '<div><label>链接（可空）</label>' + inputHtml('profile.facts.' + i + '.href', f.href) + '</div>' +
+      '</div></div>';
+  }).join('');
+}
+
+function buildAbout(){
+  $('aboutBox').innerHTML = arr(DATA.about.paragraphs).map(function(t, i){
+    return '<div class="item"><div class="ih"><b>段落 ' + (i + 1) + '</b><span class="sp"></span>' +
+      '<button class="danger" type="button" data-del="about" data-i="' + i + '">删除</button></div>' +
+      inputHtml('about.paragraphs.' + i, t, 'area') + '</div>';
+  }).join('');
+}
+
+function buildStats(){
+  $('statsBox').innerHTML = arr(DATA.about.stats).map(function(s, i){
+    return '<div class="item"><div class="ih"><b>第 ' + (i + 1) + ' 块</b><span class="sp"></span>' +
+      '<button class="danger" type="button" data-del="stats" data-i="' + i + '">删除</button></div>' +
+      '<div class="row2">' +
+      '<div><label>数字</label>' + inputHtml('about.stats.' + i + '.num', s.num) + '</div>' +
+      '<div><label>说明（可用 &lt;br&gt; 换行）</label>' + inputHtml('about.stats.' + i + '.label', s.label) + '</div>' +
+      '</div></div>';
+  }).join('');
+}
+
+function buildSkills(){
+  $('skillsBox').innerHTML = arr(DATA.skills).map(function(g, i){
+    var bars = arr(g.bars).map(function(b, j){
+      return '<div class="item" style="background:#fff">' +
+        '<div class="ih"><b>能力条 ' + (j + 1) + '</b><span class="sp"></span>' +
+        '<button class="danger" type="button" data-del="bar" data-i="' + i + '" data-j="' + j + '">删除</button></div>' +
+        '<div class="row3">' +
+        '<div><label>名称</label>' + inputHtml('skills.' + i + '.bars.' + j + '.label', b.label) + '</div>' +
+        '<div><label>说明</label>' + inputHtml('skills.' + i + '.bars.' + j + '.note', b.note) + '</div>' +
+        '<div><label>百分比</label><input type="number" min="0" max="100" data-p="skills.' + i + '.bars.' + j + '.pct" value="' + (b.pct || 0) + '"></div>' +
+        '</div></div>';
+    }).join('');
+    return '<div class="item"><div class="ih"><b>分组 ' + (i + 1) + '</b><span class="sp"></span>' +
+      '<button class="danger" type="button" data-del="skill" data-i="' + i + '">删除分组</button></div>' +
+      '<div class="row2">' +
+      '<div><label>分组名</label>' + inputHtml('skills.' + i + '.name', g.name) + '</div>' +
+      '<div><label>说明</label>' + inputHtml('skills.' + i + '.note', g.note) + '</div>' +
+      '</div>' +
+      '<label>关键词（每行一个）</label><textarea data-p="skills.' + i + '.kws" data-type="lines">' +
+        esc(arr(g.kws).join('\n')) + '</textarea>' +
+      '<label style="margin-top:14px">能力条</label>' + bars +
+      '<button class="ghost mini" type="button" data-add="bar" data-i="' + i + '">+ 添加能力条</button>' +
+      '</div>';
+  }).join('');
+}
+
+function buildProjects(){
+  $('projectsBox').innerHTML = arr(DATA.projects).map(function(p, i){
+    return '<div class="item"><div class="ih"><b>项目 ' + (i + 1) + '</b><span class="sp"></span>' +
+      '<button class="danger" type="button" data-del="project" data-i="' + i + '">删除项目</button></div>' +
+      '<label>标题</label>' + inputHtml('projects.' + i + '.title', p.title) +
+      '<label>角色 / 标签行</label>' + inputHtml('projects.' + i + '.role', p.role) +
+      '<label>背景</label>' + inputHtml('projects.' + i + '.bg', p.bg, 'area') +
+      '<label>行动</label>' + inputHtml('projects.' + i + '.act', p.act, 'area') +
+      '<label>结果</label>' + inputHtml('projects.' + i + '.res', p.res, 'area') +
+      '<label>标签（每行一个）</label><textarea data-p="projects.' + i + '.kws" data-type="lines">' +
+        esc(arr(p.kws).join('\n')) + '</textarea>' +
+      '<label>截图区 HTML（可填 &lt;img src="..."&gt;，留空则显示占位）</label>' +
+      inputHtml('projects.' + i + '.shot', p.shot, 'area') +
+      '</div>';
+  }).join('');
+}
+
+function buildTimeline(){
+  $('timelineBox').innerHTML = arr(DATA.timeline).map(function(t, i){
+    return '<div class="item"><div class="ih"><b>第 ' + (i + 1) + ' 条</b><span class="sp"></span>' +
+      '<button class="danger" type="button" data-del="time" data-i="' + i + '">删除</button></div>' +
+      '<div class="row2"><div><label>时间</label>' + inputHtml('timeline.' + i + '.when', t.when) + '</div>' +
+      '<div><label>标题</label>' + inputHtml('timeline.' + i + '.title', t.title) + '</div></div>' +
+      '<label>描述</label>' + inputHtml('timeline.' + i + '.desc', t.desc, 'area') +
+      '</div>';
+  }).join('');
+}
+
+function buildAll(){
+  buildFacts(); buildAbout(); buildStats(); buildSkills(); buildProjects(); buildTimeline();
+}
+
+/* 增删按钮（事件委托） */
+document.addEventListener('click', function(e){
+  var b = e.target.closest('button');
+  if (!b) return;
+  var kind = b.getAttribute('data-del') || b.getAttribute('data-add');
+  if (!kind) return;
+  collect(); // 先把当前输入写回 DATA，再增删，避免丢失未保存修改
+  var i = parseInt(b.getAttribute('data-i'), 10);
+  var j = parseInt(b.getAttribute('data-j'), 10);
+  if (b.hasAttribute('data-del')){
+    if (kind === 'facts')    DATA.profile.facts.splice(i, 1);
+    if (kind === 'about')    DATA.about.paragraphs.splice(i, 1);
+    if (kind === 'stats')    DATA.about.stats.splice(i, 1);
+    if (kind === 'bar')      DATA.skills[i].bars.splice(j, 1);
+    if (kind === 'skill')    DATA.skills.splice(i, 1);
+    if (kind === 'project')  DATA.projects.splice(i, 1);
+    if (kind === 'time')     DATA.timeline.splice(i, 1);
+  } else {
+    if (kind === 'bar') DATA.skills[i].bars.push({label:'新能力', note:'', pct:60});
+  }
+  buildAll();
+  fillStatic();
+});
+
+$('addFact').addEventListener('click', function(){ collect(); DATA.profile.facts.push({k:'', v:'', href:''}); buildFacts(); });
+$('addPara').addEventListener('click', function(){ collect(); DATA.about.paragraphs.push(''); buildAbout(); });
+$('addStat').addEventListener('click', function(){ collect(); DATA.about.stats.push({num:'', label:''}); buildStats(); });
+$('addSkill').addEventListener('click', function(){ collect(); DATA.skills.push({name:'新分组', note:'', bars:[], kws:[]}); buildSkills(); });
+$('addProject').addEventListener('click', function(){
+  collect();
+  DATA.projects.push({shot:'', title:'新项目', role:'', bg:'', act:'', res:'', kws:[]});
+  buildProjects();
+});
+$('addTime').addEventListener('click', function(){ collect(); DATA.timeline.push({when:'', title:'', desc:''}); buildTimeline(); });
+
+/* ================= 收集表单写入 DATA ================= */
+function setPath(obj, path, value){
+  var keys = path.split('.'), cur = obj;
+  for (var i = 0; i < keys.length - 1; i++){
+    var k = keys[i];
+    if (cur[k] == null) cur[k] = /^\d+$/.test(keys[i + 1]) ? [] : {};
+    cur = cur[k];
+  }
+  cur[keys[keys.length - 1]] = value;
+}
+function collect(){
+  var nodes = document.querySelectorAll('#panel [data-p]');
+  Array.prototype.forEach.call(nodes, function(n){
+    var path = n.getAttribute('data-p');
+    var val = n.value;
+    if (n.getAttribute('data-type') === 'lines'){
+      val = val.split('\n').map(function(s){ return s.trim(); }).filter(function(s){ return s !== ''; });
+    } else if (n.type === 'number'){
+      val = parseInt(val, 10) || 0;
+    }
+    setPath(DATA, path, val);
+  });
+}
+/* 把简单字段（非动态区）的初始值填进表单 */
+function fillStatic(){
+  Array.prototype.forEach.call(document.querySelectorAll('#panel [data-p]'), function(n){
+    var path = n.getAttribute('data-p'), cur = DATA, ok = true;
+    path.split('.').forEach(function(k){
+      if (cur == null) { ok = false; return; }
+      cur = cur[k];
+    });
+    if (!ok || cur == null) return;
+    if (n.getAttribute('data-type') === 'lines'){
+      n.value = arr(cur).join('\n');
+    } else {
+      n.value = cur;
+    }
+  });
+}
+
+/* ================= 保存 ================= */
+$('saveBtn').addEventListener('click', function(){
+  collect();
+  var text = JSON.stringify(DATA, null, 2);
+  var message = $('commitMsg').value.trim() || ('更新作品集内容 ' + new Date().toLocaleString('zh-CN'));
+  msg('正在提交…', '');
+  var path = '/repos/' + ADMIN_CONFIG.OWNER + '/' + ADMIN_CONFIG.REPO + '/contents/' + ADMIN_CONFIG.DATA_PATH;
+
+  gh('GET', path + '?ref=' + ADMIN_CONFIG.BRANCH).then(function(j){
+    DATA_SHA = j.sha;
+    return gh('PUT', path, {
+      message: message,
+      content: b64enc(text),
+      sha: DATA_SHA,
+      branch: ADMIN_CONFIG.BRANCH
+    });
+  }).then(function(){
+    msg('已保存并发布。GitHub Pages 约 1 分钟内生效，点“查看前台”按 Ctrl+F5 强制刷新即可看到最新内容。', 'ok');
+    $('commitMsg').value = '';
+  }).catch(function(e){ msg('保存失败：' + e.message, 'err'); });
+});
+
+$('reloadBtn').addEventListener('click', function(){ loadData(); msg('已重新载入线上数据，未保存的修改已丢弃。', ''); });
+
+/* ================= 修改密码 ================= */
+$('pwBtn').addEventListener('click', function(){
+  var a = $('np1').value, b = $('np2').value;
+  if (!a) return msg('请输入新密码。', 'err');
+  if (a !== b) return msg('两次输入不一致。', 'err');
+  if (a.length < 8) return msg('密码至少 8 位，建议含大小写、数字与符号。', 'err');
+  msg('正在提交…', '');
+  sha256(a).then(function(hash){
+    var path = '/repos/' + ADMIN_CONFIG.OWNER + '/' + ADMIN_CONFIG.REPO + '/contents/' + ADMIN_CONFIG.ADMIN_PATH;
+    return gh('GET', path + '?ref=' + ADMIN_CONFIG.BRANCH).then(function(j){
+      var src = b64dec(j.content);
+      var next = src.replace(/PASS_SHA256\s*:\s*'[^']*'/, "PASS_SHA256: '" + hash + "'");
+      if (next === src) throw new Error('未在 admin.html 中找到 PASS_SHA256，请检查文件是否被改写');
+      return gh('PUT', path, {
+        message: '更新后台管理密码哈希',
+        content: b64enc(next),
+        sha: j.sha,
+        branch: ADMIN_CONFIG.BRANCH
+      });
+    });
+  }).then(function(){
+    $('np1').value = ''; $('np2').value = '';
+    msg('密码已更新并重新发布，下次登录请使用新密码。', 'ok');
+  }).catch(function(e){ msg('修改密码失败：' + e.message, 'err'); });
+});
+
+/* ================= 初始化 ================= */
+$('sitePill').textContent = ADMIN_CONFIG.OWNER + '/' + ADMIN_CONFIG.REPO;
+var savedTok = sessionStorage.getItem('pfTok');
+if (savedTok) $('tok').value = savedTok;
+$('tok').addEventListener('input', function(){
+  sessionStorage.setItem('pfTok', this.value);
+});
+if (authed) loadData();
+</script>
+</body>
+</html>
