@@ -1646,7 +1646,7 @@ function commitData(msg,cb){
       /* 关键：PUT 必须带上刚取到的 sha，否则 GitHub 返回 422 "sha wasn't supplied" */
       return putXHR('data.json',body.content,msg,function(){},body.sha)
         .catch(function(err){
-          if(/sha/i.test(err.message)){
+          if(/sha|match|422/i.test(err.message)){
             return fetch(API+'/repos/'+OWNER+'/'+REPO+'/contents/data.json?ref='+BRANCH,
               {headers:{'Authorization':'Bearer '+tok,'Accept':'application/vnd.github+json'}})
               .then(function(r){return r.json();})

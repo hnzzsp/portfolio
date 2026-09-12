@@ -892,22 +892,36 @@ function upHint(){
 }
 function b64u(str){ return btoa(unescape(encodeURIComponent(str))); }
 /* data.json 已存在 → 必须先取 sha 再 PUT，否则 422 */
+/* 写 data.json 统一走串行队列：批量上传时多个写入若并行抢 sha，
+   第一个提交后其余全部 422 "does not match"。排队 + 失败重取 sha 重试。 */
+var dataWriteQueue = Promise.resolve();
 function putDataJson(msg){
+  var run = function(){ return putDataJsonOnce(msg); };
+  var p = dataWriteQueue.then(run, run);
+  dataWriteQueue = p.catch(function(){});   /* 队列不因单次失败中断 */
+  return p;
+}
+function putDataJsonOnce(msg){
   var path = '/repos/' + CONFIG.OWNER + '/' + CONFIG.REPO + '/contents/' + CONFIG.DATA;
   var body = { message: msg, branch: CONFIG.BRANCH, content: b64u(JSON.stringify(DATA, null, 2)) };
-  return gh('GET', path + '?ref=' + CONFIG.BRANCH)
-    .then(function(j){ if (j && j.sha) body.sha = j.sha; })
-    .catch(function(){})
-    .then(function(){ return gh('PUT', path, body); })
-    .catch(function(err){
-      if (/sha/i.test(err.message)){
-        return gh('GET', path + '?ref=' + CONFIG.BRANCH).then(function(j){
-          body.sha = j.sha;
-          return gh('PUT', path, body);
-        });
-      }
-      throw err;
-    });
+  var attempts = 0;
+  function attempt(){
+    attempts++;
+    return gh('GET', path + '?ref=' + CONFIG.BRANCH)
+      .then(function(j){
+        if (!j || !j.sha) throw new Error('取不到 data.json 的 sha，请稍后重试');
+        body.sha = j.sha;
+        return gh('PUT', path, body);
+      })
+      .catch(function(err){
+        /* sha 过期 / 并发覆盖 / 422 → 重取再试，最多 3 次 */
+        if (attempts < 3 && /sha|match|422/i.test(err.message)){
+          return new Promise(function(res){ setTimeout(res, 700 * attempts); }).then(attempt);
+        }
+        throw err;
+      });
+  }
+  return attempt();
 }
 /* 上传成功后按用途写入 media */
 function applyMediaTarget(tgt, path){
@@ -1025,7 +1039,7 @@ function uploadOne(file){
               toast('上传成功并写入项目：' + name, 'ok');
               if ($('tabs').querySelector('.on').dataset.tab === 'img') loadImages();
             }).catch(function(e){
-              st.innerHTML = '<span class="er">已上传，但写入数据失败：' + esc(e.message) + '</span>';
+              st.innerHTML = '<span class="er">图片已上传，写入数据失败：' + esc(e.message) + '（多为多窗口同时保存，稍候在图片页签重试或刷新后再传）</span>';
             });
             return;
           }
@@ -1284,7 +1298,7 @@ $('saveBtn').addEventListener('click', function(){
       toast('已保存到线上，约 1 分钟生效', 'ok');
       if ($('tabs').querySelector('.on').dataset.tab === 'img') loadImages();
     })
-    .catch(function(e){ toast('保存失败：' + e.message, 'err'); })
+    .catch(function(e){ toast('保存失败：' + e.message + '（多窗口同时保存会导致冲突，请重试）', 'err'); })
     .then(function(){ b.disabled = false; syncToolBtns(); });
 });
 
