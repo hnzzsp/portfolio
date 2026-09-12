@@ -441,7 +441,60 @@ body.editing [data-shot]{cursor:pointer}
   font:inherit;font-size:12.5px;color:var(--text);box-shadow:0 4px 16px rgba(0,0,0,.1);cursor:pointer;
 }
 .pf-cmp input{width:auto;margin:0;accent-color:var(--accent)}
-@media print{.pv-bar,.pf-lb,.pf-editbar,.pf-shotov,.pf-uphint,.pf-toast,.pf-prog,.pf-cmp,.pf-wait{display:none!important}}
+/* ============ 顶部视图滑块：作品集 / 简历 / 着陆页 ============ */
+.pf-vbar{
+  position:sticky;top:64px;z-index:45;
+  background:var(--bg);background:color-mix(in srgb,var(--bg) 92%,transparent);
+  backdrop-filter:saturate(160%) blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.pf-vbar-in{max-width:var(--maxw);margin:0 auto;padding:10px var(--pad);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.pf-vbar .lb{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-dim)}
+.pf-sw{
+  position:relative;display:inline-flex;padding:4px;gap:0;
+  background:var(--bg-soft);border:1px solid var(--line);border-radius:999px;
+  user-select:none;-webkit-user-select:none;touch-action:none;cursor:grab;
+}
+.pf-sw.dragging{cursor:grabbing}
+.pf-sw .pf-knob{
+  position:absolute;top:4px;left:0;height:calc(100% - 8px);border-radius:999px;
+  background:var(--accent);z-index:0;pointer-events:none;
+  transition:transform .36s cubic-bezier(.32,1.16,.42,1),width .24s ease;
+}
+.pf-sw.dragging .pf-knob{transition:none}
+.pf-sw .pf-seg{
+  position:relative;z-index:1;appearance:none;-webkit-appearance:none;border:0;background:transparent;
+  font:inherit;font-size:13px;font-weight:700;color:var(--text-dim);
+  padding:7px 18px;border-radius:999px;cursor:pointer;white-space:nowrap;
+  transition:color .26s ease;
+}
+.pf-sw .pf-seg:hover{color:var(--text)}
+.pf-sw .pf-seg.on{color:var(--accent-ink)}
+.pf-vhint{font-size:12.5px;color:var(--text-dim)}
+.pf-vsel{
+  font:inherit;font-size:12.5px;padding:5px 9px;border:1px solid var(--line);
+  border-radius:var(--radius);background:var(--surface);color:var(--text);
+}
+.pf-vsel.hide,.pf-vbtn.hide{display:none}
+.pf-vbtn{
+  font:inherit;font-size:12.5px;padding:6px 13px;border:1px solid var(--line);
+  border-radius:var(--radius);background:var(--surface);color:var(--text);cursor:pointer;
+}
+.pf-vbtn:hover{border-color:var(--accent);color:var(--accent)}
+.pf-vstage{display:none;opacity:0;transform:translateY(12px);transition:opacity .32s ease,transform .32s ease}
+.pf-vstage.on{display:block}
+.pf-vstage.show{opacity:1;transform:none}
+.pf-vstage iframe{width:100%;border:0;display:block;min-height:78vh;background:transparent}
+.pf-native{transition:opacity .26s ease,transform .26s ease}
+.pf-native.out{opacity:0;transform:translateY(10px)}
+.pf-native.gone{display:none}
+.pf-vload{padding:60px var(--pad);text-align:center;color:var(--text-dim);font-size:13.5px}
+@media (max-width:880px){
+  .pf-vbar{top:56px}
+  .pf-vbar .lb{display:none}
+  .pf-sw .pf-seg{padding:7px 12px;font-size:12.5px}
+}
+@media print{.pv-bar,.pf-lb,.pf-editbar,.pf-shotov,.pf-uphint,.pf-toast,.pf-prog,.pf-cmp,.pf-wait,.pf-vbar,.pf-vstage{display:none!important}}
 </style>
 </head>
 <body>
@@ -489,6 +542,22 @@ body.editing [data-shot]{cursor:pointer}
 </div>
 
 <main id="top">
+
+  <!-- ============ 视图切换滑块（作品集 / 个人简历 / 产品着陆页） ============ -->
+  <div class="pf-vbar" id="pfVbar">
+    <div class="pf-vbar-in">
+      <span class="lb">视图</span>
+      <div class="pf-sw" id="pfSw" role="tablist" aria-label="页面视图切换">
+        <span class="pf-knob" id="pfKnob" aria-hidden="true"></span>
+        <button type="button" class="pf-seg on" data-v="portfolio" role="tab" aria-selected="true">作品集</button>
+        <button type="button" class="pf-seg" data-v="resume" role="tab" aria-selected="false">个人简历</button>
+        <button type="button" class="pf-seg" data-v="landing" role="tab" aria-selected="false">产品着陆页</button>
+      </div>
+      <select class="pf-vsel hide" id="pfVstyle" title="该视图的配色风格"></select>
+      <span class="pf-vhint" id="pfVhint">拖动滑块或点击标签切换 · 简历与着陆页由同一份数据实时生成</span>
+      <button type="button" class="pf-vbtn hide" id="pfVprint">打印 / 存 PDF</button>
+    </div>
+  </div>
 
   <!-- ============ HERO ============ -->
   <div class="hero">
@@ -799,6 +868,11 @@ body.editing [data-shot]{cursor:pointer}
       </div>
     </div>
   </section>
+  <!-- ============ 简历 / 着陆页 视图容器（iframe 隔离样式，保证版式完整） ============ -->
+  <div class="pf-vstage" id="pfVstage">
+    <div class="pf-vload" id="pfVload">正在生成视图…</div>
+    <iframe id="pfVframe" title="简历 / 着陆页视图" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+  </div>
 
 </main>
 
@@ -1536,6 +1610,234 @@ bindOnce();
 window.__pfRendered=function(){renderAll();};
 renderAll();
 if(EDIT&&getTok()){/* 已具备编辑条件 */}
+})();
+</script>
+
+<script src="views.js"></script>
+<script>
+/* ============================================================
+   顶部视图滑块：作品集 / 个人简历 / 产品着陆页
+   - 默认停在「作品集」，选择记在本机 localStorage，下次打开沿用
+   - 可点击标签，也可按住滑块左右拖动，松手吸附到最近一档
+   - 简历 / 着陆页用 iframe 渲染：样式完全隔离，版式不被作品集主题影响
+   - 两个视图都由 data.json 实时生成，与作品集同源，不丢信息
+   ============================================================ */
+(function(){
+'use strict';
+if(!window.PFV){
+  /* views.js 没加载成功（本地单文件打开等场景）→ 直接收起视图条，不给点不动的控件 */
+  var vb=document.getElementById('pfVbar');
+  if(vb) vb.style.display='none';
+  console.warn('[portfolio] views.js 未加载，视图切换已隐藏');
+  return;
+}
+function $(id){return document.getElementById(id);}
+var VIEWS=[['portfolio','作品集'],['resume','个人简历'],['landing','产品着陆页']];
+var KEY='pf-topview';
+var sw=$('pfSw'), knob=$('pfKnob'), stage=$('pfVstage'), frame=$('pfVframe'),
+    loadTip=$('pfVload'), vsel=$('pfVstyle'), vprint=$('pfVprint'), bar=$('pfVbar'), main=$('top');
+if(!sw||!stage||!frame) return;
+
+var cur='portfolio', data=null;
+var style={resume:'classic', landing:'tech'};
+try{
+  var sv=localStorage.getItem(KEY);
+  if(sv && VIEWS.some(function(v){return v[0]===sv;})) cur=sv;
+  ['resume','landing'].forEach(function(k){
+    var s=localStorage.getItem('pf-vstyle-'+k), dict=dictOf(k);
+    if(s && dict[s]) style[k]=s;
+  });
+}catch(e){}
+
+/* 作品集原生内容：main 下除视图条与视图容器以外的直接子元素 */
+var natives=[];
+Array.prototype.forEach.call(main.children,function(el){
+  if(el===bar||el===stage) return;
+  el.classList.add('pf-native');   /* 过渡所需的基类，必须在切换前加好 */
+  natives.push(el);
+});
+
+function dictOf(v){ return v==='resume'?window.PFV.RESUME_STYLES:window.PFV.LANDING_STYLES; }
+function segs(){ return Array.prototype.slice.call(sw.querySelectorAll('.pf-seg')); }
+function idxOf(v){ for(var i=0;i<VIEWS.length;i++){ if(VIEWS[i][0]===v) return i; } return 0; }
+function setKnob(i){
+  var s=segs()[i]; if(!s||!s.offsetWidth) return;
+  knob.style.width=s.offsetWidth+'px';
+  knob.style.transform='translateX('+(s.offsetLeft-4)+'px)';
+}
+function markOn(i){
+  segs().forEach(function(b,ix){
+    b.classList.toggle('on',ix===i);
+    b.setAttribute('aria-selected',ix===i?'true':'false');
+  });
+}
+function syncStyleSel(){
+  if(cur==='portfolio'){ vsel.classList.add('hide'); vprint.classList.add('hide'); return; }
+  var dict=dictOf(cur);
+  vsel.innerHTML=Object.keys(dict).map(function(k){
+    return '<option value="'+k+'"'+(k===style[cur]?' selected':'')+'>'+dict[k].name+'</option>';
+  }).join('');
+  vsel.classList.remove('hide');
+  vprint.classList.remove('hide');
+}
+
+/* ---- 平滑过渡 ---- */
+function toNative(){
+  stage.classList.remove('show');
+  setTimeout(function(){ if(cur==='portfolio') stage.classList.remove('on'); },320);
+  natives.forEach(function(el){ el.classList.remove('gone'); });
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){ natives.forEach(function(el){ el.classList.remove('out'); }); });
+  });
+}
+function toStage(){
+  natives.forEach(function(el){ el.classList.add('out'); });
+  setTimeout(function(){ if(cur!=='portfolio') natives.forEach(function(el){ el.classList.add('gone'); }); },280);
+  stage.classList.add('on');
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){ stage.classList.add('show'); });
+  });
+}
+function scrollToBar(){
+  try{
+    var y=bar.getBoundingClientRect().top+window.pageYOffset-70;
+    window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
+  }catch(e){ window.scrollTo(0,0); }
+}
+
+/* ---- 数据 ---- */
+function loadData(){
+  if(data) return Promise.resolve(data);
+  return fetch('data.json?t='+Date.now(),{cache:'no-store'})
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .catch(function(){
+      return fetch('https://api.github.com/repos/hnzzsp/portfolio/contents/data.json?ref=main',
+        {headers:{'Accept':'application/vnd.github.raw'}})
+        .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
+    })
+    .then(function(d){ data=d; return d; });
+}
+function buildSrc(){
+  return cur==='resume'
+    ? window.PFV.tplResume(data, style.resume, false)
+    : window.PFV.tplLanding(data, style.landing, false);
+}
+var hTimer=null;
+function syncH(){
+  if(cur==='portfolio') return;
+  try{
+    var d=frame.contentDocument;
+    if(!d||!d.body) return;
+    var h=Math.max(d.body.scrollHeight, d.documentElement.scrollHeight);
+    frame.style.height=(h+48)+'px';
+  }catch(e){}
+}
+frame.addEventListener('load',function(){
+  loadTip.style.display='none';
+  syncH();
+  clearTimeout(hTimer);
+  hTimer=setTimeout(syncH,400);
+  setTimeout(syncH,1200);
+});
+window.addEventListener('resize',syncH);
+window.addEventListener('message',function(e){
+  var m=e.data;
+  if(m && m.type==='pf-h' && cur!=='portfolio') frame.style.height=(m.v+48)+'px';
+});
+
+/* ---- 切换 ---- */
+function apply(v){
+  var i=idxOf(v);
+  cur=v;
+  try{ localStorage.setItem(KEY,v); }catch(e){}
+  markOn(i); setKnob(i); syncStyleSel();
+  if(v==='portfolio'){ toNative(); return; }
+  toStage();
+  loadTip.style.display='';
+  loadTip.textContent='正在生成'+(v==='resume'?'简历':'着陆页')+'视图…';
+  loadData().then(function(){
+    if(cur!==v) return;
+    frame.srcdoc=buildSrc();
+  }).catch(function(err){
+    loadTip.textContent='数据加载失败（'+err.message+'），请稍后重试或点击标签重新切换';
+  });
+}
+
+/* ---- 点击 ---- */
+segs().forEach(function(b){
+  b.addEventListener('click',function(){
+    if(dragMoved) return;      /* 刚才是拖动，不当作点击 */
+    if(b.dataset.v===cur && cur==='portfolio') return;
+    apply(b.dataset.v);
+    scrollToBar();
+  });
+  b.addEventListener('keydown',function(e){
+    if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight') return;
+    e.preventDefault();
+    var i=(idxOf(cur)+(e.key==='ArrowRight'?1:-1)+VIEWS.length)%VIEWS.length;
+    apply(VIEWS[i][0]);
+  });
+});
+
+/* ---- 拖拽 ---- */
+var drag=null, dragMoved=false;
+function pd(e){
+  if(e.button){ return; }
+  var i=idxOf(cur), s=segs()[i];
+  drag={x0:e.clientX, base:s.offsetLeft-4, w:s.offsetWidth, idx:i};
+  dragMoved=false;
+  sw.classList.add('dragging');
+  try{ sw.setPointerCapture(e.pointerId); }catch(err){}
+}
+function pm(e){
+  if(!drag) return;
+  var dx=e.clientX-drag.x0;
+  if(Math.abs(dx)>4) dragMoved=true;
+  var maxL=sw.clientWidth-8-drag.w;
+  var left=Math.min(Math.max(drag.base+dx,0),Math.max(0,maxL));
+  knob.style.transform='translateX('+left+'px)';
+}
+function pu(e){
+  if(!drag) return;
+  var dx=(e.clientX||0)-drag.x0, d=drag; drag=null;
+  sw.classList.remove('dragging');
+  if(!dragMoved){ setKnob(idxOf(cur)); return; }
+  var cx=d.base+dx+d.w/2, best=0, bd=Infinity;
+  segs().forEach(function(s,ix){
+    var c=s.offsetLeft-4+s.offsetWidth/2, diff=Math.abs(c-cx);
+    if(diff<bd){ bd=diff; best=ix; }
+  });
+  apply(VIEWS[best][0]);
+  setTimeout(function(){ dragMoved=false; },60);
+}
+if(window.PointerEvent){
+  sw.addEventListener('pointerdown',pd);
+  sw.addEventListener('pointermove',pm);
+  sw.addEventListener('pointerup',pu);
+  sw.addEventListener('pointercancel',pu);
+}else{
+  sw.addEventListener('mousedown',pd);
+  window.addEventListener('mousemove',pm);
+  window.addEventListener('mouseup',pu);
+}
+
+/* ---- 风格 / 打印 ---- */
+vsel.addEventListener('change',function(){
+  style[cur]=this.value;
+  try{ localStorage.setItem('pf-vstyle-'+cur,this.value); }catch(e){}
+  if(cur==='portfolio') return;
+  loadTip.style.display=''; loadTip.textContent='正在按新风格重新生成…';
+  frame.srcdoc=buildSrc();
+});
+vprint.addEventListener('click',function(){
+  try{ frame.contentWindow.focus(); frame.contentWindow.print(); }
+  catch(e){ window.print(); }
+});
+
+/* ---- 启动 ---- */
+setKnob(idxOf(cur)); markOn(idxOf(cur)); syncStyleSel();
+window.addEventListener('load',function(){ setKnob(idxOf(cur)); });
+if(cur!=='portfolio') apply(cur);
 })();
 </script>
 </body>
