@@ -2022,6 +2022,8 @@ function apply(v){
   cur=v;
   try{ localStorage.setItem(KEY,v); }catch(e){}
   markOn(i); setKnob(i); syncStyleSel();
+  /* 通知其它模块（章节导航 spy 等）：视图变了，页面在顶部时不会产生 scroll 事件 */
+  try{ window.dispatchEvent(new CustomEvent('pf-view-change')); }catch(e){}
   if(v==='portfolio'){ toNative(); return; }
   toStage();
   loadTip.style.display='';
@@ -2167,6 +2169,7 @@ function goTo(id){
 window.addEventListener('scroll',spy,{passive:true});
 window.addEventListener('resize',spy);
 window.addEventListener('load',spy);
+window.addEventListener('pf-view-change',spy);
 spy();
 })();
 </script>
