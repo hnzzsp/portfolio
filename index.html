@@ -1554,7 +1554,7 @@ function compress(file,cb){
   img.onerror=function(){URL.revokeObjectURL(url);cb(file,'');};
   img.src=url;
 }
-function putXHR(path,b64,msg,onProg){
+function putXHR(path,b64,msg,onProg,sha){
   return new Promise(function(res,rej){
     var x=new XMLHttpRequest();
     x.open('PUT',API+'/repos/'+OWNER+'/'+REPO+'/contents/'+path);
@@ -1565,7 +1565,9 @@ function putXHR(path,b64,msg,onProg){
     x.onload=function(){var j={};try{j=JSON.parse(x.responseText);}catch(e){}
       if(x.status>=200&&x.status<300)res(j);else rej(new Error((j&&j.message)||('HTTP '+x.status)));};
     x.onerror=function(){rej(new Error('网络错误'));};
-    x.send(JSON.stringify({message:msg,content:b64,branch:BRANCH}));
+    var payload={message:msg,content:b64,branch:BRANCH};
+    if(sha) payload.sha=sha;   /* 已存在的文件必须带 sha，否则 422 */
+    x.send(JSON.stringify(payload));
   });
 }
 function commitData(msg,cb){
@@ -1578,13 +1580,17 @@ function commitData(msg,cb){
     .then(function(j){ if(j&&j.sha) body.sha=j.sha; })
     .catch(function(){})
     .then(function(){
-      return putXHR('data.json',body.content,msg,function(){})
+      /* 关键：PUT 必须带上刚取到的 sha，否则 GitHub 返回 422 "sha wasn't supplied" */
+      return putXHR('data.json',body.content,msg,function(){},body.sha)
         .catch(function(err){
           if(/sha/i.test(err.message)){
             return fetch(API+'/repos/'+OWNER+'/'+REPO+'/contents/data.json?ref='+BRANCH,
               {headers:{'Authorization':'Bearer '+tok,'Accept':'application/vnd.github+json'}})
               .then(function(r){return r.json();})
-              .then(function(j){body.sha=j.sha;return putXHR('data.json',body.content,msg,function(){});});
+              .then(function(j){
+                if(!j||!j.sha) throw new Error('取不到 data.json 的 sha：'+(j&&j.message||'未知'));
+                return putXHR('data.json',body.content,msg,function(){},j.sha);
+              });
           }
           throw err;
         });
