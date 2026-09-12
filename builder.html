@@ -574,6 +574,7 @@ function renderPreview(){
     f.removeAttribute('srcdoc');
     f.onload = function(){ showLoading(false); };
     f.src = ENV.remote ? (PROD_URL + '?v=' + Date.now()) : (CONFIG.PAGE + '?v=' + Date.now());
+    f.src += '&edit=1';   // 作品集预览启用截图编辑入口
   } else {
     var html = (STATE.files[0] && STATE.files[0].text) || '';
     f.onload = function(){ showLoading(false); };
