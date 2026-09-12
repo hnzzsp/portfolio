@@ -1004,6 +1004,11 @@ function uploadOne(file){
     if (r.note){ item.children[1].textContent = r.note; item.children[1].className = 'hint'; }
     var name = safeName(f.name);
     var tgt = ($('upTarget') && $('upTarget').value) || 'shot';
+    /* 截图用途只收图片：传了 PDF 等非图片时自动降级为附件，避免前台裂图 */
+    if (tgt === 'shot' && !/^image\//.test(f.type) && !isImgName(name)){
+      toast('「' + f.name + '」不是图片，不能做项目封面，已自动按附件上传', 'err');
+      tgt = 'file';
+    }
     var dirMap = UP_DIR[STATE.type] || UP_DIR.portfolio;
     var dir = dirMap[tgt] || (isImgName(name) ? 'projects' : 'files');
     var path = 'assets/' + dir + '/' + name;
