@@ -95,6 +95,18 @@ button:disabled{opacity:.5;cursor:not-allowed}
 footer{border-top:1px solid var(--line);padding:20px 24px 40px;color:var(--dim);font-size:13px;text-align:center}
 .upbox{border:1px dashed var(--line);border-radius:var(--r2);padding:12px;background:var(--soft);margin-top:10px}
 .upbox .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+/* 小预览窗口 */
+.prevrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.preview{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff;max-width:300px}
+.preview .thumb{
+  width:58px;height:44px;flex-shrink:0;border-radius:5px;border:1px solid var(--line);
+  object-fit:cover;background:#f2f2ee;display:grid;place-items:center;
+  font-size:9.5px;font-weight:800;color:#fff;letter-spacing:.03em;overflow:hidden;
+}
+.preview .pmeta{min-width:0;font-size:12px;color:var(--dim);line-height:1.5}
+.preview .pmeta b{display:block;font-size:13px;color:var(--text);max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.preview .pmeta a{color:var(--accent);word-break:break-all}
+.preview.pending{opacity:.72}
 </style>
 </head>
 <body>
@@ -504,9 +516,11 @@ function buildSkills(){
 }
 function buildProjects(){
   $('projectsBox').innerHTML = arr(DATA.projects).map(function(p, i){
-    var hasImg = /<img\s/i.test(p.shot || '');
-    var prev = hasImg ? '<div style="max-width:220px;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-top:8px">' + p.shot + '</div>'
-                      : '<div class="hint">当前：占位文字（未设置图片）</div>';
+    var src = shotSrc(p.shot);
+    var prev = src
+      ? previewHtml('当前截图', src, 0, '已设置')
+      : '<div class="hint">当前：占位文字（未设置图片）</div>';
+    var files = filePreviews(p.res);
     return '<div class="item"><div class="ih"><b>项目 ' + (i + 1) + '</b><span class="sp">' + SAVE_BTN +
       '<button class="danger" type="button" data-del="project" data-i="' + i + '">删除项目</button></span></div>' +
       '<label>标题</label>' + inputHtml('projects.' + i + '.title', p.title) +
@@ -520,7 +534,8 @@ function buildProjects(){
         '<button class="ghost mini" type="button" data-pick="shot" data-i="' + i + '">上传截图</button>' +
         '<button class="ghost mini" type="button" data-pick="file" data-i="' + i + '">上传源文件</button>' +
         '<span class="hint" id="upstate-' + i + '"></span>' +
-      '</div>' + prev +
+      '</div>' +
+      '<div class="prevrow" id="prevbox-' + i + '">' + prev + files + '</div>' +
       '<input type="file" class="hide" id="pick-' + i + '">' +
       '</div></div>';
   }).join('');
@@ -671,6 +686,39 @@ window.addEventListener('beforeunload', function(e){
 
 /* ================= 上传 ================= */
 var upSeq = 0;
+/* ---- 小预览窗口 ---- */
+var EXT_COLOR = {psd:'#31a8ff', ai:'#ff9a00', pdf:'#e2574c', zip:'#8a63d2', rar:'#8a63d2',
+                 fig:'#a259ff', sketch:'#fdb300', xd:'#ff61f6', mp4:'#4c9be8', doc:'#2b579a',
+                 docx:'#2b579a', ppt:'#d24726', pptx:'#d24726', txt:'#7a7a72'};
+function extOf(n){ var d = String(n).lastIndexOf('.'); return d > 0 ? String(n).slice(d + 1).toLowerCase() : ''; }
+function isImgName(n){ return /^(png|jpe?g|webp|gif|svg|avif|bmp)$/.test(extOf(n)); }
+function thumbHtml(name, url){
+  if (isImgName(name)) return '<img class="thumb" src="' + esc(url) + '" alt="">';
+  var e = extOf(name);
+  var c = EXT_COLOR[e] || '#6d6d68';
+  return '<span class="thumb" style="background:' + c + '">' + esc(e ? e.toUpperCase() : 'FILE') + '</span>';
+}
+function previewHtml(name, url, size, note){
+  return '<div class="preview' + (note === '上传中…' ? ' pending' : '') + '">' +
+    thumbHtml(name, url) +
+    '<div class="pmeta"><b title="' + esc(name) + '">' + esc(name) + '</b>' +
+    (size ? fmtSize(size) + ' · ' : '') +
+    (note ? esc(note) : (url ? '<a href="' + esc(url) + '" target="_blank" rel="noopener">打开 ↗</a>' : '')) +
+    '</div></div>';
+}
+function shotSrc(html){
+  var m = /<img[^>]+src=["']([^"']+)["']/i.exec(html || '');
+  return m ? m[1] : '';
+}
+function filePreviews(html){
+  var re = /href=["'](assets\/[^"']+)["'][^>]*>([^<]*)</g, m, out = '';
+  while ((m = re.exec(html || ''))){
+    var nm = (m[2] || '').trim() || m[1].split('/').pop();
+    out += previewHtml(nm, m[1], 0, '');
+  }
+  return out;
+}
+
 function safeName(name){ return name.replace(/[^\w.\-\u4e00-\u9fa5]+/g, '_') || ('file_' + Date.now()); }
 function fmtSize(n){ return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
 function isImg(name){ return /\.(png|jpe?g|webp|gif|svg|avif)$/i.test(name); }
@@ -712,8 +760,18 @@ document.addEventListener('change', function(e){
   if (!st) return;
   if (!$('tok').value.trim()){ st.innerHTML = '<span style="color:var(--warn)">请先填写访问令牌</span>'; inp.value = ''; return; }
   st.textContent = '上传中… ' + fmtSize(file.size);
+  /* 选完立刻用本地临时地址出小预览，不等上传完成 */
+  var box = $('prevbox-' + idx);
+  var objUrl = '';
+  if (box && isImgName(file.name)){
+    objUrl = URL.createObjectURL(file);
+    box.insertAdjacentHTML('afterbegin', previewHtml(file.name, objUrl, file.size, '上传中…'));
+    var pending = box.querySelector('.preview.pending');
+  }
   collect();  // 先把当前编辑内容同步进 DATA，避免上传后重建表单丢改动
   uploadFile(file, kind === 'shot' ? 'projects' : 'files', function(name, rel){
+    if (objUrl) URL.revokeObjectURL(objUrl);
+    if (pending && pending.parentNode) pending.parentNode.removeChild(pending);
     if (kind === 'shot'){
       DATA.projects[idx].shot = '<img src="' + rel + '" alt="' + esc(name) + '" style="width:100%;height:100%;object-fit:cover">';
     }
@@ -727,8 +785,14 @@ document.addEventListener('change', function(e){
           ' <button class="cp" data-copy="' + esc(rel) + '" type="button">复制路径</button>' +
           ' <button class="ghost mini" data-insert="' + idx + '" data-rel="' + esc(rel) + '" data-nm="' + esc(name) + '" type="button">插入到结果</button>';
     }
+    if (kind !== 'shot'){
+      var b2 = $('prevbox-' + idx);
+      if (b2) b2.insertAdjacentHTML('beforeend', previewHtml(name, rel, file.size, ''));
+    }
     toast('上传成功：' + name, 'ok');
   }, function(reason){
+    if (objUrl) URL.revokeObjectURL(objUrl);
+    if (pending && pending.parentNode) pending.parentNode.removeChild(pending);
     st.innerHTML = '<span style="color:var(--warn)">失败：' + esc(reason) + '</span>';
   });
   inp.value = '';
@@ -755,23 +819,28 @@ $('fileInput').addEventListener('change', function(){
 function otherUpload(file){
   var id = 'up' + (++upSeq);
   var name = safeName(file.name);
+  var objUrl = isImgName(file.name) ? URL.createObjectURL(file) : '';
   var row = document.createElement('div');
   row.className = 'item';
   row.innerHTML = '<div class="ih"><b>' + esc(name) + '</b><span class="sp"></span>' +
-    '<span style="color:var(--dim)">上传中… ' + fmtSize(file.size) + '</span></div>';
+    '<span style="color:var(--dim)">上传中… ' + fmtSize(file.size) + '</span></div>' +
+    (objUrl ? previewHtml(name, objUrl, file.size, '上传中…') : '');
   $('upList').prepend(row);
   uploadFile(file, 'files', function(nm, rel){
+    if (objUrl) URL.revokeObjectURL(objUrl);
     var imgTag = '<img src="' + rel + '" alt="' + esc(nm) + '" style="width:100%;height:100%;object-fit:cover">';
     var dlTag = '<a href="' + rel + '" download>下载源文件</a>';
     row.innerHTML = '<div class="ih"><b>' + esc(nm) + '</b><span class="sp"></span>' +
       '<span style="color:var(--ok);font-weight:700">已上线</span></div>' +
-      '<div class="hint"><code>' + esc(rel) + '</code> · ' + fmtSize(file.size) + '</div>' +
+      '<div class="prevrow">' + previewHtml(nm, rel, file.size, '') + '</div>' +
+      '<div class="hint"><code>' + esc(rel) + '</code></div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
       (isImg(nm)
         ? '<button class="cp" data-copy="' + esc(imgTag) + '" type="button">复制图片代码</button>'
         : '<button class="cp" data-copy="' + esc(dlTag) + '" type="button">复制下载链接代码</button>') +
       '<button class="cp" data-copy="' + esc(rel) + '" type="button">复制路径</button></div>';
   }, function(reason){
+    if (objUrl) URL.revokeObjectURL(objUrl);
     row.innerHTML = '<div class="ih"><b>' + esc(name) + '</b><span class="sp"></span>' +
       '<span style="color:var(--warn);font-weight:700">失败：' + esc(reason) + '</span></div>';
   });
