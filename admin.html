@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="zh-CN" data-page-node-id="gyO0yh2djpRA7iYg5Nv4p5">
+<head data-page-node-id="uSaW8t7EoHOMmE2i5ZvGx8">
+<meta charset="UTF-8" data-page-node-id="bdMGN71TLLeJ3kO7OjAGbG">
+<meta name="viewport" content="width=device-width, initial-scale=1" data-page-node-id="ViMAQuARHpCg84ZStT2kS4">
 <title>后台管理 · 个人作品集</title>
-<meta name="robots" content="noindex, nofollow">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23111'/%3E%3Ctext x='16' y='22' font-family='Helvetica,Arial' font-size='15' font-weight='700' fill='%23fff' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
+<meta name="robots" content="noindex, nofollow" data-page-node-id="xxv6491M9DuuJT74pjMNHl">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23111'/%3E%3Ctext x='16' y='22' font-family='Helvetica,Arial' font-size='15' font-weight='700' fill='%23fff' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E" data-page-node-id="Uj7vVeWbaeSbpqzubesEV2">
 <style>
 :root{
   --bg:#ffffff; --bg-soft:#f2f2f0; --surface:#ffffff;
@@ -61,6 +61,11 @@ button.ghost:hover{border-color:var(--accent);color:var(--accent)}
 button.danger{background:transparent;color:var(--warn);border-color:var(--line);padding:6px 12px;font-size:13px}
 button.danger:hover{border-color:var(--warn)}
 button.mini{padding:5px 11px;font-size:12.5px}
+.card .cp{
+  font-size:12px;font-weight:700;color:var(--dim);border:1px solid var(--line);
+  padding:5px 12px;border-radius:99px;background:transparent;cursor:pointer;font-family:inherit;
+}
+.card .cp:hover{border-color:var(--accent);color:var(--accent)}
 
 /* 可重复条目 */
 .item{border:1px solid var(--line);padding:16px;margin-bottom:14px;background:var(--bg)}
@@ -80,7 +85,7 @@ button.mini{padding:5px 11px;font-size:12.5px}
 footer{border-top:1px solid var(--line);margin-top:40px;padding:20px 0 40px;color:var(--dim);font-size:13px}
 </style>
 </head>
-<body>
+<body data-page-node-id="3BpqdC0vJgxjQyyiCJijZN">
 
 <!--
   ============================================================
@@ -91,189 +96,200 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding:20px 0 40px;colo
   ============================================================
 -->
 
-<div class="bar">
-  <div class="wrap">
-    <h1>作品集 · 后台管理</h1>
-    <span class="pill" id="sitePill">hnzzsp/portfolio</span>
-    <div class="sp">
-      <a class="pill" href="./" target="_blank" rel="noopener">查看前台 ↗</a>
-      <button class="ghost mini" id="logoutBtn" type="button">退出</button>
+<div class="bar" data-page-node-id="EMXCZweFXJxlJEfDEe8ZSN">
+  <div class="wrap" data-page-node-id="Cmm8qDR27kTvp1U0YRNxcx">
+    <h1 data-page-node-id="6wKvxe3h9Zrv1U0XiGrbw9">作品集 · 后台管理</h1>
+    <span class="pill" id="sitePill" data-page-node-id="vKomI2QAmwPJ9TfgVTOGYd">hnzzsp/portfolio</span>
+    <div class="sp" data-page-node-id="0PCdPYWIkO1DxrxthdTfhV">
+      <a class="pill" href="./" target="_blank" rel="noopener" data-page-node-id="V6UPtncGIkPHz9BdoVOShN">查看前台 ↗</a>
+      <button class="ghost mini" id="logoutBtn" type="button" data-page-node-id="Nvs7tBwQ1doUFIZrkQTCtd">退出</button>
     </div>
   </div>
 </div>
 
 <!-- ========== 登录 ========== -->
-<div class="wrap">
-  <div id="login">
-    <h2>管理员登录</h2>
-    <p>此页面不对外公开链接，仅本人使用。</p>
-    <form id="loginForm">
-      <label for="pw">管理密码</label>
-      <input type="password" id="pw" autocomplete="current-password" placeholder="请输入管理密码" autofocus>
-      <div style="margin-top:18px"><button type="submit">登录</button></div>
-      <div class="msg err" id="loginErr"></div>
+<div class="wrap" data-page-node-id="H5UzLE6YQ2Zu0CPTR4mEwH">
+  <div id="login" data-page-node-id="GTH0lqfHe9WnGxcLmsxSkZ">
+    <h2 data-page-node-id="Ce9Xjt9O8gbo5cQnrbLKyr">管理员登录</h2>
+    <p data-page-node-id="zzJUnpKAAs2l3Q6EhFVxO0">此页面不对外公开链接，仅本人使用。</p>
+    <form id="loginForm" data-page-node-id="xIroKW1wJBSmVnXxHPzBxD">
+      <label for="pw" data-page-node-id="P81j8lpG4DF0klHD6ST1Wv">管理密码</label>
+      <input type="password" id="pw" autocomplete="current-password" placeholder="请输入管理密码" autofocus data-page-node-id="TH96Q5em5EPOmbYyRcXGnt">
+      <div style="margin-top:18px" data-page-node-id="ybGbTA0z4S9Q1clCt2O9ym"><button type="submit" data-page-node-id="AhlAqKtm1fajg34ZEsWifZ">登录</button></div>
+      <div class="msg err" id="loginErr" data-page-node-id="96NoeVwqo03JDRlreztkxa"></div>
     </form>
   </div>
 </div>
 
 <!-- ========== 编辑区 ========== -->
-<div class="wrap hide" id="panel">
+<div class="wrap hide" id="panel" data-page-node-id="JAA9MRBW6mYzZsvp7CqUjy">
 
-  <div class="msg" id="msg"></div>
+  <div class="msg" id="msg" data-page-node-id="teWEzQQDeCbQMv8HPmmOtE"></div>
 
   <!-- 数据加载失败时的离线兜底 -->
-  <div class="card hide" id="offlineCard">
-    <h2>离线编辑模式</h2>
-    <p class="hint">
-      常见原因：<br>
-      1. 用 <code>file://</code> 直接双击打开了本页（浏览器禁止页面读取本地文件）——请改用
-      <code>python -m http.server</code> 启动本地服务器，或直接用线上地址打开；<br>
-      2. 在只挂载了单个 HTML 的预览面板里打开——data.json 不在同目录，请改用线上地址；<br>
-      3. 网络不通或 github.io 访问被干扰——稍后重试。<br>
-      当前页面地址：<code id="locInfo"></code><br><br>
-      也可以把本地 <code>site/data.json</code> 的完整内容粘贴到下面，照样进入编辑（保存时仍需网络与令牌）：
+  <div class="card hide" id="offlineCard" data-page-node-id="FGAu062idSTVUqJGIn8K2t">
+    <h2 data-page-node-id="CnjmovwdgdAX3jjPTkysDR">离线编辑模式</h2>
+    <p class="hint" data-page-node-id="lS1L5eT9OHLLVd4s5j6XvI">
+      常见原因：<br data-page-node-id="cMxNDdfGhJHi3Rui4jCBjG">
+      1. 用 <code data-page-node-id="Tb6KInJHFzXaAcbxv9SacD">file://</code> 直接双击打开了本页（浏览器禁止页面读取本地文件）——请改用
+      <code data-page-node-id="OwgE7jA9D6DJPsMPvzGEuk">python -m http.server</code> 启动本地服务器，或直接用线上地址打开；<br data-page-node-id="ZsFY3lJMEn3DYNxr9aDMED">
+      2. 在只挂载了单个 HTML 的预览面板里打开——data.json 不在同目录，请改用线上地址；<br data-page-node-id="9wPTuCfCcJCG45h15YGYj9">
+      3. 网络不通或 github.io 访问被干扰——稍后重试。<br data-page-node-id="oSz6C7EqDXHoRMYKGA0WLs">
+      当前页面地址：<code id="locInfo" data-page-node-id="dsrEd7DT3cs3Pb3WRMM1WT"></code><br data-page-node-id="QnqlTvoYy5Lga8DBPZ3nZo"><br data-page-node-id="ClbQzYJ8ZmbjMYpTVBOsui">
+      也可以把本地 <code data-page-node-id="dggAZZpYTSTwuFSPd4ISwl">site/data.json</code> 的完整内容粘贴到下面，照样进入编辑（保存时仍需网络与令牌）：
     </p>
     <textarea id="pasteJson" style="min-height:170px;font-family:var(--mono);font-size:12.5px" placeholder="把 data.json 的完整内容粘贴到这里…"></textarea>
-    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="ghost" type="button" id="pasteBtn">解析并开始编辑</button>
-      <button class="ghost" type="button" id="retryBtn">重新尝试联网读取</button>
+    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap" data-page-node-id="ZFhVuTocO2ijfb49gUVdNF">
+      <button class="ghost" type="button" id="pasteBtn" data-page-node-id="SsjMDFH1I0KQlDCCFI9hFq">解析并开始编辑</button>
+      <button class="ghost" type="button" id="retryBtn" data-page-node-id="S31ZTIzild8NuDFsB8YORs">重新尝试联网读取</button>
     </div>
   </div>
 
-  <div class="card">
-    <h2>GitHub 访问令牌 <small>用于保存时提交文件</small></h2>
-    <label for="tok">Personal Access Token（需 repo 权限）</label>
-    <input type="password" id="tok" autocomplete="off" placeholder="ghp_xxxxxxxxxxxx">
-    <p class="hint">
-      令牌只保存在当前浏览器标签页的内存里（sessionStorage），<b>不会写入任何文件、不会进仓库</b>；
+  <div class="card" data-page-node-id="jum3yGIeFiHEE9nj9dT9tR">
+    <h2 data-page-node-id="PwSbFRAK7BXIyJwgLR7EdZ">GitHub 访问令牌 <small data-page-node-id="P28xqGy1oA9xLTrTXP5QJ2">用于保存时提交文件</small></h2>
+    <label for="tok" data-page-node-id="5B00HlqDdHCBTonlnbnV6l">Personal Access Token（需 repo 权限）</label>
+    <input type="password" id="tok" autocomplete="off" placeholder="ghp_xxxxxxxxxxxx" data-page-node-id="pRCOXeFOC3agGSayleNzor">
+    <p class="hint" data-page-node-id="a2z4EX2JDUzroMKGyVqr6R">
+      令牌只保存在当前浏览器标签页的内存里（sessionStorage），<b data-page-node-id="DHfoJcbEcTOKIsDjOAixIV">不会写入任何文件、不会进仓库</b>；
       关闭标签页即失效。可在 GitHub → Settings → Developer settings → Personal access tokens 生成。
     </p>
   </div>
 
-  <div class="card">
-    <h2>联系方式</h2>
-    <div class="row2">
-      <div><label>邮箱</label><input type="text" data-p="contact.email"></div>
-      <div><label>电话</label><input type="text" data-p="contact.phone"></div>
+  <div class="card" data-page-node-id="Kd0ezh4S4KA7GBD8s9SpFH">
+    <h2 data-page-node-id="8mWl96DjGGeU7e2CCD6HCr">联系方式</h2>
+    <div class="row2" data-page-node-id="OB4M4PJ6AzTCOgTNFrFLon">
+      <div data-page-node-id="LRMVYyJ9CilpQrUJt9237s"><label data-page-node-id="uVM4Aecc3u3D9yNjykqSLY">邮箱</label><input type="text" data-p="contact.email" data-page-node-id="GnWU3gMRWLqsNnxfUdfEqp"></div>
+      <div data-page-node-id="fLpr8JOEt2OrHyDAUGnfbB"><label data-page-node-id="Bgflyan0WorhORUgqdvjkH">电话</label><input type="text" data-p="contact.phone" data-page-node-id="yx2sDiIULtLdLdFAh6CZYz"></div>
     </div>
-    <div class="row2">
-      <div><label>微信</label><input type="text" data-p="contact.wechat"></div>
-      <div><label>城市</label><input type="text" data-p="contact.city"></div>
+    <div class="row2" data-page-node-id="yxv5c8KT4G3y5LgmxJbm39">
+      <div data-page-node-id="stFKQpiuQ6MKPeAVzh5iRQ"><label data-page-node-id="WvzoSG3qN2BhRGoFjQfBuU">微信</label><input type="text" data-p="contact.wechat" data-page-node-id="r4m5AxZhlohA8vH2Gf6Nbf"></div>
+      <div data-page-node-id="sgNJA3T1ANHTLUB6Cn84gt"><label data-page-node-id="dnVhiUoXGfXj75L5B70N3y">城市</label><input type="text" data-p="contact.city" data-page-node-id="mqtmnepd1UUkmlllCmppBE"></div>
     </div>
-    <div class="row2">
-      <div><label>GitHub 显示名</label><input type="text" data-p="contact.github"></div>
-      <div><label>GitHub 链接</label><input type="text" data-p="contact.githubUrl"></div>
+    <div class="row2" data-page-node-id="ajDF8spZ3gqMbEGS9vrGrp">
+      <div data-page-node-id="S3D8xNPPWBTLFQRHnzaGKx"><label data-page-node-id="cxRjAZ3ruizXLqOG2flLA1">GitHub 显示名</label><input type="text" data-p="contact.github" data-page-node-id="tmHI4RUmEhTWinaLDvtKSW"></div>
+      <div data-page-node-id="rOGYDst9q6pFEzWywcKKFP"><label data-page-node-id="NOcYu6gTIdULmKok2aAHFc">GitHub 链接</label><input type="text" data-p="contact.githubUrl" data-page-node-id="Bfkk1Ys5K5a8JcTGfEG9CF"></div>
     </div>
-    <div class="row2">
-      <div><label>作品站显示名</label><input type="text" data-p="contact.site"></div>
-      <div><label>作品站链接</label><input type="text" data-p="contact.siteUrl"></div>
+    <div class="row2" data-page-node-id="Kr06yxWU5OUEdIZbAXVhUf">
+      <div data-page-node-id="amPfIiUJCOxeWNEY4F9xTc"><label data-page-node-id="jOYDxBvu7AwODYqPEjZ5v1">作品站显示名</label><input type="text" data-p="contact.site" data-page-node-id="G962k3Gjx4ltEIl4k3fCHm"></div>
+      <div data-page-node-id="oqlEALx8rFvrj3pQwZHBR1"><label data-page-node-id="M8WTSyvZj33HlGvvLCJ0xY">作品站链接</label><input type="text" data-p="contact.siteUrl" data-page-node-id="T7kl0rBM0gQoKhwJjy5HI1"></div>
     </div>
   </div>
 
-  <div class="card">
-    <h2>首页抬头（Hero）</h2>
-    <div class="row2">
-      <div><label>显示名（英文/拼音）</label><input type="text" data-p="profile.enName"></div>
-      <div><label>头像字母</label><input type="text" data-p="profile.avatarText"></div>
+  <div class="card" data-page-node-id="6jnH4mPXGfi2syZARFYa6b">
+    <h2 data-page-node-id="vJMnSdtIRsNdn9OBqOTR3C">首页抬头（Hero）</h2>
+    <div class="row2" data-page-node-id="cKMHupdO62RTjGFtdWjodg">
+      <div data-page-node-id="vufCZI0fU1wcUlKVKwq9rO"><label data-page-node-id="oST4LaIgvWmwdyHQKdSmZr">显示名（英文/拼音）</label><input type="text" data-p="profile.enName" data-page-node-id="EVG9OOg5ifZhH7AqYqe3VR"></div>
+      <div data-page-node-id="7MN0hI5PBggCCmA3G12x4Z"><label data-page-node-id="SodaoPDFqEjTMuRXQ4W30s">头像字母</label><input type="text" data-p="profile.avatarText" data-page-node-id="ADJo7s0LcggeBOED2xxtAO"></div>
     </div>
-    <label>眉标（小字）</label><input type="text" data-p="profile.eyebrow">
-    <label>主标题（中文大字）</label><input type="text" data-p="profile.zhTitle">
-    <label>导语段落</label><textarea data-p="profile.lede"></textarea>
-    <p class="hint">支持简单 HTML：<code>&lt;strong&gt;加粗&lt;/strong&gt;</code>、<code>&lt;br&gt;换行</code></p>
-    <label>能力标签（每行一个）</label><textarea data-p="profile.tags" data-type="lines"></textarea>
-    <div class="row2">
-      <div><label>姓名（Quick Facts）</label><input type="text" data-p="profile.name"></div>
-      <div><label>职位</label><input type="text" data-p="profile.role"></div>
+    <label data-page-node-id="cb9Ek6e3FcGVWAkT2IeFKK">眉标（小字）</label><input type="text" data-p="profile.eyebrow" data-page-node-id="4yqnB4PWUfMBrkgXW5DsCk">
+    <label data-page-node-id="kQYs3RCY4xBmdWEVs4KbbF">主标题（中文大字）</label><input type="text" data-p="profile.zhTitle" data-page-node-id="O3kyZp4swXxgNbAmTop6Df">
+    <label data-page-node-id="HtoUCw0bzSoGnDbVlKsBNG">导语段落</label><textarea data-p="profile.lede"></textarea>
+    <p class="hint" data-page-node-id="xY9WPAxPlDVjkMzDRCaQmD">支持简单 HTML：<code data-page-node-id="GIC9Yj4EV4InB4mL2dtMZ3">&lt;strong&gt;加粗&lt;/strong&gt;</code>、<code data-page-node-id="odBV3euw2vLE6xDHBV6Zi0">&lt;br&gt;换行</code></p>
+    <label data-page-node-id="l54nZ2gpna8ef8W5v80ocB">能力标签（每行一个）</label><textarea data-p="profile.tags" data-type="lines"></textarea>
+    <div class="row2" data-page-node-id="gAlrDcSOAzbMJaXMdKdtD2">
+      <div data-page-node-id="NGFdt8JMqTrBzY18aZGLy5"><label data-page-node-id="gec80p3H6zGbCeHTANZOLP">姓名（Quick Facts）</label><input type="text" data-p="profile.name" data-page-node-id="aJ2fHsx55qA4m9hm1B4H0H"></div>
+      <div data-page-node-id="2gRwvCAOieggFDR0IKTFJ7"><label data-page-node-id="Cdohl3FENHUOhxVwVy0w3Q">职位</label><input type="text" data-p="profile.role" data-page-node-id="AmmblHfo1Lgm4KQQovdMZb"></div>
     </div>
-    <label>求职方向</label><input type="text" data-p="profile.intent">
+    <label data-page-node-id="aZlWNi7wwfjmCiW2y0vl0b">求职方向</label><input type="text" data-p="profile.intent" data-page-node-id="mhPzMMLTXRxgp7CmUyzw7Q">
   </div>
 
-  <div class="card">
-    <h2>Quick Facts <small>右侧信息卡</small></h2>
-    <div id="factsBox"></div>
-    <button class="ghost mini" type="button" id="addFact">+ 添加一行</button>
+  <div class="card" data-page-node-id="bJRQvNtVLBkWWdr1WqBApZ">
+    <h2 data-page-node-id="fmVMBDrcUTgCCxmJVWKUcW">Quick Facts <small data-page-node-id="bilR6EJtoUmKrIwcQclR2P">右侧信息卡</small></h2>
+    <div id="factsBox" data-page-node-id="ZWAAbdBEBIYD89mcotthMU"></div>
+    <button class="ghost mini" type="button" id="addFact" data-page-node-id="ev67UzBTljkPlplLjNwV5T">+ 添加一行</button>
   </div>
 
-  <div class="card">
-    <h2>个人简介</h2>
-    <div id="aboutBox"></div>
-    <button class="ghost mini" type="button" id="addPara">+ 添加段落</button>
+  <div class="card" data-page-node-id="cOmJq0NqtRKFPKFOJnhqjg">
+    <h2 data-page-node-id="JZ5vXS91sWxqMXM3zLSpC1">个人简介</h2>
+    <div id="aboutBox" data-page-node-id="59x7SXYP2ugJg8N3yZ0sd4"></div>
+    <button class="ghost mini" type="button" id="addPara" data-page-node-id="Gt0gqVCqTBGduBCo3M2WwS">+ 添加段落</button>
   </div>
 
-  <div class="card">
-    <h2>关键数据 <small>4 个统计块</small></h2>
-    <div id="statsBox"></div>
-    <button class="ghost mini" type="button" id="addStat">+ 添加一块</button>
+  <div class="card" data-page-node-id="DKSzMR4AnLGduDkP2ENwji">
+    <h2 data-page-node-id="8M86oFg3kX2oiH4SaHLYEQ">关键数据 <small data-page-node-id="IkGSZxsCqOawKyRNC9Gxqu">4 个统计块</small></h2>
+    <div id="statsBox" data-page-node-id="qdmD2FuwTE0cgzprgy12Ng"></div>
+    <button class="ghost mini" type="button" id="addStat" data-page-node-id="HKUcLds1q0vfNmfJSzdquj">+ 添加一块</button>
   </div>
 
-  <div class="card">
-    <h2>技能专长</h2>
-    <div id="skillsBox"></div>
-    <button class="ghost mini" type="button" id="addSkill">+ 添加分组</button>
+  <div class="card" data-page-node-id="kZaDTCz2Pg67BIr0RcYFJB">
+    <h2 data-page-node-id="u8QLemmDhvg05bGgUKmTKc">技能专长</h2>
+    <div id="skillsBox" data-page-node-id="0MQH4KhYMyXrJYN9QMRSMe"></div>
+    <button class="ghost mini" type="button" id="addSkill" data-page-node-id="t9qiZXqzyNJMRngRbWdVpV">+ 添加分组</button>
   </div>
 
-  <div class="card">
-    <h2>项目经历</h2>
-    <div id="projectsBox"></div>
-    <button class="ghost mini" type="button" id="addProject">+ 添加项目</button>
+  <div class="card" data-page-node-id="iXYrZeSS4TmXwnmvbH26iv">
+    <h2 data-page-node-id="PNxzHBWBEvWCXvhd5Y0ODh">项目经历</h2>
+    <div id="projectsBox" data-page-node-id="tCecODveTkNt3P8gGa2J8E"></div>
+    <button class="ghost mini" type="button" id="addProject" data-page-node-id="ZJMpBp5PmRaQfwOWJsA4G6">+ 添加项目</button>
   </div>
 
-  <div class="card">
-    <h2>教育与实践</h2>
-    <div id="timelineBox"></div>
-    <button class="ghost mini" type="button" id="addTime">+ 添加一条</button>
+  <div class="card" data-page-node-id="DEDFtbwl0w6hl8qyxMLEju">
+    <h2 data-page-node-id="Kqgiqj6ngxu9C7Jdpdu5jL">教育与实践</h2>
+    <div id="timelineBox" data-page-node-id="Hd75tRRSRBl4Cp24EZqAwc"></div>
+    <button class="ghost mini" type="button" id="addTime" data-page-node-id="Q21Nudg5qWNLXFuGC8Etni">+ 添加一条</button>
   </div>
 
-  <div class="card">
-    <h2>页脚</h2>
-    <div class="row2">
-      <div><label>姓名</label><input type="text" data-p="footer.name"></div>
-      <div><label>后缀说明</label><input type="text" data-p="footer.suffix"></div>
+  <div class="card" data-page-node-id="lgf0MhbOReNsp9t9I1hADH">
+    <h2 data-page-node-id="cmN7jDMLtmLc9B6L3ABEB3">页脚</h2>
+    <div class="row2" data-page-node-id="J1HFdNHexHiBM93DkeCE4x">
+      <div data-page-node-id="aDo56G1Cqhj4zyCwGn2aiW"><label data-page-node-id="EuIFCnAALUmAxpqWVodIBM">姓名</label><input type="text" data-p="footer.name" data-page-node-id="U4l0djO9XiCHFwG5SkUCvU"></div>
+      <div data-page-node-id="1gTKyE7VFzIWMjZz4X05hR"><label data-page-node-id="Vj7YCoGhmzF8wgY02HZ8qb">后缀说明</label><input type="text" data-p="footer.suffix" data-page-node-id="xDOIMZjTEIJvC8c0f4YriS"></div>
     </div>
-    <label>最后更新日期</label><input type="text" data-p="meta.updated">
+    <label data-page-node-id="a1jzG5zb44waywJyOpqnAU">最后更新日期</label><input type="text" data-p="meta.updated" data-page-node-id="tMr1I4Zpxqz48AQy9wu5PW">
   </div>
 
-  <div class="card" style="border-color:var(--accent)">
-    <h2>保存</h2>
-    <p class="hint" style="margin:0 0 14px">
-      保存会把 <code>data.json</code> 直接提交到仓库 <code>main</code> 分支，
-      GitHub Pages 重新构建后前台自动生效，通常 <b>1 分钟内</b>，无需改代码、无需本地部署。
+  <div class="card" style="border-color:var(--accent)" data-page-node-id="IbvbF3la89B4jfJD9CRopv">
+    <h2 data-page-node-id="bIm8ZDaIDuwo0M4l62ShXB">保存</h2>
+    <p class="hint" style="margin:0 0 14px" data-page-node-id="lkbwFKOiC85jsD0Xut1TCR">
+      保存会把 <code data-page-node-id="dP22HXAIs2UYaPwGCdXiD1">data.json</code> 直接提交到仓库 <code data-page-node-id="aLUeMEeVaO3HbMuXpxddas">main</code> 分支，
+      GitHub Pages 重新构建后前台自动生效，通常 <b data-page-node-id="ldQPDyAYrthACrBybbSmGu">1 分钟内</b>，无需改代码、无需本地部署。
     </p>
-    <label>提交说明（可选）</label>
-    <input type="text" id="commitMsg" placeholder="例如：更新联系方式">
-    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
-      <button type="button" id="saveBtn">保存并发布</button>
-      <button class="ghost" type="button" id="reloadBtn">放弃修改，重新载入</button>
+    <label data-page-node-id="RMb1E6hVax3keXKPCJIL4Z">提交说明（可选）</label>
+    <input type="text" id="commitMsg" placeholder="例如：更新联系方式" data-page-node-id="koaC5zCZJVKmGRfqLwzlLe">
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap" data-page-node-id="FXGZEcLDnpQshWx1riIhd1">
+      <button type="button" id="saveBtn" data-page-node-id="Kw5FwsSYXkk4CbcpXpTyKB">保存并发布</button>
+      <button class="ghost" type="button" id="reloadBtn" data-page-node-id="f06M6Q5ZKTAk351Slx4IMC">放弃修改，重新载入</button>
     </div>
   </div>
 
-  <div class="card">
-    <h2>修改管理密码</h2>
-    <div class="row2">
-      <div><label>新密码</label><input type="password" id="np1" autocomplete="new-password"></div>
-      <div><label>再输一次</label><input type="password" id="np2" autocomplete="new-password"></div>
+  <div class="card" data-page-node-id="WuQBd2hXHFmaLJyppjUWWF">
+    <h2 data-page-node-id="MgRuSKYXuDAr7LvlWpOFze">修改管理密码</h2>
+    <div class="row2" data-page-node-id="ltMiArxHWiaQxDYUezVobd">
+      <div data-page-node-id="eSoDYPe1LzQdhgGjw5iYHt"><label data-page-node-id="Q8l0zvKHqwJjuhrDvikAhg">新密码</label><input type="password" id="np1" autocomplete="new-password" data-page-node-id="6ir70vuSmKUNaUhezS3Fjq"></div>
+      <div data-page-node-id="HiR9z88e1Nmhys7vaAmNf8"><label data-page-node-id="7hzKzvQ4jIbCqlXpWTAbUJ">再输一次</label><input type="password" id="np2" autocomplete="new-password" data-page-node-id="Y6i5aWtniJh7b8M99Voy0W"></div>
     </div>
-    <p class="hint">
-      提交后会改写 <code>admin.html</code> 里的 <code>PASS_SHA256</code> 常量并重新发布，
-      同样不需要你手动改代码。<b>新密码请务必自己记住</b>——忘了只能本地重新生成一份 admin.html。
+    <p class="hint" data-page-node-id="erkIMpgqcEhbGY41d8FXGc">
+      提交后会改写 <code data-page-node-id="S5qJiJuk4zDHjoOOiZqFV9">admin.html</code> 里的 <code data-page-node-id="t65jiQH9jjBpQcwDZbHo6m">PASS_SHA256</code> 常量并重新发布，
+      同样不需要你手动改代码。<b data-page-node-id="HyBuQHesjw8i2nzGYvFN9b">新密码请务必自己记住</b>——忘了只能本地重新生成一份 admin.html。
     </p>
-    <div style="margin-top:14px"><button class="ghost" type="button" id="pwBtn">提交新密码</button></div>
+    <div style="margin-top:14px" data-page-node-id="nEUWtbiovRKiayHC3spxw3"><button class="ghost" type="button" id="pwBtn" data-page-node-id="0elBg5FrIwOuoBDsDf0fvH">提交新密码</button></div>
   </div>
 
-  <div class="card">
-    <h2>数据与存储说明</h2>
-    <p class="hint" style="margin:0">
-      · <b>展示数据</b>：存在仓库根目录 <code>data.json</code>，公开可读，前台加载它渲染页面。<br>
-      · <b>管理密码</b>：只存哈希，写在本页顶部 <code>ADMIN_CONFIG.PASS_SHA256</code>。<br>
-      · <b>GitHub 令牌</b>：只在当前标签页内存中，关闭即失效，不落盘、不进仓库。<br>
-      · <b>登录状态</b>：sessionStorage，关闭标签页自动退出。<br>
-      · 如果 <code>data.json</code> 加载失败，前台会自动回退到 index.html 里的静态内容，不会白屏。
+  <div class="card" data-page-node-id="Fsjj62k8rH67Kjwh6hOdnL">
+    <h2 data-page-node-id="IhMuPruXUTfYJeqTk32e1g">照片 / 源文件上传</h2>
+    <p class="hint" style="margin:0 0 12px" data-page-node-id="ufYYuNOn4uuWqoP82DgxVu">
+      图片、PSD/AI 源文件、PDF、ZIP 都可以传，直接存进仓库 <code data-page-node-id="o6JaDMwmNcCyyN3jUVbO5H">assets/</code> 目录并立即上线。
+      单文件建议 ≤ 40MB（太大会超出接口限制）；文件名会自动清理空格与特殊字符。
+    </p>
+    <input type="file" id="fileInput" multiple
+           accept="image/*,.psd,.ai,.pdf,.zip,.svg,.png,.jpg,.jpeg,.webp,.gif" data-page-node-id="9K8TYC1SGx7HP6A6yoVpb7">
+    <div id="upList" style="margin-top:14px" data-page-node-id="tn97y82OATSZtNmem22xF4"></div>
+  </div>
+
+  <div class="card" data-page-node-id="6zYG5mEsoNicSmfLoV6QGn">
+    <h2 data-page-node-id="5rYoj64Xme0sv7ZTmDCD67">数据与存储说明</h2>
+    <p class="hint" style="margin:0" data-page-node-id="YGfkXbjEKbMGY76KlL4w5U">
+      · <b data-page-node-id="CrEMzQUeOaJkq4sO1iSufH">展示数据</b>：存在仓库根目录 <code data-page-node-id="mo6Udv7YTFyk4jHlmjfOAu">data.json</code>，公开可读，前台加载它渲染页面。<br data-page-node-id="NYHCNkDoAhjOBjjWNDPz6m">
+      · <b data-page-node-id="KXAULJvKYvv1ZlleDpihnc">管理密码</b>：只存哈希，写在本页顶部 <code data-page-node-id="Qp795BtqO41y1qNVdE3Nh6">ADMIN_CONFIG.PASS_SHA256</code>。<br data-page-node-id="mftFEF4KeapyUYfJf2vusv">
+      · <b data-page-node-id="0QzNY5LFaQRFxwQosL8bdu">GitHub 令牌</b>：只在当前标签页内存中，关闭即失效，不落盘、不进仓库。<br data-page-node-id="1tpTz1Z7GHDtM35tzUufXJ">
+      · <b data-page-node-id="BbwJhA6rRB2ky9EUn5RN8m">登录状态</b>：sessionStorage，关闭标签页自动退出。<br data-page-node-id="HkS4LUxpxJoOP1OcsHbGFr">
+      · 如果 <code data-page-node-id="PrJ6EhfbiYVwARw6qqqQdO">data.json</code> 加载失败，前台会自动回退到 index.html 里的静态内容，不会白屏。
     </p>
   </div>
 
 </div>
 
-<footer><div class="wrap">个人作品集后台 · 本页已设置 noindex，不参与搜索收录</div></footer>
+<footer data-page-node-id="b9k88aQwMLU1ByGEPHgr7c"><div class="wrap" data-page-node-id="00ncwidyDDTRB3vLnchTuT">个人作品集后台 · 本页已设置 noindex，不参与搜索收录</div></footer>
 
 <script>
 /* ================= 配置 ================= */
@@ -283,7 +299,7 @@ var ADMIN_CONFIG = {
   BRANCH: 'main',
   DATA_PATH: 'data.json',
   ADMIN_PATH: 'admin.html',
-  PASS_SHA256: '46daee9ffd5c862ebc9dcec9d13d2a21e4f8951c676da9c281906c2bfe6ce99b',
+  PASS_SHA256: '37a0034fb1fae0f18836a858af9b95b2215835b2b67923b69cfc3dfbeb65b40e',
   SESSION_KEY: 'pfAdminAuthed'
 };
 
@@ -622,6 +638,92 @@ $('retryBtn').addEventListener('click', function(){
   loadData();
 });
 
+/* ================= 照片 / 源文件上传 ================= */
+var upSeq = 0;
+function safeName(name){
+  var s = name.replace(/[^\w.\-\u4e00-\u9fa5]+/g, '_');
+  return s || ('file_' + Date.now());
+}
+function fmtSize(n){
+  return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
+}
+function isImg(name){ return /\.(png|jpe?g|webp|gif|svg|avif)$/i.test(name); }
+function putContents(path, b64, message){
+  return gh('PUT', '/repos/' + ADMIN_CONFIG.OWNER + '/' + ADMIN_CONFIG.REPO + '/contents/' + path,
+    { message: message, content: b64, branch: ADMIN_CONFIG.BRANCH });
+}
+function uploadOne(file){
+  var MAX = 40 * 1024 * 1024;
+  var name = safeName(file.name);
+  var id = 'up' + (++upSeq);
+  var row = document.createElement('div');
+  row.className = 'item';
+  row.id = id;
+  row.dataset.name = name;
+  row.innerHTML = '<div class="ih"><b>' + esc(name) + '</b><span class="sp"></span>' +
+    '<span style="color:var(--dim)">上传中… ' + fmtSize(file.size) + '</span></div>';
+  $('upList').prepend(row);
+
+  if (file.size > MAX){
+    row.innerHTML = '<div class="ih"><b>' + esc(name) + '</b><span class="sp"></span>' +
+      '<span style="color:var(--warn);font-weight:700">失败：超过 40MB，请压缩后重试</span></div>';
+    return;
+  }
+  var reader = new FileReader();
+  reader.onerror = function(){ upFail(row, '文件读取失败'); };
+  reader.onload = function(e){
+    var b64 = String(e.target.result).split(',')[1];
+    putContents('assets/' + name, b64, '上传素材 ' + name).then(function(){
+      showUpOk(row, name, file.size);
+    }).catch(function(err){
+      if (/sha/i.test(err.message)){
+        // 同名文件已存在 → 自动加时间戳重试
+        var dot = name.lastIndexOf('.');
+        var nn = dot > 0 ? name.slice(0, dot) + '_' + Date.now() + name.slice(dot)
+                         : name + '_' + Date.now();
+        putContents('assets/' + nn, b64, '上传素材 ' + nn).then(function(){
+          showUpOk(row, nn, file.size);
+        }).catch(function(e2){ upFail(row, e2.message || e2); });
+      } else {
+        upFail(row, err.message || err);
+      }
+    });
+  };
+  reader.readAsDataURL(file);
+}
+function showUpOk(row, name, size){
+  var rel = 'assets/' + name;
+  var imgTag = '<img src="' + rel + '" alt="' + name + '" style="width:100%;height:100%;object-fit:cover">';
+  var dlTag = '<a href="' + rel + '" download>下载源文件</a>';
+  var html = '<div class="ih"><b>' + esc(name) + '</b><span class="sp"></span>' +
+    '<span style="color:var(--ok);font-weight:700">已上线</span></div>' +
+    '<div class="hint"><code>' + esc(rel) + '</code> · ' + fmtSize(size) +
+    ' · 已直接提交到仓库，前台立即可用</div>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">';
+  if (isImg(name)){
+    html += '<button class="cp" data-copy="' + esc(imgTag) + '" type="button">复制图片代码（粘到项目“截图区”）</button>';
+  } else {
+    html += '<button class="cp" data-copy="' + esc(dlTag) + '" type="button">复制下载链接代码</button>';
+  }
+  html += '<button class="cp" data-copy="' + esc(rel) + '" type="button">复制路径</button></div>';
+  row.innerHTML = html;
+}
+function upFail(row, reason){
+  row.innerHTML = '<div class="ih"><b>' + esc(row.dataset.name || '文件') + '</b><span class="sp"></span>' +
+    '<span style="color:var(--warn);font-weight:700">失败：' + esc(reason) + '</span></div>' +
+    '<div class="hint">检查令牌是否已填、是否有 repo 权限，或稍后重试。</div>';
+}
+$('fileInput').addEventListener('change', function(){
+  if (!this.files || !this.files.length) return;
+  if (!$('tok').value.trim()){
+    msg('请先在上方填写 GitHub 访问令牌，再选择文件上传。', 'err');
+    this.value = '';
+    return;
+  }
+  Array.prototype.forEach.call(this.files, uploadOne);
+  this.value = '';
+});
+
 /* ================= 修改密码 ================= */
 $('pwBtn').addEventListener('click', function(){
   var a = $('np1').value, b = $('np2').value;
@@ -633,8 +735,13 @@ $('pwBtn').addEventListener('click', function(){
     var path = '/repos/' + ADMIN_CONFIG.OWNER + '/' + ADMIN_CONFIG.REPO + '/contents/' + ADMIN_CONFIG.ADMIN_PATH;
     return gh('GET', path + '?ref=' + ADMIN_CONFIG.BRANCH).then(function(j){
       var src = b64dec(j.content);
-      var next = src.replace(/PASS_SHA256\s*:\s*'[^']*'/, "PASS_SHA256: '" + hash + "'");
-      if (next === src) throw new Error('未在 admin.html 中找到 PASS_SHA256，请检查文件是否被改写');
+      var re = /PASS_SHA256\s*:\s*['"][^'"]*['"]/;
+      if (!re.test(src)) throw new Error('未在 admin.html 中找到 PASS_SHA256，请检查文件是否被改写');
+      var next = src.replace(re, "PASS_SHA256: '" + hash + "'");
+      if (next === src){
+        $('np1').value = ''; $('np2').value = '';
+        return msg('新密码与当前密码相同，无需修改。', '');
+      }
       return gh('PUT', path, {
         message: '更新后台管理密码哈希',
         content: b64enc(next),
