@@ -1114,8 +1114,12 @@ function shotHTML(p,i){
 function rDetail(list){
   return list.map(function(p,i){
     var kws=arr(p.kws).length?'<ul class="kws">'+arr(p.kws).map(function(k){return '<li>'+k+'</li>';}).join('')+'</ul>':'';
+    var sh=p.shot||'';
+    var shSrc=shotImg(p);
+    if(shSrc&&FRESH[shSrc]) sh=sh.split(shSrc).join(FRESH[shSrc]);
+    if(shSrc) sh=sh.replace(/<img/i,'<img data-pi="'+i+'"');
     return '<article class="proj" data-card="'+i+'">'+
-      '<div class="shot" data-shot="'+i+'">'+(p.shot||'')+'</div>'+
+      '<div class="shot" data-shot="'+i+'">'+sh+'</div>'+
       '<div class="proj-body"><h3>'+p.title+'</h3><p class="proj-role">'+(p.role||'')+'</p>'+
       '<ul class="star">'+(p.bg?'<li><dt>背景</dt><dd>'+p.bg+'</dd></li>':'')+
       (p.act?'<li><dt>行动</dt><dd>'+p.act+'</dd></li>':'')+
