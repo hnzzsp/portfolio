@@ -724,7 +724,13 @@ function filePreviews(html){
   return out;
 }
 
-function safeName(name){ return name.replace(/[^\w.\-\u4e00-\u9fa5]+/g, '_') || ('file_' + Date.now()); }
+function safeName(name){
+  // GitHub Pages 无法访问中文等非 ASCII 路径，只保留 ASCII 字符
+  var base = name.replace(/\.[^.]*$/, '').replace(/[^A-Za-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '');
+  var ext = (name.match(/\.[^.]*$/) || [''])[0].toLowerCase();
+  if (!base) base = 'file_' + Date.now();
+  return base + ext;
+}
 function fmtSize(n){ return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
 function isImg(name){ return /\.(png|jpe?g|webp|gif|svg|avif)$/i.test(name); }
 function putContents(path, b64, message){
