@@ -2022,18 +2022,21 @@ function apply(v){
   cur=v;
   try{ localStorage.setItem(KEY,v); }catch(e){}
   markOn(i); setKnob(i); syncStyleSel();
-  /* 通知其它模块（章节导航 spy 等）：视图变了，页面在顶部时不会产生 scroll 事件 */
+  if(v==='portfolio'){ toNative(); }
+  else{
+    toStage();
+    loadTip.style.display='';
+    loadTip.textContent='正在生成'+(v==='resume'?'简历':'着陆页')+'视图…';
+    loadData().then(function(){
+      if(cur!==v) return;
+      frame.srcdoc=buildSrc();
+    }).catch(function(err){
+      loadTip.textContent='数据加载失败（'+err.message+'），请稍后重试或点击标签重新切换';
+    });
+  }
+  /* 通知其它模块（章节导航 spy 等）：视图变了，页面在顶部时不会产生 scroll 事件。
+     放在 toStage/toNative 之后，spy 才能读到最新的视图状态 */
   try{ window.dispatchEvent(new CustomEvent('pf-view-change')); }catch(e){}
-  if(v==='portfolio'){ toNative(); return; }
-  toStage();
-  loadTip.style.display='';
-  loadTip.textContent='正在生成'+(v==='resume'?'简历':'着陆页')+'视图…';
-  loadData().then(function(){
-    if(cur!==v) return;
-    frame.srcdoc=buildSrc();
-  }).catch(function(err){
-    loadTip.textContent='数据加载失败（'+err.message+'），请稍后重试或点击标签重新切换';
-  });
 }
 
 /* ---- 点击 ---- */
