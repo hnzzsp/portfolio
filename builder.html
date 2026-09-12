@@ -237,6 +237,11 @@ pre.code{
     <div class="tabpane" id="pane-up">
       <div class="drop" id="drop">点击选择文件，或把文件拖到这里<br><span style="font-size:12px">图片会存到 assets/projects/，其他文件存到 assets/files/</span></div>
       <input type="file" id="fileInput" class="hide" multiple>
+      <div class="row" style="margin-top:12px">
+        <span class="hint" style="margin:0">上传用途（随站点类型变化）</span>
+        <select id="upTarget" style="margin-left:auto;font:inherit;font-size:13px;padding:5px 8px;border:1px solid var(--line);border-radius:var(--r2);background:var(--surface);color:var(--text)"></select>
+      </div>
+      <p class="hint" id="upTargetHint"></p>
       <label class="check"><input type="checkbox" id="doCompress" checked> 上传前自动压缩图片（最长边 1600px，JPEG 质量 85）</label>
       <p class="hint">建议开启：一张 2.8MB 的 PNG 压缩后约 <b>60KB</b>，手机端加载快几十倍。源文件（PSD/AI/PDF/ZIP）不受影响。</p>
       <div id="upList" style="margin-top:12px"></div>
@@ -428,6 +433,7 @@ function fileListOf(type, src){
 /* ===================== M7 模板生成（简历 / 着陆页） ===================== */
 function tplResume(d){
   var p = (d && d.profile) || {}, a = (d && d.about) || {}, c = (d && d.contact) || {};
+  var md = (d && d.media) || {};
   function skills(){
     return (d.skills || []).map(function(g){
       var items = (g.bars || []).map(function(b){
@@ -467,10 +473,14 @@ function tplResume(d){
     '.tl{display:flex;gap:14px;padding:8px 0;border-top:1px solid #eee}' +
     '.tl span{width:96px;flex-shrink:0;color:#6d6d68;font-size:12.5px}.tl b{font-size:14px}.tl p{margin:2px 0 0;font-size:13px;color:#444}' +
     'footer{margin-top:28px;border-top:1px solid #eee;padding-top:12px;font-size:12px;color:#8a8a84}' +
+    '.shots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}' +
+    '.shots img{width:100%;height:140px;object-fit:cover;border:1px solid #eee;border-radius:6px}' +
     '@media print{body{padding:0}h2{page-break-after:avoid}.pj{page-break-inside:avoid}}' +
-    '@media (max-width:600px){body{padding:18px 14px}h1{font-size:26px}.bar span{width:90px}}' +
+    '@media (max-width:600px){body{padding:18px 14px}h1{font-size:26px}.bar span{width:90px}.shots{grid-template-columns:repeat(2,1fr)}}' +
     '</style></head><body>' +
-    '<header><h1>' + esc(p.name || '姓名') + '</h1>' +
+    '<header>' +
+    (md.avatar ? '<img src="' + esc(md.avatar) + '" alt="头像" style="width:92px;height:92px;border-radius:50%;object-fit:cover;float:right;margin:0 0 8px 18px;border:1px solid #e2e2dd">' : '') +
+    '<h1>' + esc(p.name || '姓名') + '</h1>' +
     '<div class="sub">' + esc(p.eyebrow || '') + (p.intent ? ' · ' + esc(p.intent) : '') + '</div>' +
     '<div class="ct">' +
       (c.email ? '<span>邮箱 ' + esc(c.email) + '</span>' : '') +
@@ -483,12 +493,18 @@ function tplResume(d){
     skills() +
     '<section><h2>项目经历</h2>' + projects + '</section>' +
     '<section><h2>教育与实践</h2>' + tl + '</section>' +
+    (md.resumeShots && md.resumeShots.length
+      ? '<section><h2>作品样张</h2><div class="shots">' +
+        md.resumeShots.map(function(u){ return '<img src="' + esc(u) + '" alt="">'; }).join('') +
+        '</div></section>'
+      : '') +
     '<footer>本页由站点生成与预览工具从 data.json 实时生成 · ' + esc((d.meta && d.meta.updated) || '') + '</footer>' +
     '</body></html>';
 }
 
 function tplLanding(d){
   var p = (d && d.profile) || {}, a = (d && d.about) || {}, c = (d && d.contact) || {};
+  var md = (d && d.media) || {};
   var features = (d.skills || []).slice(0, 3).map(function(g, i){
     return '<div class="f"><span class="n">0' + (i + 1) + '</span><h3>' + esc(g.name) + '</h3>' +
       '<p>' + esc(g.note || '') + '</p>' +
@@ -504,6 +520,11 @@ function tplLanding(d){
       '<p class="d">' + stripTags(x.act).slice(0, 110) + '…</p>' +
       ((x.kws || []).map(function(k){ return '<i>' + esc(k) + '</i>'; }).join('')) + '</article>';
   }).join('');
+  var gallery = (md.landingShots && md.landingShots.length)
+    ? '<div class="gallery">' + md.landingShots.map(function(u){
+        return '<div class="g"><img src="' + esc(u) + '" alt="" loading="lazy"></div>';
+      }).join('') + '</div>'
+    : cards;
   return '<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<title>' + esc(p.name || '') + ' · ' + esc(p.role || '') + '</title><style>' +
@@ -537,6 +558,11 @@ function tplLanding(d){
     'article .d{color:#9aa7b5;font-size:13px;margin:0 14px 12px}article i{display:inline-block;font-style:normal;font-size:11.5px;border:1px solid #2b3541;border-radius:999px;padding:2px 9px;margin:0 0 14px 14px;color:#9aa7b5}' +
     '.band{background:#121820;border:1px solid #232a33;border-radius:16px;padding:34px;text-align:center}' +
     'footer{border-top:1px solid #232a33;padding:24px 0;color:#6e7c8c;font-size:12.5px}' +
+    '.heroimg{max-width:1080px;margin:24px auto 0;padding:0 22px}' +
+    '.heroimg img{width:100%;height:300px;object-fit:cover;border-radius:14px;border:1px solid #232a33;display:block}' +
+    '.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}' +
+    '.gallery .g{border-radius:12px;overflow:hidden;border:1px solid #232a33;background:#121820}' +
+    '.gallery img{width:100%;height:170px;object-fit:cover;display:block}' +
     '@media (max-width:860px){.stats{grid-template-columns:repeat(2,1fr)}.feat{grid-template-columns:1fr}h1{font-size:32px}header.hero{padding:52px 0 40px}}' +
     '</style></head><body>' +
     '<nav><div class="wrap"><b>' + esc(p.name || '') + '</b><span style="color:#6e7c8c;font-size:13px">' + esc(p.role || '') + '</span>' +
@@ -549,8 +575,9 @@ function tplLanding(d){
     (c.siteUrl ? '<a class="s" href="' + esc(c.siteUrl) + '" target="_blank" rel="noopener">查看作品站 ↗</a>' : '') + '</div>' +
     '</div></header>' +
     '<div class="wrap"><div class="stats">' + stats + '</div></div>' +
+    (md.landingHero ? '<div class="heroimg"><img src="' + esc(md.landingHero) + '" alt=""></div>' : '') +
     '<section><div class="wrap"><h2>能力矩阵</h2><div class="feat">' + features + '</div></div></section>' +
-    '<section style="background:#0b0e13"><div class="wrap"><h2>项目与作品</h2><div class="cards">' + cards + '</div></div></section>' +
+    '<section style="background:#0b0e13"><div class="wrap"><h2>项目与作品</h2><div class="cards">' + gallery + '</div></div></section>' +
     '<section><div class="wrap"><div class="band"><h2>有合适的机会？聊聊</h2>' +
     '<p style="color:#9aa7b5;margin:0 0 18px">邮箱 ' + esc(c.email || '') + (c.wechat ? ' · 微信 ' + esc(c.wechat) : '') + (c.phone ? ' · 电话 ' + esc(c.phone) : '') + '</p>' +
     '<a class="p" style="background:#7ee787;color:#0e1116;padding:11px 24px;border-radius:999px;text-decoration:none;font-weight:700" href="mailto:' + esc(c.email || '') + '">发送邮件</a>' +
@@ -615,6 +642,7 @@ function switchType(type){
     b.setAttribute('aria-selected', String(on));
   });
   $('typeName').textContent = TYPE_LABEL[type];
+  fillUpTargets();
   showLoading(true, '正在生成…');
   loadData().then(buildSource).then(function(src){
     STATE.src = src;
@@ -777,6 +805,15 @@ function syncDataAfterDelete(path){
     var out = s.replace(imgRe, '').replace(aRe, '').split(path).join('');
     return out;
   }
+  if (DATA.media){
+    if (DATA.media.avatar === path) DATA.media.avatar = '';
+    if (DATA.media.landingHero === path) DATA.media.landingHero = '';
+    ['resumeShots', 'landingShots'].forEach(function(k){
+      if (Array.isArray(DATA.media[k])){
+        DATA.media[k] = DATA.media[k].filter(function(u){ return u !== path; });
+      }
+    });
+  }
   (DATA.projects || []).forEach(function(p){
     var before = p.shot;
     p.shot = clean(p.shot);
@@ -799,13 +836,82 @@ function syncDataAfterDelete(path){
   var next = JSON.stringify(DATA, null, 2);
   if (next === JSON.stringify(JSON.parse(raw), null, 2)) return Promise.resolve(false);
   var b64 = btoa(unescape(encodeURIComponent(next)));
-  return gh('PUT', '/repos/' + CONFIG.OWNER + '/' + CONFIG.REPO + '/contents/' + CONFIG.DATA,
-    { message: '清理已删除素材的引用：' + path, content: b64, branch: CONFIG.BRANCH })
+  return putDataJson('清理已删除素材的引用：' + path)
     .then(function(){ return true; })
     .catch(function(){ return false; });
 }
 
 /* ===================== M11 上传（进度 + 可选压缩） ===================== */
+/* 按站点类型分流：不同用途落到不同目录，并决定是否写入 data.json.media */
+var UP_TARGETS = {
+  portfolio: [['shot', '项目截图'], ['file', '其他文件']],
+  resume:    [['avatar', '简历头像'], ['shot', '简历作品图'], ['file', '其他文件']],
+  landing:   [['hero', '着陆页主视觉'], ['shot', '着陆页画廊图'], ['file', '其他文件']]
+};
+var UP_HINT = {
+  portfolio: { shot: '存到 assets/projects/，复制路径后自己插进项目卡', file: '存到 assets/files/，可作为下载源文件' },
+  resume:    { avatar: '自动写进 data.json → media.avatar，简历抬头右侧圆形头像',
+               shot: '自动追加到 media.resumeShots，简历底部「作品样张」九宫格',
+               file: '存到 assets/files/' },
+  landing:   { hero: '自动写进 media.landingHero，着陆页顶部大图',
+               shot: '自动追加到 media.landingShots，着陆页画廊网格',
+               file: '存到 assets/files/' }
+};
+var UP_DIR = {
+  portfolio: { shot: 'projects', file: 'files' },
+  resume:    { avatar: 'resume', shot: 'resume', file: 'files' },
+  landing:   { hero: 'landing', shot: 'landing', file: 'files' }
+};
+function fillUpTargets(){
+  var sel = $('upTarget'); if (!sel) return;
+  var t = STATE.type || 'portfolio';
+  var list = UP_TARGETS[t] || UP_TARGETS.portfolio;
+  sel.innerHTML = list.map(function(x){ return '<option value="' + x[0] + '">' + x[1] + '</option>'; }).join('');
+  upHint();
+  sel.onchange = upHint;
+}
+function upHint(){
+  var sel = $('upTarget'), h = $('upTargetHint');
+  if (!sel || !h) return;
+  var t = STATE.type || 'portfolio';
+  h.textContent = (UP_HINT[t] && UP_HINT[t][sel.value]) || '';
+}
+function b64u(str){ return btoa(unescape(encodeURIComponent(str))); }
+/* data.json 已存在 → 必须先取 sha 再 PUT，否则 422 */
+function putDataJson(msg){
+  var path = '/repos/' + CONFIG.OWNER + '/' + CONFIG.REPO + '/contents/' + CONFIG.DATA;
+  var body = { message: msg, branch: CONFIG.BRANCH, content: b64u(JSON.stringify(DATA, null, 2)) };
+  return gh('GET', path + '?ref=' + CONFIG.BRANCH)
+    .then(function(j){ if (j && j.sha) body.sha = j.sha; })
+    .catch(function(){})
+    .then(function(){ return gh('PUT', path, body); })
+    .catch(function(err){
+      if (/sha/i.test(err.message)){
+        return gh('GET', path + '?ref=' + CONFIG.BRANCH).then(function(j){
+          body.sha = j.sha;
+          return gh('PUT', path, body);
+        });
+      }
+      throw err;
+    });
+}
+/* 上传成功后按用途写入 media */
+function applyMediaTarget(tgt, path){
+  if (!DATA || tgt === 'file' || STATE.type === 'portfolio') return Promise.resolve(false);
+  DATA.media = DATA.media || { avatar: '', resumeShots: [], landingHero: '', landingShots: [] };
+  if (tgt === 'avatar') DATA.media.avatar = path;
+  else if (tgt === 'hero') DATA.media.landingHero = path;
+  else if (STATE.type === 'resume'){
+    DATA.media.resumeShots = DATA.media.resumeShots || [];
+    if (DATA.media.resumeShots.indexOf(path) === -1) DATA.media.resumeShots.push(path);
+  } else if (STATE.type === 'landing'){
+    DATA.media.landingShots = DATA.media.landingShots || [];
+    if (DATA.media.landingShots.indexOf(path) === -1) DATA.media.landingShots.push(path);
+  } else return Promise.resolve(false);
+  return putDataJson('更新媒体素材：' + path)
+    .then(function(){ return true; })
+    .catch(function(e){ toast('已上传，但写入数据失败：' + e.message, 'err'); return false; });
+}
 function compressImage(file){
   return new Promise(function(resolve){
     var maxSide = 1600, quality = 0.85;
@@ -856,7 +962,9 @@ function uploadOne(file){
     var f = r.file;
     if (r.note){ item.children[1].textContent = r.note; item.children[1].className = 'hint'; }
     var name = safeName(f.name);
-    var dir = isImgName(name) ? 'projects' : 'files';
+    var tgt = ($('upTarget') && $('upTarget').value) || 'shot';
+    var dirMap = UP_DIR[STATE.type] || UP_DIR.portfolio;
+    var dir = dirMap[tgt] || (isImgName(name) ? 'projects' : 'files');
     var path = 'assets/' + dir + '/' + name;
     var reader = new FileReader();
     reader.onprogress = function(e){
@@ -871,9 +979,13 @@ function uploadOne(file){
         bar.style.width = (45 + Math.round(p * 54)) + '%';
       }).then(function(){
         bar.style.width = '100%';
-        st.innerHTML = '<span class="ok">已上线</span> · <code>' + esc(path) + '</code>';
-        toast('上传成功：' + name, 'ok');
-        if ($('tabs').querySelector('.on').dataset.tab === 'img') loadImages();
+        st.innerHTML = '<span class="ok">上传中…写入数据</span> · <code>' + esc(path) + '</code>';
+        applyMediaTarget(tgt, path).then(function(written){
+          st.innerHTML = '<span class="ok">已上线' + (written ? '并写入数据' : '') + '</span> · <code>' + esc(path) + '</code>';
+          toast('上传成功：' + name, 'ok');
+          if (written) switchType(STATE.type);   /* 重新生成源码与预览 */
+          if ($('tabs').querySelector('.on').dataset.tab === 'img') loadImages();
+        });
       }).catch(function(err){
         st.innerHTML = '<span class="er">失败：' + esc(err.message) + '</span>';
         toast('上传失败：' + err.message, 'err');
