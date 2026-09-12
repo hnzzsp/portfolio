@@ -140,6 +140,25 @@ pre.code{
 .envbar a{color:#8a4a08;font-weight:700}
 .envbar.hide{display:none}
 
+/* ---------- 素材弹层预览（图片放大 / PDF 在线翻阅） ---------- */
+.pf-view{position:fixed;inset:0;z-index:300;background:rgba(8,10,14,.82);display:flex;align-items:center;justify-content:center;padding:56px 24px;backdrop-filter:blur(3px)}
+.pf-view .bd{display:flex;align-items:center;justify-content:center;max-width:100%;max-height:100%}
+.pf-view img{max-width:92vw;max-height:84vh;border-radius:10px;box-shadow:0 24px 70px rgba(0,0,0,.55);background:#fff}
+.pf-view iframe{width:min(1000px,90vw);height:84vh;border:0;border-radius:10px;background:#fff;box-shadow:0 24px 70px rgba(0,0,0,.55)}
+.pf-view .x{
+  position:fixed;top:16px;right:22px;z-index:3;
+  font:inherit;font-size:13px;padding:8px 16px;border-radius:999px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);color:#fff;
+}
+.pf-view .x:hover{background:#fff;color:#111}
+.pf-view .cap{
+  position:fixed;left:0;right:0;bottom:16px;display:flex;gap:14px;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.86);font-size:12.5px;
+}
+.pf-view .cap code{background:rgba(255,255,255,.12);padding:4px 10px;border-radius:6px;max-width:70vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pf-view .cap a{color:#7ee787;font-size:12.5px}
+.pf-view .th{cursor:zoom-in}
+
 /* ---------- toast / modal ---------- */
 .toast{
   position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);z-index:200;
@@ -202,7 +221,7 @@ pre.code{
     </div>
     <div class="framebox">
       <div class="loading" id="pvLoading"><span class="spin"></span><span id="pvLoadingText">正在生成预览…</span></div>
-      <iframe id="pv" title="站点预览" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+      <iframe id="pv" title="站点预览" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"></iframe>
     </div>
   </section>
 
@@ -237,14 +256,14 @@ pre.code{
       </div>
       <div id="imgBox"><div class="empty"><b>尚未加载</b>切换到本页签后自动读取</div></div>
       <p class="hint" style="margin-top:10px">
-        删除会<b>立即从仓库移除文件</b>，并同步清理 <code>data.json</code> 里对它的引用，随后自动刷新预览。
+        点击缩略图或文件名可弹层预览（<b>图片直接放大，PDF 在线翻阅</b>）。删除会立即从仓库移除文件，并同步清理 <code>data.json</code> 里对它的引用，随后自动刷新预览。
       </p>
     </div>
 
     <!-- 上传面板 -->
     <div class="tabpane" id="pane-up">
-      <div class="drop" id="drop">点击选择文件，或把文件拖到这里<br><span style="font-size:12px">图片会存到 assets/projects/，其他文件存到 assets/files/</span></div>
-      <input type="file" id="fileInput" class="hide" multiple>
+      <div class="drop" id="drop">点击选择文件，或把文件拖到这里<br><span style="font-size:12px">支持 图片 JPG / PNG / WebP / GIF · 文档 PDF · 源文件 PSD / AI / SKETCH / ZIP 等 ｜单个文件 ≤ 40MB</span></div>
+      <input type="file" id="fileInput" class="hide" multiple accept="image/*,application/pdf,.psd,.ai,.sketch,.fig,.zip,.rar,.7z">
       <div class="row" style="margin-top:12px">
         <span class="hint" style="margin:0">上传用途（随站点类型变化）</span>
         <select id="upTarget" style="margin-left:auto;font:inherit;font-size:13px;padding:5px 8px;border:1px solid var(--line);border-radius:var(--r2);background:var(--surface);color:var(--text)"></select>
@@ -637,6 +656,15 @@ function renderImages(){
       im.parentNode.appendChild(sp);
     });
   });
+  /* 点缩略图 / 文件名 → 弹层预览：图片放大，PDF 用内置阅读器在线翻阅 */
+  Array.prototype.forEach.call(box.querySelectorAll('.card'), function(card){
+    var x = IMAGES[+card.dataset.i];
+    if (!x) return;
+    var open = function(){ pfView(x.path); };
+    var th = card.querySelector('.th'), nm = card.querySelector('.nm');
+    if (th){ th.style.cursor = 'zoom-in'; th.addEventListener('click', open); }
+    if (nm){ nm.style.cursor = 'zoom-in'; nm.addEventListener('click', open); }
+  });
   Array.prototype.forEach.call(box.querySelectorAll('[data-copy]'), function(b){
     b.addEventListener('click', function(){
       copyText(b.dataset.copy).then(function(){ toast('已复制路径', 'ok'); })
@@ -653,6 +681,28 @@ function renderImages(){
       });
     });
   });
+}
+/* 弹层预览：与作品集的灯箱保持一致——图片直接放大，PDF 用浏览器内置阅读器 */
+function pfView(path){
+  var img = isImgName(path);
+  var ov = document.createElement('div'); ov.className = 'pf-view';
+  ov.innerHTML =
+    '<button type="button" class="x" aria-label="关闭预览">✕ 关闭</button>' +
+    '<div class="bd">' + (img
+      ? '<img src="' + esc(path) + '" alt="' + esc(path) + '">'
+      : '<iframe src="' + esc(path) + '" title="文件预览"></iframe>') + '</div>' +
+    '<div class="cap"><code>' + esc(path) + '</code>' +
+    '<a href="' + esc(path) + '" target="_blank" rel="noopener">新窗口打开 ↗</a></div>';
+  document.body.appendChild(ov);
+  function close(){
+    ov.remove();
+    document.removeEventListener('keydown', onKey);
+  }
+  function onKey(e){ if (e.key === 'Escape') close(); }
+  ov.addEventListener('click', function(e){
+    if (e.target === ov || (e.target.classList && e.target.classList.contains('x'))) close();
+  });
+  document.addEventListener('keydown', onKey);
 }
 function deleteAsset(btn, x){
   btn.disabled = true;
@@ -734,13 +784,13 @@ var UP_TARGETS = {
   landing:   [['hero', '着陆页主视觉'], ['shot', '着陆页画廊图'], ['file', '其他文件']]
 };
 var UP_HINT = {
-  portfolio: { shot: '存到 assets/projects/，并自动写进下方所选项目卡，页面立刻显示', file: '存到 assets/files/，可作为下载源文件' },
+  portfolio: { shot: '存到 assets/projects/，并自动写进下方所选项目卡，页面立刻显示', file: '存到 assets/files/，作为下载源文件（PDF / PSD / AI / ZIP 等，非图片走这里）' },
   resume:    { avatar: '自动写进 data.json → media.avatar，简历抬头右侧圆形头像',
                shot: '自动追加到 media.resumeShots，简历底部「作品样张」九宫格',
-               file: '存到 assets/files/' },
+               file: '存到 assets/files/，作为下载源文件（PDF / PSD / AI / ZIP 等）' },
   landing:   { hero: '自动写进 media.landingHero，着陆页顶部大图',
                shot: '自动追加到 media.landingShots，着陆页画廊网格',
-               file: '存到 assets/files/' }
+               file: '存到 assets/files/，作为下载源文件（PDF / PSD / AI / ZIP 等）' }
 };
 var UP_DIR = {
   portfolio: { shot: 'projects', file: 'files' },
@@ -912,10 +962,23 @@ function addUpItem(name, size, note){
   $('upList').insertBefore(d, $('upList').firstChild);
   return d;
 }
+/* 单文件上限：GitHub Contents API 约 50MB 硬限，留出余量定 40MB */
+var MAX_UPLOAD = 40 * 1024 * 1024;
+var UPLOAD_ACCEPT = 'image/jpeg,image/png,image/webp,image/gif,application/pdf,.psd,.ai,.zip,.rar,.7z,.sketch,.fig,.indd';
+function tooBig(file){
+  if (file.size > MAX_UPLOAD){
+    toast('「' + file.name + '」' + fmtSize(file.size) + '，超过 40MB 上限，未上传', 'err');
+    return true;
+  }
+  return false;
+}
 function handleFiles(files){
   if (!files || !files.length) return;
   if (!getTok()){ toast('请先设置 GitHub 令牌', 'err'); return; }
-  Array.prototype.forEach.call(files, function(file){ uploadOne(file); });
+  Array.prototype.forEach.call(files, function(file){
+    if (tooBig(file)) return;
+    uploadOne(file);
+  });
 }
 function uploadOne(file){
   var item = addUpItem(file.name, file.size, '');
@@ -1052,6 +1115,7 @@ function onImgAction(k, act){
 }
 function uploadForImage(file, k){
   if (!getTok()){ toast('请先设置 GitHub 令牌', 'err'); return; }
+  if (tooBig(file)) return;
   var name = safeName(file.name);
   var path = 'assets/' + imgDirOf(k) + '/' + name;
   var fr = new FileReader();

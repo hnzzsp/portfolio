@@ -402,6 +402,16 @@ body.editing [data-card]{position:relative}
 body.editing .pf-editbar{display:flex}
 .pf-editbar button{width:26px;height:26px;border:1px solid var(--line);background:#fff;color:#16161a;cursor:pointer;font-size:13px;line-height:1;border-radius:4px}
 .pf-editbar button:hover{border-color:var(--accent);color:var(--accent)}
+/* 编辑模式确认 / 输入弹层：iframe sandbox 会静默禁用原生 confirm/prompt，必须用页面内弹层 */
+.pf-cfm{position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;background:rgba(10,12,16,.55);backdrop-filter:blur(2px)}
+.pf-cfm-box{max-width:min(430px,86vw);background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:22px;box-shadow:0 24px 60px rgba(0,0,0,.28)}
+.pf-cfm-box p{margin:0 0 18px;white-space:pre-line;font-size:14px;line-height:1.7}
+.pf-cfm-box input{width:100%;box-sizing:border-box;margin:0 0 16px;padding:9px 12px;font:inherit;font-size:13.5px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text)}
+.pf-cfm-act{display:flex;gap:10px;justify-content:flex-end}
+.pf-cfm-act button{font:inherit;font-size:13.5px;padding:8px 18px;border-radius:999px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--text)}
+.pf-cfm-act button:hover{border-color:var(--accent);color:var(--accent)}
+.pf-cfm-act button.yes{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.pf-cfm-act button.yes:hover{color:var(--accent-ink);filter:brightness(.94)}
 .pf-shotov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(20,20,22,.45);opacity:0;transition:.18s;z-index:5}
 body.editing [data-shot]:hover .pf-shotov{opacity:1}
 .pf-shotov button{border:0;background:#fff;color:#111;font:inherit;font-size:12.5px;font-weight:700;padding:7px 14px;cursor:pointer;border-radius:4px}
@@ -494,7 +504,7 @@ body.editing [data-shot]{cursor:pointer}
   .pf-vbar .lb{display:none}
   .pf-sw .pf-seg{padding:7px 12px;font-size:12.5px}
 }
-@media print{.pv-bar,.pf-lb,.pf-editbar,.pf-shotov,.pf-uphint,.pf-toast,.pf-prog,.pf-cmp,.pf-wait,.pf-vbar,.pf-vstage{display:none!important}}
+@media print{.pv-bar,.pf-lb,.pf-editbar,.pf-shotov,.pf-uphint,.pf-toast,.pf-prog,.pf-cmp,.pf-wait,.pf-vbar,.pf-vstage,.pf-cfm{display:none!important}}
 </style>
 </head>
 <body>
@@ -1394,6 +1404,43 @@ function gotoDetail(i){
 }
 
 /* ---------- 编辑模式：上传 / 替换 / 删除 / 排序 ---------- */
+/* ---------- 自定义确认 / 输入弹层 ----------
+   生成器预览的 iframe 带 sandbox，原生 confirm()/prompt() 被静默禁用
+   （返回 undefined，点删除就像没点一样）。统一改用页面内弹层，任何环境可用。 */
+function pfDialog(html, setup){
+  return new Promise(function(res){
+    var ov=document.createElement('div'); ov.className='pf-cfm';
+    ov.innerHTML='<div class="pf-cfm-box">'+html+'</div>';
+    var box=ov.firstChild;
+    function close(v){ ov.remove(); res(v); }
+    setup(box, close);
+    ov.addEventListener('click',function(e){ if(e.target===ov) close(false); });
+    document.body.appendChild(ov);
+    var f=box.querySelector('input'); if(f){ f.focus(); f.select(); }
+    var b=box.querySelector('.no'); if(b) b.focus();
+  });
+}
+function pfConfirm(msg, yesText){
+  return pfDialog('<p></p><div class="pf-cfm-act"><button type="button" class="no">取消</button>'+
+    '<button type="button" class="yes">'+esc(yesText||'确定')+'</button></div>',
+    function(box, close){
+      box.querySelector('p').textContent=msg;
+      box.querySelector('.yes').addEventListener('click',function(){close(true);});
+      box.querySelector('.no').addEventListener('click',function(){close(false);});
+    });
+}
+function pfPrompt(msg, val){
+  return pfDialog('<p></p><input type="text"><div class="pf-cfm-act"><button type="button" class="no">取消</button>'+
+    '<button type="button" class="yes">确定</button></div>',
+    function(box, close){
+      box.querySelector('p').textContent=msg;
+      var inp=box.querySelector('input'); inp.value=val||'';
+      box.querySelector('.yes').addEventListener('click',function(){close(inp.value.trim());});
+      box.querySelector('.no').addEventListener('click',function(){close(null);});
+      inp.addEventListener('keydown',function(e){ if(e.key==='Enter') close(inp.value.trim()); });
+    });
+}
+
 function needData(){ if(!DATA){toast('数据文件未加载，无法保存修改','err');return false;} return true; }
 /* 编辑模式的数据加载：本地 data.json 优先，读不到（预览面板 / 构建窗口期）走仓库 API 兜底。
    之前编辑模式从没加载过 DATA，导致上传 / 保存 / 删除 / 排序全部报「数据文件未加载」。 */
@@ -1562,9 +1609,13 @@ function startUpload(file,i){
   if(!/^image\/(jpeg|png|webp|gif)$/.test(file.type)){toast('仅支持 JPG / PNG / WebP / GIF','err');return;}
   if(file.size>20*1024*1024){toast('图片超过 20MB，请先压缩','err');return;}
   if(!getTok()){
-    var t=prompt('粘贴 GitHub 访问令牌（需 repo 权限）\n将保存在本机浏览器，用于上传截图')||'';
-    if(!t){toast('未提供令牌，已取消','err');return;}
-    try{localStorage.setItem('pfTok',t.trim());}catch(e){}
+    /* 原生 prompt 在 iframe sandbox 里同样被禁，用页面内弹层 */
+    pfPrompt('粘贴 GitHub 访问令牌（需 repo 权限）\n将保存在本机浏览器，用于上传截图').then(function(t){
+      if(!t){toast('未提供令牌，已取消','err');return;}
+      try{localStorage.setItem('pfTok',t);}catch(e){}
+      startUpload(file,i);
+    });
+    return;
   }
   function proceed(blob,note){
     var name=asciiName(blob.name);
@@ -1592,9 +1643,12 @@ function startUpload(file,i){
 }
 function delShot(i){
   if(!needData())return;
-  if(!confirm('删除这张截图？\n将从仓库移除引用并恢复占位（原文件保留在仓库 assets/ 中，可随时重新上传）。'))return;
-  DATA.projects[i].shot=PLACEHOLDER;
-  commitData('移除项目截图',renderAll);
+  pfConfirm('删除这张截图？\n将从仓库移除引用并恢复占位（原文件保留在 assets/ 中，可随时重新上传）。','删除')
+    .then(function(ok){
+      if(!ok) return;
+      DATA.projects[i].shot=PLACEHOLDER;
+      commitData('移除项目截图',renderAll);
+    });
 }
 function moveProj(i,d){
   if(!needData())return;
