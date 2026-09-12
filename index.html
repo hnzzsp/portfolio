@@ -473,6 +473,48 @@ body.editing [data-shot]{cursor:pointer}
 .pf-atv .cap code{background:rgba(255,255,255,.12);padding:4px 10px;border-radius:6px;max-width:70vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pf-atv .cap a{color:#7ee787;font-size:12.5px}
 
+/* ============ 左侧章节导航（PC 大屏） + 底部 dock（手机） ============ */
+.pf-rail{
+  position:fixed;left:24px;top:50%;transform:translateY(-50%);z-index:40;
+  display:none;flex-direction:column;gap:2px;
+  transition:opacity .25s ease;
+}
+.pf-rail a{
+  display:flex;align-items:center;gap:10px;padding:7px 10px;
+  font-size:12.5px;color:var(--text-dim);text-decoration:none;border-radius:999px;
+  transition:color .2s ease,transform .2s ease;
+}
+.pf-rail a .dot{width:6px;height:6px;border-radius:50%;background:var(--line);transition:.22s ease;flex-shrink:0}
+.pf-rail a:hover{color:var(--text);transform:translateX(3px)}
+.pf-rail a.on{color:var(--accent);font-weight:700;transform:translateX(3px)}
+.pf-rail a.on .dot{background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+.pf-dock{
+  position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:44;
+  display:none;gap:2px;padding:6px;
+  background:color-mix(in srgb,var(--bg) 86%,transparent);
+  backdrop-filter:saturate(160%) blur(14px);
+  border:1px solid var(--line);border-radius:999px;
+  box-shadow:0 12px 34px rgba(0,0,0,.18);
+  transition:opacity .25s ease;
+}
+.pf-dock a{
+  font-size:12.5px;font-weight:600;color:var(--text-dim);
+  padding:8px 12px;border-radius:999px;text-decoration:none;
+  transition:background .2s ease,color .2s ease;
+}
+.pf-dock a.on{background:var(--accent);color:var(--accent-ink)}
+.pf-dock a:not(.on):active{background:var(--bg-soft)}
+@media (min-width:1200px){
+  .pf-rail{display:flex}
+  .hdr .nav{display:none}          /* 左侧 rail 顶替顶部横向导航 */
+  .hdr-tools{margin-left:auto}
+}
+@media (max-width:880px){
+  .pf-dock{display:flex}
+  body{padding-bottom:64px}        /* 给 dock 留出空间，不挡 footer */
+}
+@media print{.pf-rail,.pf-dock{display:none!important}}
+
 /* ============ 顶部视图滑块：作品集 / 简历 / 着陆页 ============ */
 .pf-vbar{
   position:sticky;top:64px;z-index:45;
@@ -914,6 +956,9 @@ body.editing [data-shot]{cursor:pointer}
     <button class="topbtn" id="topBtn" type="button">回到顶部 ↑</button>
   </div>
 </footer>
+
+<nav class="pf-rail" id="pfRail" aria-label="章节导航（侧边）"></nav>
+<nav class="pf-dock" id="pfDock" aria-label="章节导航（底部）"></nav>
 
 <div aria-live="polite" class="sr" id="live"></div>
 
@@ -1990,6 +2035,57 @@ vprint.addEventListener('click',function(){
 setKnob(idxOf(cur)); markOn(idxOf(cur)); syncStyleSel();
 window.addEventListener('load',function(){ setKnob(idxOf(cur)); });
 if(cur!=='portfolio') apply(cur);
+})();
+
+/* ============================================================
+   章节导航：PC ≥1200px 左侧竖排 rail，手机 ≤880px 底部 dock
+   滚动时自动高亮当前章节；切到简历 / 着陆页视图时自动隐藏
+   ============================================================ */
+(function(){
+'use strict';
+var SECTIONS=[['about','简介'],['skills','技能专长'],['projects','项目经历'],['timeline','教育与实践'],['contact','联系方式']];
+var rail=document.getElementById('pfRail'), dock=document.getElementById('pfDock');
+if(!rail||!dock) return;
+var links=SECTIONS.map(function(s){
+  return '<a href="#'+s[0]+'" data-s="'+s[0]+'"><span class="dot" aria-hidden="true"></span>'+s[1]+'</a>';
+}).join('');
+rail.innerHTML=links; dock.innerHTML=links;
+
+function stageOn(){ var st=document.getElementById('pfVstage'); return !!(st&&st.classList.contains('on')); }
+function spy(){
+  var hidden=stageOn();
+  [rail,dock].forEach(function(c){
+    c.style.opacity=hidden?'0':'';
+    c.style.pointerEvents=hidden?'none':'';
+  });
+  if(hidden) return;
+  var y=window.pageYOffset+160, cur=SECTIONS[0][0];
+  SECTIONS.forEach(function(s){
+    var el=document.getElementById(s[0]);
+    if(el&&el.offsetTop-80<=y) cur=s[0];
+  });
+  [rail,dock].forEach(function(c){
+    Array.prototype.forEach.call(c.querySelectorAll('a'),function(a){
+      a.classList.toggle('on',a.dataset.s===cur);
+    });
+  });
+}
+function goTo(id){
+  var el=document.getElementById(id); if(!el) return;
+  var y=el.getBoundingClientRect().top+window.pageYOffset-78;
+  window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
+}
+[rail,dock].forEach(function(c){
+  c.addEventListener('click',function(e){
+    var a=e.target.closest?e.target.closest('a[data-s]'):null; if(!a) return;
+    e.preventDefault();
+    goTo(a.dataset.s);
+  });
+});
+window.addEventListener('scroll',spy,{passive:true});
+window.addEventListener('resize',spy);
+window.addEventListener('load',spy);
+spy();
 })();
 </script>
 </body>
