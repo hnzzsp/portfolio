@@ -55,6 +55,8 @@ input[type=text],input[type=password],input[type=number],textarea,select{
 textarea{min-height:74px;resize:vertical;line-height:1.65}
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(216,30,5,.08)}
 .hint{font-size:12.5px;color:var(--dim);margin-top:6px;line-height:1.65}
+.check{display:flex;align-items:center;gap:8px;font-weight:400;font-size:13px;color:var(--text);margin-top:10px;cursor:pointer}
+.check input{width:auto;margin:0}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 @media (max-width:680px){.row2,.row3{grid-template-columns:1fr}}
@@ -99,7 +101,7 @@ footer{border-top:1px solid var(--line);padding:20px 24px 40px;color:var(--dim);
 .prevrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
 .preview{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff;max-width:300px}
 .preview .thumb{
-  width:58px;height:44px;flex-shrink:0;border-radius:5px;border:1px solid var(--line);
+  width:64px;height:48px;flex-shrink:0;border-radius:5px;border:1px solid var(--line);
   object-fit:cover;background:#f2f2ee;display:grid;place-items:center;
   font-size:9.5px;font-weight:800;color:#fff;letter-spacing:.03em;overflow:hidden;
 }
@@ -185,6 +187,8 @@ footer{border-top:1px solid var(--line);padding:20px 24px 40px;color:var(--dim);
       <p class="tip">保存与上传都靠它。只存在当前标签页内存里，<b>不会写入任何文件、不会进仓库</b>，关闭标签页即失效。</p>
       <label for="tok">GitHub Personal Access Token（需 repo 权限）</label>
       <input type="password" id="tok" autocomplete="off" placeholder="ghp_xxxxxxxxxxxx">
+      <label class="check"><input type="checkbox" id="tokLong" checked> 在本机记住令牌（长期有效，下次打开自动填好）</label>
+      <p class="hint">只存在<b>你这台电脑的浏览器</b>里（localStorage），不写进任何文件、不进仓库、不上传服务器。换浏览器或清缓存后需重新贴一次。<b>公用电脑请取消勾选</b>，那样只在当前标签页有效、关闭即失效。</p>
     </div>
 
     <div class="card" id="s-contact">
@@ -328,7 +332,7 @@ var ADMIN_CONFIG = {
   BRANCH: 'main',
   DATA_PATH: 'data.json',
   ADMIN_PATH: 'admin.html',
-  PASS_SHA256: '46daee9ffd5c862ebc9dcec9d13d2a21e4f8951c676da9c281906c2bfe6ce99b',
+  PASS_SHA256: '37a0034fb1fae0f18836a858af9b95b2215835b2b67923b69cfc3dfbeb65b40e',
   SESSION_KEY: 'pfAdminAuthed'
 };
 
@@ -693,7 +697,8 @@ var EXT_COLOR = {psd:'#31a8ff', ai:'#ff9a00', pdf:'#e2574c', zip:'#8a63d2', rar:
 function extOf(n){ var d = String(n).lastIndexOf('.'); return d > 0 ? String(n).slice(d + 1).toLowerCase() : ''; }
 function isImgName(n){ return /^(png|jpe?g|webp|gif|svg|avif|bmp)$/.test(extOf(n)); }
 function thumbHtml(name, url){
-  if (isImgName(name)) return '<img class="thumb" src="' + esc(url) + '" alt="">';
+  if (isImgName(name)) return '<a href="' + esc(url) + '" target="_blank" rel="noopener" title="点击查看大图">'
+    + '<img class="thumb" src="' + esc(url) + '" alt=""></a>';
   var e = extOf(name);
   var c = EXT_COLOR[e] || '#6d6d68';
   return '<span class="thumb" style="background:' + c + '">' + esc(e ? e.toUpperCase() : 'FILE') + '</span>';
@@ -912,9 +917,23 @@ $('pwBtn').addEventListener('click', function(){
 
 /* ================= 初始化 ================= */
 $('sitePill').textContent = ADMIN_CONFIG.OWNER + '/' + ADMIN_CONFIG.REPO;
-var savedTok = sessionStorage.getItem('pfTok');
-if (savedTok) $('tok').value = savedTok;
-$('tok').addEventListener('input', function(){ sessionStorage.setItem('pfTok', this.value); });
+var TOKK = 'pfTok';
+try{
+  var lt = localStorage.getItem(TOKK);
+  $('tok').value = lt || sessionStorage.getItem(TOKK) || '';
+  $('tokLong').checked = !!lt;
+}catch(e){}
+function storeTok(v, keep){
+  try{
+    if (keep){ localStorage.setItem(TOKK, v); }
+    else { localStorage.removeItem(TOKK); sessionStorage.setItem(TOKK, v); }
+  }catch(e){}
+}
+$('tok').addEventListener('input', function(){ storeTok(this.value, $('tokLong').checked); });
+$('tokLong').addEventListener('change', function(){
+  storeTok($('tok').value, this.checked);
+  toast(this.checked ? '已在本机记住令牌，下次打开自动填好' : '已改为仅当前标签页有效', 'ok');
+});
 if (authed) loadData();
 </script>
 </body>
