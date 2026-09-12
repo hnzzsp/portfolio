@@ -248,8 +248,8 @@ pre.code{
         <select id="upTarget" style="margin-left:auto;font:inherit;font-size:13px;padding:5px 8px;border:1px solid var(--line);border-radius:var(--r2);background:var(--surface);color:var(--text)"></select>
       </div>
       <p class="hint" id="upTargetHint"></p>
-      <label class="check"><input type="checkbox" id="doCompress" checked> 上传前自动压缩图片（最长边 1600px，JPEG 质量 85）</label>
-      <p class="hint">建议开启：一张 2.8MB 的 PNG 压缩后约 <b>60KB</b>，手机端加载快几十倍。源文件（PSD/AI/PDF/ZIP）不受影响。</p>
+      <label class="check"><input type="checkbox" id="doCompress"> 压缩图片后上传（最长边 1600px，JPEG 质量 85）</label>
+      <p class="hint">默认<b>保留原图</b>不上传前压缩。原图太大（如 2MB+）时 HR 手机打开会慢，需要时再勾选——一张 2.8MB 的 PNG 压后约 60KB。源文件（PSD/AI/PDF/ZIP）不受影响。</p>
       <div id="upList" style="margin-top:12px"></div>
       <p class="hint">上传需要 GitHub 令牌（点右上角「设置令牌」）。单个文件 ≤ 40MB。</p>
     </div>
