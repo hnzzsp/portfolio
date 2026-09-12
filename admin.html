@@ -520,6 +520,17 @@ function buildSkills(){
       '<button class="ghost mini" type="button" data-add="bar" data-i="' + i + '">+ 添加能力条</button></div>';
   }).join('');
 }
+/* 已归档的项目附件 chips（只读展示；文件本体可在生成器「图片」页签删除） */
+function attachChips(p){
+  var list = arr(p.files);
+  if (!list.length) return '';
+  var chips = list.map(function(f){
+    var path = f.rel || f.path || '';
+    var nm = f.name || path.split('/').pop();
+    return '<a class="cp" href="' + esc(path) + '" target="_blank" rel="noopener" title="' + esc(path) + '">📎 ' + esc(nm) + '</a>';
+  }).join(' ');
+  return '<div class="hint" style="margin:0 0 10px"><b>项目附件（' + list.length + '）：</b>' + chips + '</div>';
+}
 function buildProjects(){
   $('projectsBox').innerHTML = arr(DATA.projects).map(function(p, i){
     var src = shotSrc(p.shot);
@@ -536,6 +547,8 @@ function buildProjects(){
       '<label>结果</label>' + inputHtml('projects.' + i + '.res', p.res, 'area') +
       '<label>标签（每行一个）</label><textarea data-p="projects.' + i + '.kws" data-type="lines">' + esc(arr(p.kws).join('\n')) + '</textarea>' +
       '<label>截图区 HTML</label><textarea data-p="projects.' + i + '.shot">' + esc(p.shot) + '</textarea>' +
+      '<div class="hint" style="margin:2px 0 8px">「上传截图」传<b>图片</b>才会显示为项目封面；「上传源文件」传 PDF / PSD / ZIP 等，会作为<b>附件</b>出现在前台项目详情（可在线预览、下载）。</div>' +
+      attachChips(p) +
       '<div class="upbox"><div class="row">' +
         '<button class="ghost mini" type="button" data-pick="shot" data-i="' + i + '">上传截图</button>' +
         '<button class="ghost mini" type="button" data-pick="file" data-i="' + i + '">上传源文件</button>' +
@@ -787,14 +800,17 @@ document.addEventListener('change', function(e){
     if (pending && pending.parentNode) pending.parentNode.removeChild(pending);
     if (kind === 'shot'){
       DATA.projects[idx].shot = '<img src="' + rel + '" alt="' + esc(name) + '" style="width:100%;height:100%;object-fit:cover">';
+    } else {
+      /* 源文件自动归档为项目附件：前台项目详情里可见、可在线预览、可下载 */
+      DATA.projects[idx].files = DATA.projects[idx].files || [];
+      DATA.projects[idx].files.push({ name: name, rel: rel, size: file.size });
     }
     buildProjects(); fillStatic(); setDirty();
     var s2 = $('upstate-' + idx);
     if (s2){
       s2.innerHTML = kind === 'shot'
         ? '<span style="color:var(--ok)">截图已上传并写入，记得点保存</span>'
-        : '<span style="color:var(--ok)">已上传 ' + esc(name) + '</span> <button class="cp" data-copy="' +
-          esc('<a href="' + rel + '" download>下载源文件</a>') + '" type="button">复制下载链接</button>' +
+        : '<span style="color:var(--ok)">已上传 ' + esc(name) + '，已加入本项目附件（前台项目详情可见）</span> · 记得点保存' +
           ' <button class="cp" data-copy="' + esc(rel) + '" type="button">复制路径</button>' +
           ' <button class="ghost mini" data-insert="' + idx + '" data-rel="' + esc(rel) + '" data-nm="' + esc(name) + '" type="button">插入到结果</button>';
     }

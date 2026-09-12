@@ -451,6 +451,28 @@ body.editing [data-shot]{cursor:pointer}
   font:inherit;font-size:12.5px;color:var(--text);box-shadow:0 4px 16px rgba(0,0,0,.1);cursor:pointer;
 }
 .pf-cmp input{width:auto;margin:0;accent-color:var(--accent)}
+/* ============ 项目附件（源文件）展示与预览 ============ */
+.pf-files{margin-top:16px;padding-top:14px;border-top:1px dashed var(--line);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pf-files>b{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);width:100%}
+.pf-files .tip{font-size:11.5px;color:var(--text-dim);opacity:.8}
+.pf-file{
+  display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:12.5px;
+  padding:6px 13px;border:1px solid var(--line);border-radius:999px;cursor:zoom-in;
+  background:var(--surface);color:var(--text);transition:border-color .18s,color .18s;
+}
+.pf-file:hover{border-color:var(--accent);color:var(--accent)}
+.pf-file .ic{font-size:13px}
+.pf-file small{color:var(--text-dim);font-size:11px}
+.pf-atv{position:fixed;inset:0;z-index:9990;background:rgba(8,10,14,.82);display:flex;align-items:center;justify-content:center;padding:56px 24px;backdrop-filter:blur(3px)}
+.pf-atv .bd{display:flex;align-items:center;justify-content:center;max-width:100%;max-height:100%}
+.pf-atv img{max-width:92vw;max-height:84vh;border-radius:10px;box-shadow:0 24px 70px rgba(0,0,0,.55);background:#fff}
+.pf-atv iframe{width:min(1000px,90vw);height:84vh;border:0;border-radius:10px;background:#fff;box-shadow:0 24px 70px rgba(0,0,0,.55)}
+.pf-atv .x{position:fixed;top:16px;right:22px;font:inherit;font-size:13px;padding:8px 16px;border-radius:999px;cursor:pointer;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.12);color:#fff}
+.pf-atv .x:hover{background:#fff;color:#111}
+.pf-atv .cap{position:fixed;left:0;right:0;bottom:16px;display:flex;gap:14px;align-items:center;justify-content:center;color:rgba(255,255,255,.86);font-size:12.5px}
+.pf-atv .cap code{background:rgba(255,255,255,.12);padding:4px 10px;border-radius:6px;max-width:70vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pf-atv .cap a{color:#7ee787;font-size:12.5px}
+
 /* ============ 顶部视图滑块：作品集 / 简历 / 着陆页 ============ */
 .pf-vbar{
   position:sticky;top:64px;z-index:45;
@@ -1232,8 +1254,43 @@ function rDetail(list){
       '<div class="proj-body"><h3>'+p.title+'</h3><p class="proj-role">'+(p.role||'')+'</p>'+
       '<ul class="star">'+(p.bg?'<li><dt>背景</dt><dd>'+p.bg+'</dd></li>':'')+
       (p.act?'<li><dt>行动</dt><dd>'+p.act+'</dd></li>':'')+
-      (p.res?'<li><dt>结果</dt><dd>'+p.res+'</dd></li>':'')+'</ul>'+kws+'</div></article>';
+      (p.res?'<li><dt>结果</dt><dd>'+p.res+'</dd></li>':'')+'</ul>'+kws+filesHTML(p)+'</div></article>';
   }).join('');
+}
+/* 项目附件（源文件：PDF / PSD / ZIP 等）：后台「上传源文件」自动归档到这里 */
+function filesHTML(p){
+  var list=arr(p.files);
+  if(!list.length) return '';
+  var items=list.map(function(f,fi){
+    var path=f.rel||f.path||''; if(!path) return '';
+    var nm=f.name||path.split('/').pop();
+    var icon=/\.pdf$/i.test(path)?'📄':(/\.(zip|rar|7z)$/i.test(path)?'🗜️':'📎');
+    return '<button type="button" class="pf-file" data-af="'+esc(path)+'" title="点击在线预览">'+
+      '<span class="ic">'+icon+'</span>'+esc(nm)+(f.size?'<small>'+fmtKB(f.size)+'</small>':'')+'</button>';
+  }).join('');
+  return '<div class="pf-files"><b>附件 / 源文件</b><span class="tip">点击可在线预览</span>'+items+'</div>';
+}
+function fmtKB(n){
+  if(n>=1024*1024) return (n/1024/1024).toFixed(1)+' MB';
+  if(n>=1024) return Math.round(n/1024)+' KB';
+  return n+' B';
+}
+/* 附件弹层预览：图片放大，PDF 用浏览器内置阅读器在线翻阅 */
+function attachView(path){
+  var img=/\.(png|jpe?g|webp|gif|svg|avif)$/i.test(path);
+  var ov=document.createElement('div'); ov.className='pf-atv';
+  ov.innerHTML='<button type="button" class="x" aria-label="关闭预览">✕ 关闭</button>'+
+    '<div class="bd">'+(img?'<img src="'+esc(path)+'" alt="'+esc(path)+'">'
+      :'<iframe src="'+esc(path)+'" title="附件预览"></iframe>')+'</div>'+
+    '<div class="cap"><code>'+esc(path)+'</code>'+
+    '<a href="'+esc(path)+'" download>下载文件</a></div>';
+  document.body.appendChild(ov);
+  function close(){ ov.remove(); document.removeEventListener('keydown',onKey); }
+  function onKey(e){ if(e.key==='Escape') close(); }
+  ov.addEventListener('click',function(e){
+    if(e.target===ov||(e.target.classList&&e.target.classList.contains('x'))) close();
+  });
+  document.addEventListener('keydown',onKey);
 }
 function rList(list){
   return '<div class="pv-list">'+list.map(function(p,i){
@@ -1364,6 +1421,8 @@ function bindOnce(){
   var el=$('js-projects'); if(!el||el.dataset.pfBound) return;
   el.dataset.pfBound='1';
   el.addEventListener('click',function(e){
+    var af=e.target.closest?e.target.closest('.pf-file'):null;
+    if(af){attachView(af.dataset.af);return;}
     var carBtn=e.target.closest?e.target.closest('[data-car]'):null;
     if(carBtn){carGo(+carBtn.dataset.car);return;}
     var dot=e.target.closest?e.target.closest('[data-dot]'):null;

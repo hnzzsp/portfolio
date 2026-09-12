@@ -784,7 +784,7 @@ var UP_TARGETS = {
   landing:   [['hero', '着陆页主视觉'], ['shot', '着陆页画廊图'], ['file', '其他文件']]
 };
 var UP_HINT = {
-  portfolio: { shot: '存到 assets/projects/，并自动写进下方所选项目卡，页面立刻显示', file: '存到 assets/files/，作为下载源文件（PDF / PSD / AI / ZIP 等，非图片走这里）' },
+  portfolio: { shot: '存到 assets/projects/，并自动写进下方所选项目卡做封面', file: '存到 assets/files/，并归档为下方所选项目的附件（前台可在线预览 / 下载）' },
   resume:    { avatar: '自动写进 data.json → media.avatar，简历抬头右侧圆形头像',
                shot: '自动追加到 media.resumeShots，简历底部「作品样张」九宫格',
                file: '存到 assets/files/，作为下载源文件（PDF / PSD / AI / ZIP 等）' },
@@ -1008,15 +1008,21 @@ function uploadOne(file){
         bar.style.width = '100%';
         st.innerHTML = '<span class="ok">上传中…写入数据</span> · <code>' + esc(path) + '</code>';
         applyMediaTarget(tgt, path).then(function(written){
-          /* 作品集截图：按选择写进项目卡，省掉手动改 data.json 这一步 */
+          /* 作品集：截图写进所选项目卡的封面，源文件归档为项目附件（前台可见） */
           var pi = ($('upProject') && $('upProject').value) || '';
-          if (STATE.type === 'portfolio' && tgt === 'shot' && pi !== '' &&
+          if (STATE.type === 'portfolio' && (tgt === 'shot' || tgt === 'file') && pi !== '' &&
               DATA && DATA.projects && DATA.projects[+pi]){
             var ix = +pi;
-            DATA.projects[ix].shot = '<img src="' + path + '" alt="">';
-            putDataJson('项目截图：' + path).then(function(){
-              st.innerHTML = '<span class="ok">已写入第 ' + (ix + 1) + ' 个项目卡</span> · <code>' + esc(path) + '</code>';
-              toast('上传成功并写入项目卡：' + name, 'ok');
+            if (tgt === 'shot'){
+              DATA.projects[ix].shot = '<img src="' + path + '" alt="">';
+            } else {
+              DATA.projects[ix].files = DATA.projects[ix].files || [];
+              DATA.projects[ix].files.push({ name: name, rel: path, size: file.size });
+            }
+            putDataJson((tgt === 'shot' ? '项目截图：' : '项目附件：') + path).then(function(){
+              st.innerHTML = '<span class="ok">已写入第 ' + (ix + 1) + ' 个项目' +
+                (tgt === 'file' ? '附件' : '卡') + '</span> · <code>' + esc(path) + '</code>';
+              toast('上传成功并写入项目：' + name, 'ok');
               if ($('tabs').querySelector('.on').dataset.tab === 'img') loadImages();
             }).catch(function(e){
               st.innerHTML = '<span class="er">已上传，但写入数据失败：' + esc(e.message) + '</span>';
