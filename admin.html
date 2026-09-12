@@ -8,99 +8,111 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23111'/%3E%3Ctext x='16' y='22' font-family='Helvetica,Arial' font-size='15' font-weight='700' fill='%23fff' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E">
 <style>
 :root{
-  --bg:#ffffff; --bg-soft:#f2f2f0; --surface:#ffffff;
-  --text:#111; --dim:#5c5c57; --line:#dcdcd7;
+  --bg:#f6f6f4; --surface:#ffffff; --soft:#fbfbf9;
+  --text:#16161a; --dim:#6d6d68; --line:#e2e2dd;
   --accent:#d81e05; --ok:#0a7d3c; --warn:#b3541e;
+  --r:10px; --r2:8px;
   --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  --sans:"Helvetica Neue",Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif;
 }
 *{box-sizing:border-box}
-body{
-  margin:0;background:var(--bg);color:var(--text);
-  font:15px/1.7 "Helvetica Neue",Helvetica,Arial,"PingFang SC","Microsoft YaHei",sans-serif;
-  -webkit-font-smoothing:antialiased;
-}
-.wrap{max-width:900px;margin:0 auto;padding:0 24px}
-a{color:var(--accent)}
-code{font-family:var(--mono);font-size:.9em;background:var(--bg-soft);padding:1px 5px}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.7 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+code{font-family:var(--mono);font-size:.88em;background:#efefe9;padding:1px 5px;border-radius:4px}
+.hide{display:none!important}
 
 /* 顶栏 */
-.bar{border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:20}
-.bar .wrap{display:flex;align-items:center;gap:14px;height:60px;flex-wrap:wrap}
-.bar h1{font-size:16px;margin:0;letter-spacing:-.01em}
-.bar .sp{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.pill{font-size:12px;color:var(--dim);border:1px solid var(--line);padding:4px 10px;border-radius:99px}
+.bar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar .inner{max-width:1180px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:12px;height:62px}
+.bar h1{font-size:16px;margin:0;letter-spacing:-.01em;font-weight:800}
+.bar .sp{margin-left:auto;display:flex;align-items:center;gap:10px}
+.pill{font-size:12px;color:var(--dim);border:1px solid var(--line);padding:4px 11px;border-radius:99px;white-space:nowrap}
+.pill.dirty{color:var(--warn);border-color:var(--warn);background:#fdf3ee}
+
+/* 主体 */
+.admin{max-width:1180px;margin:0 auto;padding:22px 24px 80px;display:grid;grid-template-columns:212px 1fr;gap:26px;align-items:start}
+.side{position:sticky;top:84px}
+.side h4{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:0 0 10px 8px;font-weight:700}
+.side a{display:block;padding:7px 10px;border-radius:var(--r2);font-size:13.5px;color:var(--dim);transition:background .15s,color .15s}
+.side a:hover{background:#eee;color:var(--text)}
+.side a.on{background:var(--text);color:#fff;font-weight:600}
+@media (max-width:980px){.admin{grid-template-columns:1fr}.side{display:none}}
 
 /* 卡片 */
-.card{border:1px solid var(--line);padding:22px 24px;margin:20px 0;background:var(--surface)}
-.card > h2{
-  font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
-  margin:0 0 16px;font-weight:700;
-}
-.card > h2 small{text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px 24px;margin-bottom:18px;box-shadow:0 1px 2px rgba(0,0,0,.03);scroll-margin-top:80px}
+.card > h2{font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);margin:0 0 16px;font-weight:700;display:flex;align-items:center;gap:10px}
+.card > h2::before{content:"";width:14px;height:2px;background:var(--accent)}
+.card > .tip{font-size:12.5px;color:var(--dim);margin:-8px 0 16px;line-height:1.65}
+.barrow{display:flex;align-items:center;gap:10px;margin-top:18px;padding-top:14px;border-top:1px dashed var(--line);flex-wrap:wrap}
+.barrow .hint{margin:0}
 
-label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}
+label{display:block;font-size:12.5px;font-weight:700;color:var(--dim);margin:14px 0 6px}
 label:first-of-type{margin-top:0}
 input[type=text],input[type=password],input[type=number],textarea,select{
-  width:100%;padding:10px 12px;border:1px solid var(--line);background:var(--bg);
-  font:inherit;font-size:14px;color:var(--text);border-radius:0;
+  width:100%;padding:9px 12px;border:1px solid var(--line);background:var(--soft);
+  font:inherit;font-size:14px;color:var(--text);border-radius:var(--r2);transition:border-color .15s,background .15s;
 }
-textarea{min-height:76px;resize:vertical;line-height:1.65}
-input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--accent)}
-.hint{font-size:12.5px;color:var(--dim);margin-top:6px;line-height:1.6}
+textarea{min-height:74px;resize:vertical;line-height:1.65}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(216,30,5,.08)}
+.hint{font-size:12.5px;color:var(--dim);margin-top:6px;line-height:1.65}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-@media (max-width:640px){.row2,.row3{grid-template-columns:1fr}}
+@media (max-width:680px){.row2,.row3{grid-template-columns:1fr}}
 
-button{
-  font:inherit;font-size:14px;font-weight:700;padding:10px 20px;cursor:pointer;
-  border:1px solid var(--text);background:var(--text);color:#fff;border-radius:0;
-}
-button:hover{opacity:.86}
-button.ghost{background:transparent;color:var(--text);border-color:var(--line)}
-button.ghost:hover{border-color:var(--accent);color:var(--accent)}
-button.danger{background:transparent;color:var(--warn);border-color:var(--line);padding:6px 12px;font-size:13px}
-button.danger:hover{border-color:var(--warn)}
-button.mini{padding:5px 11px;font-size:12.5px}
-.card .cp{
-  font-size:12px;font-weight:700;color:var(--dim);border:1px solid var(--line);
-  padding:5px 12px;border-radius:99px;background:transparent;cursor:pointer;font-family:inherit;
-}
-.card .cp:hover{border-color:var(--accent);color:var(--accent)}
+button{font:inherit;font-size:14px;font-weight:700;padding:10px 20px;cursor:pointer;border-radius:var(--r2);border:1px solid var(--text);background:var(--text);color:#fff;font-family:var(--sans);transition:opacity .15s,background .15s,border-color .15s}
+button:hover{opacity:.87}
+button:disabled{opacity:.5;cursor:not-allowed}
+.ghost{background:transparent;color:var(--text);border-color:var(--line)}
+.ghost:hover{border-color:var(--accent);color:var(--accent);opacity:1}
+.danger{background:transparent;color:var(--warn);border-color:var(--line);padding:6px 12px;font-size:12.5px}
+.danger:hover{border-color:var(--warn);color:var(--warn);opacity:1}
+.mini{padding:6px 13px;font-size:12.5px}
+.cp{font-size:12px;font-weight:700;color:var(--dim);border:1px solid var(--line);padding:5px 12px;border-radius:99px;background:transparent;cursor:pointer;font-family:var(--sans)}
+.cp:hover{border-color:var(--accent);color:var(--accent);opacity:1}
 
-/* 可重复条目 */
-.item{border:1px solid var(--line);padding:16px;margin-bottom:14px;background:var(--bg)}
-.item .ih{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.item .ih b{font-size:13px;letter-spacing:.06em;color:var(--dim)}
-.item .ih .sp{margin-left:auto}
+.item{border:1px solid var(--line);border-radius:var(--r2);padding:16px;margin-bottom:12px;background:var(--soft)}
+.item .ih{display:flex;align-items:center;gap:9px;margin-bottom:6px}
+.item .ih b{font-size:12px;letter-spacing:.06em;color:var(--dim);font-weight:700}
+.item .ih .sp{margin-left:auto;display:flex;gap:7px}
 
-.msg{padding:12px 16px;border:1px solid var(--line);margin:16px 0;font-size:14px;display:none}
+.msg{border:1px solid var(--line);border-radius:var(--r2);padding:12px 16px;margin-bottom:18px;font-size:14px;display:none}
 .msg.on{display:block}
 .msg.ok{border-color:var(--ok);color:var(--ok);background:#f2faf5}
 .msg.err{border-color:var(--warn);color:var(--warn);background:#fdf6f2}
 
-#login{max-width:420px;margin:12vh auto;padding:28px;border:1px solid var(--line)}
-#login h2{margin:0 0 6px;font-size:22px}
-#login p{color:var(--dim);font-size:13.5px;margin:0 0 20px}
-.hide{display:none!important}
-footer{border-top:1px solid var(--line);margin-top:40px;padding:20px 0 40px;color:var(--dim);font-size:13px}
+.toast{position:fixed;top:76px;right:22px;z-index:80;padding:12px 20px;border-radius:var(--r2);font-size:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.14);opacity:0;transform:translateY(-8px);pointer-events:none;transition:opacity .2s,transform .2s}
+.toast.on{opacity:1;transform:none}
+.toast.ok{background:var(--ok);color:#fff}
+.toast.err{background:var(--warn);color:#fff}
+.toast.info{background:var(--text);color:#fff}
+
+.fabsave{position:fixed;right:22px;bottom:22px;z-index:70;box-shadow:0 8px 24px rgba(0,0,0,.18);display:none;padding:12px 24px}
+.fabsave.on{display:block}
+
+#login{max-width:400px;margin:14vh auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:30px}
+#login h2{margin:0 0 6px;font-size:22px;letter-spacing:-.01em}
+#login p{color:var(--dim);font-size:13.5px;margin:0 0 22px}
+footer{border-top:1px solid var(--line);padding:20px 24px 40px;color:var(--dim);font-size:13px;text-align:center}
+.upbox{border:1px dashed var(--line);border-radius:var(--r2);padding:12px;background:var(--soft);margin-top:10px}
+.upbox .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 </style>
 </head>
 <body>
 
 <!--
   ============================================================
-   后台配置区（ADMIN_CONFIG）
-   - PASS_SHA256：登录密码的 SHA-256 哈希。改密码见页面底部「修改密码」。
-     生成哈希：python -c "import hashlib;print(hashlib.sha256('你的密码'.encode()).hexdigest())"
-   - 本文件会发布到公开站点，哈希不可逆但可被离线暴力破解，密码请足够强。
+   后台配置：ADMIN_CONFIG
+   - PASS_SHA256：登录密码的 SHA-256 哈希
+   - 改密码：页面底部「修改管理密码」直接提交，无需改代码
   ============================================================
 -->
 
 <div class="bar">
-  <div class="wrap">
+  <div class="inner">
     <h1>作品集 · 后台管理</h1>
-    <span class="pill" id="sitePill">hnzzsp/portfolio</span>
+    <span class="pill" id="sitePill"></span>
     <div class="sp">
+      <span class="pill dirty hide" id="dirtyTip">● 有未保存的修改</span>
       <a class="pill" href="./" target="_blank" rel="noopener">查看前台 ↗</a>
       <button class="ghost mini" id="logoutBtn" type="button">退出</button>
     </div>
@@ -108,188 +120,193 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding:20px 0 40px;colo
 </div>
 
 <!-- ========== 登录 ========== -->
-<div class="wrap">
-  <div id="login">
-    <h2>管理员登录</h2>
-    <p>此页面不对外公开链接，仅本人使用。</p>
-    <form id="loginForm">
-      <label for="pw">管理密码</label>
-      <input type="password" id="pw" autocomplete="current-password" placeholder="请输入管理密码" autofocus>
-      <div style="margin-top:18px"><button type="submit">登录</button></div>
-      <div class="msg err" id="loginErr"></div>
-    </form>
-  </div>
+<div id="login">
+  <h2>管理员登录</h2>
+  <p>此页面不对外公开，仅本人使用。</p>
+  <form id="loginForm">
+    <label for="pw">管理密码</label>
+    <input type="password" id="pw" autocomplete="current-password" placeholder="请输入管理密码" autofocus>
+    <div style="margin-top:20px"><button type="submit">登录</button></div>
+    <div class="msg err" id="loginErr"></div>
+  </form>
 </div>
 
 <!-- ========== 编辑区 ========== -->
-<div class="wrap hide" id="panel">
+<div class="admin hide" id="panel">
 
-  <div class="msg" id="msg"></div>
+  <!-- 侧栏目录 -->
+  <nav class="side" id="side">
+    <h4>分区</h4>
+    <a href="#s-token">访问令牌</a>
+    <a href="#s-contact">联系方式</a>
+    <a href="#s-hero">首页抬头</a>
+    <a href="#s-facts">Quick Facts</a>
+    <a href="#s-about">个人简介</a>
+    <a href="#s-stats">关键数据</a>
+    <a href="#s-skills">技能专长</a>
+    <a href="#s-projects">项目经历</a>
+    <a href="#s-timeline">教育与实践</a>
+    <a href="#s-footer">页脚</a>
+    <a href="#s-files">其他文件</a>
+    <a href="#s-save">保存与发布</a>
+    <a href="#s-pw">修改密码</a>
+    <a href="#s-about2">存储说明</a>
+  </nav>
 
-  <!-- 数据加载失败时的离线兜底 -->
-  <div class="card hide" id="offlineCard">
-    <h2>离线编辑模式</h2>
-    <p class="hint">
-      常见原因：<br>
-      1. 用 <code>file://</code> 直接双击打开了本页（浏览器禁止页面读取本地文件）——请改用
-      <code>python -m http.server</code> 启动本地服务器，或直接用线上地址打开；<br>
-      2. 在只挂载了单个 HTML 的预览面板里打开——data.json 不在同目录，请改用线上地址；<br>
-      3. 网络不通或 github.io 访问被干扰——稍后重试。<br>
-      当前页面地址：<code id="locInfo"></code><br><br>
-      也可以把本地 <code>site/data.json</code> 的完整内容粘贴到下面，照样进入编辑（保存时仍需网络与令牌）：
-    </p>
-    <textarea id="pasteJson" style="min-height:170px;font-family:var(--mono);font-size:12.5px" placeholder="把 data.json 的完整内容粘贴到这里…"></textarea>
-    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
-      <button class="ghost" type="button" id="pasteBtn">解析并开始编辑</button>
-      <button class="ghost" type="button" id="retryBtn">重新尝试联网读取</button>
+  <div>
+
+    <div class="msg" id="msg"></div>
+
+    <div class="card hide" id="offlineCard">
+      <h2>离线编辑模式</h2>
+      <p class="tip">无法从服务器读取 <code>data.json</code>。常见原因：用 <code>file://</code> 直接打开（浏览器禁止读取本地文件）；
+      在只挂单个 HTML 的预览面板里打开；或网络不通。当前地址：<code id="locInfo"></code></p>
+      <textarea id="pasteJson" style="min-height:150px;font-family:var(--mono);font-size:12.5px" placeholder="把本地 site/data.json 的完整内容粘贴到这里…"></textarea>
+      <div class="barrow">
+        <button class="ghost mini" type="button" id="pasteBtn">解析并开始编辑</button>
+        <button class="ghost mini" type="button" id="retryBtn">重新尝试联网读取</button>
+      </div>
     </div>
-  </div>
 
-  <div class="card">
-    <h2>GitHub 访问令牌 <small>用于保存时提交文件</small></h2>
-    <label for="tok">Personal Access Token（需 repo 权限）</label>
-    <input type="password" id="tok" autocomplete="off" placeholder="ghp_xxxxxxxxxxxx">
-    <p class="hint">
-      令牌只保存在当前浏览器标签页的内存里（sessionStorage），<b>不会写入任何文件、不会进仓库</b>；
-      关闭标签页即失效。可在 GitHub → Settings → Developer settings → Personal access tokens 生成。
-    </p>
-  </div>
-
-  <div class="card">
-    <h2>联系方式</h2>
-    <div class="row2">
-      <div><label>邮箱</label><input type="text" data-p="contact.email"></div>
-      <div><label>电话</label><input type="text" data-p="contact.phone"></div>
+    <div class="card" id="s-token">
+      <h2>访问令牌</h2>
+      <p class="tip">保存与上传都靠它。只存在当前标签页内存里，<b>不会写入任何文件、不会进仓库</b>，关闭标签页即失效。</p>
+      <label for="tok">GitHub Personal Access Token（需 repo 权限）</label>
+      <input type="password" id="tok" autocomplete="off" placeholder="ghp_xxxxxxxxxxxx">
     </div>
-    <div class="row2">
-      <div><label>微信</label><input type="text" data-p="contact.wechat"></div>
-      <div><label>城市</label><input type="text" data-p="contact.city"></div>
+
+    <div class="card" id="s-contact">
+      <h2>联系方式</h2>
+      <div class="row2">
+        <div><label>邮箱</label><input type="text" data-p="contact.email"></div>
+        <div><label>电话</label><input type="text" data-p="contact.phone"></div>
+      </div>
+      <div class="row2">
+        <div><label>微信</label><input type="text" data-p="contact.wechat"></div>
+        <div><label>城市</label><input type="text" data-p="contact.city"></div>
+      </div>
+      <div class="row2">
+        <div><label>GitHub 显示名</label><input type="text" data-p="contact.github"></div>
+        <div><label>GitHub 链接</label><input type="text" data-p="contact.githubUrl"></div>
+      </div>
+      <div class="row2">
+        <div><label>作品站显示名</label><input type="text" data-p="contact.site"></div>
+        <div><label>作品站链接</label><input type="text" data-p="contact.siteUrl"></div>
+      </div>
+      <div class="barrow"><button class="mini" data-save type="button">保存本区</button><span class="hint">改动会立即提交到仓库</span></div>
     </div>
-    <div class="row2">
-      <div><label>GitHub 显示名</label><input type="text" data-p="contact.github"></div>
-      <div><label>GitHub 链接</label><input type="text" data-p="contact.githubUrl"></div>
+
+    <div class="card" id="s-hero">
+      <h2>首页抬头 Hero</h2>
+      <div class="row2">
+        <div><label>显示名</label><input type="text" data-p="profile.enName"></div>
+        <div><label>头像字母</label><input type="text" data-p="profile.avatarText"></div>
+      </div>
+      <label>眉标</label><input type="text" data-p="profile.eyebrow">
+      <label>主标题</label><input type="text" data-p="profile.zhTitle">
+      <label>导语段落（支持 &lt;strong&gt; 加粗）</label><textarea data-p="profile.lede"></textarea>
+      <label>能力标签（每行一个）</label><textarea data-p="profile.tags" data-type="lines"></textarea>
+      <div class="row2">
+        <div><label>姓名</label><input type="text" data-p="profile.name"></div>
+        <div><label>职位</label><input type="text" data-p="profile.role"></div>
+      </div>
+      <label>求职方向</label><input type="text" data-p="profile.intent">
+      <div class="barrow"><button class="mini" data-save type="button">保存本区</button></div>
     </div>
-    <div class="row2">
-      <div><label>作品站显示名</label><input type="text" data-p="contact.site"></div>
-      <div><label>作品站链接</label><input type="text" data-p="contact.siteUrl"></div>
+
+    <div class="card" id="s-facts">
+      <h2>Quick Facts</h2>
+      <div id="factsBox"></div>
+      <div class="barrow"><button class="ghost mini" type="button" id="addFact">+ 添加一行</button><button class="mini" data-save type="button">保存本区</button></div>
     </div>
-  </div>
 
-  <div class="card">
-    <h2>首页抬头（Hero）</h2>
-    <div class="row2">
-      <div><label>显示名（英文/拼音）</label><input type="text" data-p="profile.enName"></div>
-      <div><label>头像字母</label><input type="text" data-p="profile.avatarText"></div>
+    <div class="card" id="s-about">
+      <h2>个人简介</h2>
+      <div id="aboutBox"></div>
+      <div class="barrow"><button class="ghost mini" type="button" id="addPara">+ 添加段落</button><button class="mini" data-save type="button">保存本区</button></div>
     </div>
-    <label>眉标（小字）</label><input type="text" data-p="profile.eyebrow">
-    <label>主标题（中文大字）</label><input type="text" data-p="profile.zhTitle">
-    <label>导语段落</label><textarea data-p="profile.lede"></textarea>
-    <p class="hint">支持简单 HTML：<code>&lt;strong&gt;加粗&lt;/strong&gt;</code>、<code>&lt;br&gt;换行</code></p>
-    <label>能力标签（每行一个）</label><textarea data-p="profile.tags" data-type="lines"></textarea>
-    <div class="row2">
-      <div><label>姓名（Quick Facts）</label><input type="text" data-p="profile.name"></div>
-      <div><label>职位</label><input type="text" data-p="profile.role"></div>
+
+    <div class="card" id="s-stats">
+      <h2>关键数据</h2>
+      <div id="statsBox"></div>
+      <div class="barrow"><button class="ghost mini" type="button" id="addStat">+ 添加一块</button><button class="mini" data-save type="button">保存本区</button></div>
     </div>
-    <label>求职方向</label><input type="text" data-p="profile.intent">
-  </div>
 
-  <div class="card">
-    <h2>Quick Facts <small>右侧信息卡</small></h2>
-    <div id="factsBox"></div>
-    <button class="ghost mini" type="button" id="addFact">+ 添加一行</button>
-  </div>
-
-  <div class="card">
-    <h2>个人简介</h2>
-    <div id="aboutBox"></div>
-    <button class="ghost mini" type="button" id="addPara">+ 添加段落</button>
-  </div>
-
-  <div class="card">
-    <h2>关键数据 <small>4 个统计块</small></h2>
-    <div id="statsBox"></div>
-    <button class="ghost mini" type="button" id="addStat">+ 添加一块</button>
-  </div>
-
-  <div class="card">
-    <h2>技能专长</h2>
-    <div id="skillsBox"></div>
-    <button class="ghost mini" type="button" id="addSkill">+ 添加分组</button>
-  </div>
-
-  <div class="card">
-    <h2>项目经历</h2>
-    <div id="projectsBox"></div>
-    <button class="ghost mini" type="button" id="addProject">+ 添加项目</button>
-  </div>
-
-  <div class="card">
-    <h2>教育与实践</h2>
-    <div id="timelineBox"></div>
-    <button class="ghost mini" type="button" id="addTime">+ 添加一条</button>
-  </div>
-
-  <div class="card">
-    <h2>页脚</h2>
-    <div class="row2">
-      <div><label>姓名</label><input type="text" data-p="footer.name"></div>
-      <div><label>后缀说明</label><input type="text" data-p="footer.suffix"></div>
+    <div class="card" id="s-skills">
+      <h2>技能专长</h2>
+      <div id="skillsBox"></div>
+      <div class="barrow"><button class="ghost mini" type="button" id="addSkill">+ 添加分组</button><button class="mini" data-save type="button">保存本区</button></div>
     </div>
-    <label>最后更新日期</label><input type="text" data-p="meta.updated">
-  </div>
 
-  <div class="card" style="border-color:var(--accent)">
-    <h2>保存</h2>
-    <p class="hint" style="margin:0 0 14px">
-      保存会把 <code>data.json</code> 直接提交到仓库 <code>main</code> 分支，
-      GitHub Pages 重新构建后前台自动生效，通常 <b>1 分钟内</b>，无需改代码、无需本地部署。
-    </p>
-    <label>提交说明（可选）</label>
-    <input type="text" id="commitMsg" placeholder="例如：更新联系方式">
-    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
-      <button type="button" id="saveBtn">保存并发布</button>
-      <button class="ghost" type="button" id="reloadBtn">放弃修改，重新载入</button>
+    <div class="card" id="s-projects">
+      <h2>项目经历</h2>
+      <p class="tip">每张卡可单独上传截图与源文件：截图会自动写入「截图区」，源文件上传后可一键插入到「结果」。</p>
+      <div id="projectsBox"></div>
+      <div class="barrow"><button class="ghost mini" type="button" id="addProject">+ 添加项目</button><button class="mini" data-save type="button">保存本区</button></div>
     </div>
-  </div>
 
-  <div class="card">
-    <h2>修改管理密码</h2>
-    <div class="row2">
-      <div><label>新密码</label><input type="password" id="np1" autocomplete="new-password"></div>
-      <div><label>再输一次</label><input type="password" id="np2" autocomplete="new-password"></div>
+    <div class="card" id="s-timeline">
+      <h2>教育与实践</h2>
+      <div id="timelineBox"></div>
+      <div class="barrow"><button class="ghost mini" type="button" id="addTime">+ 添加一条</button><button class="mini" data-save type="button">保存本区</button></div>
     </div>
-    <p class="hint">
-      提交后会改写 <code>admin.html</code> 里的 <code>PASS_SHA256</code> 常量并重新发布，
-      同样不需要你手动改代码。<b>新密码请务必自己记住</b>——忘了只能本地重新生成一份 admin.html。
-    </p>
-    <div style="margin-top:14px"><button class="ghost" type="button" id="pwBtn">提交新密码</button></div>
-  </div>
 
-  <div class="card">
-    <h2>照片 / 源文件上传</h2>
-    <p class="hint" style="margin:0 0 12px">
-      图片、PSD/AI 源文件、PDF、ZIP 都可以传，直接存进仓库 <code>assets/</code> 目录并立即上线。
-      单文件建议 ≤ 40MB（太大会超出接口限制）；文件名会自动清理空格与特殊字符。
-    </p>
-    <input type="file" id="fileInput" multiple
-           accept="image/*,.psd,.ai,.pdf,.zip,.svg,.png,.jpg,.jpeg,.webp,.gif">
-    <div id="upList" style="margin-top:14px"></div>
-  </div>
+    <div class="card" id="s-footer">
+      <h2>页脚</h2>
+      <div class="row2">
+        <div><label>姓名</label><input type="text" data-p="footer.name"></div>
+        <div><label>后缀说明</label><input type="text" data-p="footer.suffix"></div>
+      </div>
+      <label>最后更新日期</label><input type="text" data-p="meta.updated">
+      <div class="barrow"><button class="mini" data-save type="button">保存本区</button></div>
+    </div>
 
-  <div class="card">
-    <h2>数据与存储说明</h2>
-    <p class="hint" style="margin:0">
-      · <b>展示数据</b>：存在仓库根目录 <code>data.json</code>，公开可读，前台加载它渲染页面。<br>
-      · <b>管理密码</b>：只存哈希，写在本页顶部 <code>ADMIN_CONFIG.PASS_SHA256</code>。<br>
-      · <b>GitHub 令牌</b>：只在当前标签页内存中，关闭即失效，不落盘、不进仓库。<br>
-      · <b>登录状态</b>：sessionStorage，关闭标签页自动退出。<br>
-      · 如果 <code>data.json</code> 加载失败，前台会自动回退到 index.html 里的静态内容，不会白屏。
-    </p>
-  </div>
+    <div class="card" id="s-files">
+      <h2>其他文件上传</h2>
+      <p class="tip">不属于某个项目的图片 / 源文件传到这里，存进 <code>assets/files/</code>，上传后复制代码自行粘贴到需要的位置。</p>
+      <input type="file" id="fileInput" multiple accept="image/*,.psd,.ai,.pdf,.zip,.svg">
+      <div id="upList"></div>
+    </div>
 
+    <div class="card" id="s-save" style="border-color:var(--accent)">
+      <h2>保存与发布</h2>
+      <p class="tip">保存会把 <code>data.json</code> 提交到仓库 <code>main</code> 分支，Pages 重新构建后前台自动生效，通常 <b>1 分钟内</b>。
+      每个分区都有自己的保存按钮，效果一样——都是提交整份数据。</p>
+      <label>提交说明（可选）</label>
+      <input type="text" id="commitMsg" placeholder="例如：更新联系方式">
+      <div class="barrow">
+        <button type="button" id="saveBtn">保存并发布</button>
+        <button class="ghost" type="button" id="reloadBtn">放弃修改，重新载入</button>
+      </div>
+    </div>
+
+    <div class="card" id="s-pw">
+      <h2>修改管理密码</h2>
+      <div class="row2">
+        <div><label>新密码</label><input type="password" id="np1" autocomplete="new-password"></div>
+        <div><label>再输一次</label><input type="password" id="np2" autocomplete="new-password"></div>
+      </div>
+      <p class="tip">提交后改写 <code>admin.html</code> 里的哈希并重新发布，不用手改代码。<b>新密码务必自己记住</b>。</p>
+      <div class="barrow"><button class="ghost" type="button" id="pwBtn">提交新密码</button></div>
+    </div>
+
+    <div class="card" id="s-about2">
+      <h2>存储说明</h2>
+      <p class="tip" style="margin:0">
+        · <b>展示数据</b>：仓库根目录 <code>data.json</code>，公开可读<br>
+        · <b>上传文件</b>：<code>assets/projects/</code>（项目图）、<code>assets/files/</code>（源文件与其他）<br>
+        · <b>管理密码</b>：只存哈希，写在本页 <code>ADMIN_CONFIG.PASS_SHA256</code><br>
+        · <b>令牌 / 登录态</b>：sessionStorage，关闭标签页即失效
+      </p>
+    </div>
+
+  </div>
 </div>
 
-<footer><div class="wrap">个人作品集后台 · 本页已设置 noindex，不参与搜索收录</div></footer>
+<button class="fabsave" id="fabSave" type="button">保存并发布</button>
+<div class="toast" id="toast"></div>
+
+<footer>个人作品集后台 · 已设置 noindex，不参与搜索收录</footer>
 
 <script>
 /* ================= 配置 ================= */
@@ -299,33 +316,49 @@ var ADMIN_CONFIG = {
   BRANCH: 'main',
   DATA_PATH: 'data.json',
   ADMIN_PATH: 'admin.html',
-  PASS_SHA256: '46daee9ffd5c862ebc9dcec9d13d2a21e4f8951c676da9c281906c2bfe6ce99b',
+  PASS_SHA256: '37a0034fb1fae0f18836a858af9b95b2215835b2b67923b69cfc3dfbeb65b40e',
   SESSION_KEY: 'pfAdminAuthed'
 };
 
 var API = 'https://api.github.com';
-var DATA = null;   // 当前编辑中的数据对象
-var DATA_SHA = ''; // data.json 的 blob sha，更新时必需
+var DATA = null;
+var DIRTY = false;
 
 /* ================= 工具 ================= */
 function $(id){ return document.getElementById(id); }
 function arr(v){ return Object.prototype.toString.call(v) === '[object Array]' ? v : []; }
 function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+var toastTimer = null;
+function toast(text, kind){
+  var t = $('toast');
+  t.className = 'toast on ' + (kind || 'info');
+  t.textContent = text;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.className = 'toast ' + (kind || 'info'); }, 2600);
+}
 function msg(text, kind){
   var el = $('msg');
   el.className = 'msg on ' + (kind || '');
   el.textContent = text;
-  el.scrollIntoView({behavior:'smooth', block:'center'});
+  toast(text, kind === 'err' ? 'err' : (kind === 'ok' ? 'ok' : 'info'));
+}
+function setDirty(){
+  DIRTY = true;
+  $('dirtyTip').classList.remove('hide');
+  $('fabSave').classList.add('on');
+}
+function clearDirty(){
+  DIRTY = false;
+  $('dirtyTip').classList.add('hide');
+  $('fabSave').classList.remove('on');
 }
 function sha256(str){
   if (window.crypto && crypto.subtle){
     return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)).then(function(buf){
-      return Array.prototype.map.call(new Uint8Array(buf), function(b){
-        return ('0' + b.toString(16)).slice(-2);
-      }).join('');
+      return Array.prototype.map.call(new Uint8Array(buf), function(b){ return ('0' + b.toString(16)).slice(-2); }).join('');
     });
   }
-  return Promise.reject(new Error('当前环境不支持 crypto.subtle，请用 https 或 localhost 访问本页。'));
+  return Promise.reject(new Error('当前环境不支持 crypto.subtle，请用 https 或 localhost 访问。'));
 }
 function b64enc(str){
   var bytes = new TextEncoder().encode(str), bin = '';
@@ -340,15 +373,14 @@ function b64dec(b64){
 function gh(method, path, body){
   var token = $('tok').value.trim();
   if (!token) return Promise.reject(new Error('请先填写 GitHub 访问令牌'));
-  var headers = {
-    'Authorization': 'Bearer ' + token,
-    'Accept': 'application/vnd.github+json',
-    'X-GitHub-Api-Version': '2022-11-28',
-    'Content-Type': 'application/json'
-  };
   return fetch(API + path, {
     method: method,
-    headers: headers,
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Accept': 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      'Content-Type': 'application/json'
+    },
     body: body ? JSON.stringify(body) : undefined
   }).then(function(r){
     return r.json().then(function(j){
@@ -360,16 +392,12 @@ function gh(method, path, body){
 
 /* ================= 登录 ================= */
 var authed = sessionStorage.getItem(ADMIN_CONFIG.SESSION_KEY) === '1';
-function showPanel(){
-  $('login').classList.add('hide');
-  $('panel').classList.remove('hide');
-}
+function showPanel(){ $('login').classList.add('hide'); $('panel').classList.remove('hide'); }
 if (authed) showPanel();
 
 $('loginForm').addEventListener('submit', function(e){
   e.preventDefault();
-  var v = $('pw').value;
-  sha256(v).then(function(h){
+  sha256($('pw').value).then(function(h){
     if (h === ADMIN_CONFIG.PASS_SHA256){
       sessionStorage.setItem(ADMIN_CONFIG.SESSION_KEY, '1');
       $('pw').value = '';
@@ -391,50 +419,43 @@ $('logoutBtn').addEventListener('click', function(){
 
 /* ================= 载入数据 ================= */
 function loadData(){
-  /* file:// 协议下浏览器禁止读取本地文件，直接给出明确指引 */
   if (location.protocol === 'file:'){
     offlinePrompt('当前是用 file:// 直接打开的，浏览器禁止页面读取本地数据文件。');
     return;
   }
-  var urls = [ADMIN_CONFIG.DATA_PATH + '?t=' + Date.now(), ADMIN_CONFIG.DATA_PATH, './' + ADMIN_CONFIG.DATA_PATH];
-  tryLoad(urls);
+  tryLoad([ADMIN_CONFIG.DATA_PATH + '?t=' + Date.now(), ADMIN_CONFIG.DATA_PATH, './' + ADMIN_CONFIG.DATA_PATH]);
 }
 function tryLoad(urls){
-  if (!urls.length){
-    offlinePrompt('无法从服务器读取 data.json（网络失败或文件不在本页同目录）。');
-    return;
-  }
+  if (!urls.length){ offlinePrompt('无法从服务器读取 data.json（网络失败或文件不在本页同目录）。'); return; }
   fetch(urls.shift(), {cache:'no-store'}).then(function(r){
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
   }).then(function(d){
     if (!d || !d.contact) throw new Error('数据格式不对');
-    DATA = d;
-    buildAll();
-    fillStatic();
+    DATA = d; buildAll(); fillStatic();
     $('offlineCard').classList.add('hide');
+    clearDirty();
   }).catch(function(){ tryLoad(urls); });
 }
 function offlinePrompt(reason){
   $('locInfo').textContent = location.href;
   $('offlineCard').classList.remove('hide');
-  msg('读取 data.json 失败：' + reason + ' 可在下方“离线编辑模式”粘贴本地 data.json 内容继续编辑，或按“重新尝试联网读取”。', 'err');
+  msg('读取 data.json 失败：' + reason, 'err');
 }
 
 /* ================= 表单构建 ================= */
 function inputHtml(path, value, type){
   var v = esc(value);
-  if (type === 'area'){
-    return '<textarea data-p="' + path + '" style="min-height:64px">' + v + '</textarea>';
-  }
-  return '<input type="text" data-p="' + path + '" value="' + v + '">';
+  return type === 'area'
+    ? '<textarea data-p="' + path + '" style="min-height:62px">' + v + '</textarea>'
+    : '<input type="text" data-p="' + path + '" value="' + v + '">';
 }
+var SAVE_BTN = '<button class="mini ghost" data-save type="button">保存</button>';
 
 function buildFacts(){
-  var box = $('factsBox');
-  box.innerHTML = arr(DATA.profile.facts).map(function(f, i){
-    return '<div class="item"><div class="ih"><b>第 ' + (i + 1) + ' 行</b>' +
-      '<span class="sp"></span><button class="danger" type="button" data-del="facts" data-i="' + i + '">删除</button></div>' +
+  $('factsBox').innerHTML = arr(DATA.profile.facts).map(function(f, i){
+    return '<div class="item"><div class="ih"><b>第 ' + (i + 1) + ' 行</b><span class="sp">' + SAVE_BTN +
+      '<button class="danger" type="button" data-del="facts" data-i="' + i + '">删除</button></span></div>' +
       '<div class="row3">' +
       '<div><label>标签</label>' + inputHtml('profile.facts.' + i + '.k', f.k) + '</div>' +
       '<div><label>值</label>' + inputHtml('profile.facts.' + i + '.v', f.v) + '</div>' +
@@ -442,120 +463,149 @@ function buildFacts(){
       '</div></div>';
   }).join('');
 }
-
 function buildAbout(){
   $('aboutBox').innerHTML = arr(DATA.about.paragraphs).map(function(t, i){
-    return '<div class="item"><div class="ih"><b>段落 ' + (i + 1) + '</b><span class="sp"></span>' +
-      '<button class="danger" type="button" data-del="about" data-i="' + i + '">删除</button></div>' +
+    return '<div class="item"><div class="ih"><b>段落 ' + (i + 1) + '</b><span class="sp">' + SAVE_BTN +
+      '<button class="danger" type="button" data-del="about" data-i="' + i + '">删除</button></span></div>' +
       inputHtml('about.paragraphs.' + i, t, 'area') + '</div>';
   }).join('');
 }
-
 function buildStats(){
   $('statsBox').innerHTML = arr(DATA.about.stats).map(function(s, i){
-    return '<div class="item"><div class="ih"><b>第 ' + (i + 1) + ' 块</b><span class="sp"></span>' +
-      '<button class="danger" type="button" data-del="stats" data-i="' + i + '">删除</button></div>' +
+    return '<div class="item"><div class="ih"><b>第 ' + (i + 1) + ' 块</b><span class="sp">' + SAVE_BTN +
+      '<button class="danger" type="button" data-del="stats" data-i="' + i + '">删除</button></span></div>' +
       '<div class="row2">' +
       '<div><label>数字</label>' + inputHtml('about.stats.' + i + '.num', s.num) + '</div>' +
       '<div><label>说明（可用 &lt;br&gt; 换行）</label>' + inputHtml('about.stats.' + i + '.label', s.label) + '</div>' +
       '</div></div>';
   }).join('');
 }
-
 function buildSkills(){
   $('skillsBox').innerHTML = arr(DATA.skills).map(function(g, i){
     var bars = arr(g.bars).map(function(b, j){
-      return '<div class="item" style="background:#fff">' +
-        '<div class="ih"><b>能力条 ' + (j + 1) + '</b><span class="sp"></span>' +
-        '<button class="danger" type="button" data-del="bar" data-i="' + i + '" data-j="' + j + '">删除</button></div>' +
+      return '<div class="item" style="background:#fff;margin-bottom:10px">' +
+        '<div class="ih"><b>能力条 ' + (j + 1) + '</b><span class="sp">' + SAVE_BTN +
+        '<button class="danger" type="button" data-del="bar" data-i="' + i + '" data-j="' + j + '">删除</button></span></div>' +
         '<div class="row3">' +
         '<div><label>名称</label>' + inputHtml('skills.' + i + '.bars.' + j + '.label', b.label) + '</div>' +
         '<div><label>说明</label>' + inputHtml('skills.' + i + '.bars.' + j + '.note', b.note) + '</div>' +
         '<div><label>百分比</label><input type="number" min="0" max="100" data-p="skills.' + i + '.bars.' + j + '.pct" value="' + (b.pct || 0) + '"></div>' +
         '</div></div>';
     }).join('');
-    return '<div class="item"><div class="ih"><b>分组 ' + (i + 1) + '</b><span class="sp"></span>' +
-      '<button class="danger" type="button" data-del="skill" data-i="' + i + '">删除分组</button></div>' +
+    return '<div class="item"><div class="ih"><b>分组 ' + (i + 1) + '</b><span class="sp">' + SAVE_BTN +
+      '<button class="danger" type="button" data-del="skill" data-i="' + i + '">删除分组</button></span></div>' +
       '<div class="row2">' +
       '<div><label>分组名</label>' + inputHtml('skills.' + i + '.name', g.name) + '</div>' +
-      '<div><label>说明</label>' + inputHtml('skills.' + i + '.note', g.note) + '</div>' +
-      '</div>' +
-      '<label>关键词（每行一个）</label><textarea data-p="skills.' + i + '.kws" data-type="lines">' +
-        esc(arr(g.kws).join('\n')) + '</textarea>' +
-      '<label style="margin-top:14px">能力条</label>' + bars +
-      '<button class="ghost mini" type="button" data-add="bar" data-i="' + i + '">+ 添加能力条</button>' +
-      '</div>';
+      '<div><label>说明</label>' + inputHtml('skills.' + i + '.note', g.note) + '</div></div>' +
+      '<label>关键词（每行一个）</label><textarea data-p="skills.' + i + '.kws" data-type="lines">' + esc(arr(g.kws).join('\n')) + '</textarea>' +
+      '<label>能力条</label>' + bars +
+      '<button class="ghost mini" type="button" data-add="bar" data-i="' + i + '">+ 添加能力条</button></div>';
   }).join('');
 }
-
 function buildProjects(){
   $('projectsBox').innerHTML = arr(DATA.projects).map(function(p, i){
-    return '<div class="item"><div class="ih"><b>项目 ' + (i + 1) + '</b><span class="sp"></span>' +
-      '<button class="danger" type="button" data-del="project" data-i="' + i + '">删除项目</button></div>' +
+    var hasImg = /<img\s/i.test(p.shot || '');
+    var prev = hasImg ? '<div style="max-width:220px;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-top:8px">' + p.shot + '</div>'
+                      : '<div class="hint">当前：占位文字（未设置图片）</div>';
+    return '<div class="item"><div class="ih"><b>项目 ' + (i + 1) + '</b><span class="sp">' + SAVE_BTN +
+      '<button class="danger" type="button" data-del="project" data-i="' + i + '">删除项目</button></span></div>' +
       '<label>标题</label>' + inputHtml('projects.' + i + '.title', p.title) +
       '<label>角色 / 标签行</label>' + inputHtml('projects.' + i + '.role', p.role) +
       '<label>背景</label>' + inputHtml('projects.' + i + '.bg', p.bg, 'area') +
       '<label>行动</label>' + inputHtml('projects.' + i + '.act', p.act, 'area') +
       '<label>结果</label>' + inputHtml('projects.' + i + '.res', p.res, 'area') +
-      '<label>标签（每行一个）</label><textarea data-p="projects.' + i + '.kws" data-type="lines">' +
-        esc(arr(p.kws).join('\n')) + '</textarea>' +
-      '<label>截图区 HTML（可填 &lt;img src="..."&gt;，留空则显示占位）</label>' +
-      inputHtml('projects.' + i + '.shot', p.shot, 'area') +
-      '</div>';
+      '<label>标签（每行一个）</label><textarea data-p="projects.' + i + '.kws" data-type="lines">' + esc(arr(p.kws).join('\n')) + '</textarea>' +
+      '<label>截图区 HTML</label><textarea data-p="projects.' + i + '.shot">' + esc(p.shot) + '</textarea>' +
+      '<div class="upbox"><div class="row">' +
+        '<button class="ghost mini" type="button" data-pick="shot" data-i="' + i + '">上传截图</button>' +
+        '<button class="ghost mini" type="button" data-pick="file" data-i="' + i + '">上传源文件</button>' +
+        '<span class="hint" id="upstate-' + i + '"></span>' +
+      '</div>' + prev +
+      '<input type="file" class="hide" id="pick-' + i + '">' +
+      '</div></div>';
   }).join('');
 }
-
 function buildTimeline(){
   $('timelineBox').innerHTML = arr(DATA.timeline).map(function(t, i){
-    return '<div class="item"><div class="ih"><b>第 ' + (i + 1) + ' 条</b><span class="sp"></span>' +
-      '<button class="danger" type="button" data-del="time" data-i="' + i + '">删除</button></div>' +
+    return '<div class="item"><div class="ih"><b>第 ' + (i + 1) + ' 条</b><span class="sp">' + SAVE_BTN +
+      '<button class="danger" type="button" data-del="time" data-i="' + i + '">删除</button></span></div>' +
       '<div class="row2"><div><label>时间</label>' + inputHtml('timeline.' + i + '.when', t.when) + '</div>' +
       '<div><label>标题</label>' + inputHtml('timeline.' + i + '.title', t.title) + '</div></div>' +
-      '<label>描述</label>' + inputHtml('timeline.' + i + '.desc', t.desc, 'area') +
-      '</div>';
+      '<label>描述</label>' + inputHtml('timeline.' + i + '.desc', t.desc, 'area') + '</div>';
   }).join('');
 }
+function buildAll(){ buildFacts(); buildAbout(); buildStats(); buildSkills(); buildProjects(); buildTimeline(); }
 
-function buildAll(){
-  buildFacts(); buildAbout(); buildStats(); buildSkills(); buildProjects(); buildTimeline();
-}
-
-/* 增删按钮（事件委托） */
+/* ================= 增删（事件委托） ================= */
 document.addEventListener('click', function(e){
   var b = e.target.closest('button');
   if (!b) return;
+
+  /* 复制按钮 */
+  var cp = e.target.closest('.cp[data-copy]');
+  if (cp){
+    var txt = cp.dataset.copy, old = cp.textContent;
+    var done = function(ok){
+      cp.textContent = ok ? '已复制' : '请手动复制';
+      setTimeout(function(){ cp.textContent = old; }, 1500);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){ done(true); }, function(){ done(false); });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { done(document.execCommand('copy')); } catch (err) { done(false); }
+      document.body.removeChild(ta);
+    }
+    return;
+  }
+
+  /* 分区/条目保存 */
+  if (b.hasAttribute('data-save')){ doSave('已保存并发布'); return; }
+
+  /* 项目内上传入口 */
+  var pick = b.getAttribute('data-pick');
+  if (pick){
+    var idx = b.getAttribute('data-i');
+    var input = $('pick-' + idx);
+    if (input){
+      input.accept = pick === 'shot' ? 'image/*' : '*/*';
+      input.dataset.kind = pick;
+      input.dataset.idx = idx;
+      input.value = '';
+      input.click();
+    }
+    return;
+  }
+
   var kind = b.getAttribute('data-del') || b.getAttribute('data-add');
   if (!kind) return;
-  collect(); // 先把当前输入写回 DATA，再增删，避免丢失未保存修改
+  collect();
   var i = parseInt(b.getAttribute('data-i'), 10);
   var j = parseInt(b.getAttribute('data-j'), 10);
   if (b.hasAttribute('data-del')){
-    if (kind === 'facts')    DATA.profile.facts.splice(i, 1);
-    if (kind === 'about')    DATA.about.paragraphs.splice(i, 1);
-    if (kind === 'stats')    DATA.about.stats.splice(i, 1);
-    if (kind === 'bar')      DATA.skills[i].bars.splice(j, 1);
-    if (kind === 'skill')    DATA.skills.splice(i, 1);
-    if (kind === 'project')  DATA.projects.splice(i, 1);
-    if (kind === 'time')     DATA.timeline.splice(i, 1);
-  } else {
-    if (kind === 'bar') DATA.skills[i].bars.push({label:'新能力', note:'', pct:60});
+    if (kind === 'facts')   DATA.profile.facts.splice(i, 1);
+    if (kind === 'about')   DATA.about.paragraphs.splice(i, 1);
+    if (kind === 'stats')   DATA.about.stats.splice(i, 1);
+    if (kind === 'bar')     DATA.skills[i].bars.splice(j, 1);
+    if (kind === 'skill')   DATA.skills.splice(i, 1);
+    if (kind === 'project') DATA.projects.splice(i, 1);
+    if (kind === 'time')    DATA.timeline.splice(i, 1);
+  } else if (kind === 'bar'){
+    DATA.skills[i].bars.push({label:'新能力', note:'', pct:60});
   }
-  buildAll();
-  fillStatic();
+  buildAll(); fillStatic(); setDirty();
 });
 
-$('addFact').addEventListener('click', function(){ collect(); DATA.profile.facts.push({k:'', v:'', href:''}); buildFacts(); });
-$('addPara').addEventListener('click', function(){ collect(); DATA.about.paragraphs.push(''); buildAbout(); });
-$('addStat').addEventListener('click', function(){ collect(); DATA.about.stats.push({num:'', label:''}); buildStats(); });
-$('addSkill').addEventListener('click', function(){ collect(); DATA.skills.push({name:'新分组', note:'', bars:[], kws:[]}); buildSkills(); });
-$('addProject').addEventListener('click', function(){
-  collect();
-  DATA.projects.push({shot:'', title:'新项目', role:'', bg:'', act:'', res:'', kws:[]});
-  buildProjects();
-});
-$('addTime').addEventListener('click', function(){ collect(); DATA.timeline.push({when:'', title:'', desc:''}); buildTimeline(); });
+$('addFact').addEventListener('click', function(){ collect(); DATA.profile.facts.push({k:'',v:'',href:''}); buildFacts(); setDirty(); });
+$('addPara').addEventListener('click', function(){ collect(); DATA.about.paragraphs.push(''); buildAbout(); setDirty(); });
+$('addStat').addEventListener('click', function(){ collect(); DATA.about.stats.push({num:'',label:''}); buildStats(); setDirty(); });
+$('addSkill').addEventListener('click', function(){ collect(); DATA.skills.push({name:'新分组',note:'',bars:[],kws:[]}); buildSkills(); setDirty(); });
+$('addProject').addEventListener('click', function(){ collect(); DATA.projects.push({shot:'',title:'新项目',role:'',bg:'',act:'',res:'',kws:[]}); buildProjects(); setDirty(); });
+$('addTime').addEventListener('click', function(){ collect(); DATA.timeline.push({when:'',title:'',desc:''}); buildTimeline(); setDirty(); });
 
-/* ================= 收集表单写入 DATA ================= */
+/* ================= 收集与填充 ================= */
 function setPath(obj, path, value){
   var keys = path.split('.'), cur = obj;
   for (var i = 0; i < keys.length - 1; i++){
@@ -566,163 +616,179 @@ function setPath(obj, path, value){
   cur[keys[keys.length - 1]] = value;
 }
 function collect(){
-  var nodes = document.querySelectorAll('#panel [data-p]');
-  Array.prototype.forEach.call(nodes, function(n){
-    var path = n.getAttribute('data-p');
+  Array.prototype.forEach.call(document.querySelectorAll('#panel [data-p]'), function(n){
     var val = n.value;
     if (n.getAttribute('data-type') === 'lines'){
       val = val.split('\n').map(function(s){ return s.trim(); }).filter(function(s){ return s !== ''; });
-    } else if (n.type === 'number'){
-      val = parseInt(val, 10) || 0;
-    }
-    setPath(DATA, path, val);
+    } else if (n.type === 'number'){ val = parseInt(val, 10) || 0; }
+    setPath(DATA, n.getAttribute('data-p'), val);
   });
 }
-/* 把简单字段（非动态区）的初始值填进表单 */
 function fillStatic(){
   Array.prototype.forEach.call(document.querySelectorAll('#panel [data-p]'), function(n){
-    var path = n.getAttribute('data-p'), cur = DATA, ok = true;
-    path.split('.').forEach(function(k){
-      if (cur == null) { ok = false; return; }
+    var cur = DATA, ok = true;
+    n.getAttribute('data-p').split('.').forEach(function(k){
+      if (cur == null){ ok = false; return; }
       cur = cur[k];
     });
     if (!ok || cur == null) return;
-    if (n.getAttribute('data-type') === 'lines'){
-      n.value = arr(cur).join('\n');
-    } else {
-      n.value = cur;
-    }
+    n.value = n.getAttribute('data-type') === 'lines' ? arr(cur).join('\n') : cur;
   });
 }
 
 /* ================= 保存 ================= */
-$('saveBtn').addEventListener('click', function(){
+function doSave(okText){
   collect();
   var text = JSON.stringify(DATA, null, 2);
   var message = $('commitMsg').value.trim() || ('更新作品集内容 ' + new Date().toLocaleString('zh-CN'));
-  msg('正在提交…', '');
   var path = '/repos/' + ADMIN_CONFIG.OWNER + '/' + ADMIN_CONFIG.REPO + '/contents/' + ADMIN_CONFIG.DATA_PATH;
-
+  var btns = document.querySelectorAll('[data-save],#saveBtn,#fabSave');
+  Array.prototype.forEach.call(btns, function(x){ x.disabled = true; });
+  toast('正在提交…', 'info');
   gh('GET', path + '?ref=' + ADMIN_CONFIG.BRANCH).then(function(j){
-    DATA_SHA = j.sha;
-    return gh('PUT', path, {
-      message: message,
-      content: b64enc(text),
-      sha: DATA_SHA,
-      branch: ADMIN_CONFIG.BRANCH
-    });
+    return gh('PUT', path, { message: message, content: b64enc(text), sha: j.sha, branch: ADMIN_CONFIG.BRANCH });
   }).then(function(){
-    msg('已保存并发布。GitHub Pages 约 1 分钟内生效，点“查看前台”按 Ctrl+F5 强制刷新即可看到最新内容。', 'ok');
+    Array.prototype.forEach.call(btns, function(x){ x.disabled = false; });
+    clearDirty();
     $('commitMsg').value = '';
-  }).catch(function(e){ msg('保存失败：' + e.message, 'err'); });
+    msg((okText || '已保存并发布') + '。前台约 1 分钟内生效，按 Ctrl+F5 强制刷新可立即看到。', 'ok');
+  }).catch(function(e){
+    Array.prototype.forEach.call(btns, function(x){ x.disabled = false; });
+    msg('保存失败：' + e.message, 'err');
+  });
+}
+$('saveBtn').addEventListener('click', function(){ doSave('已保存并发布'); });
+$('fabSave').addEventListener('click', function(){ doSave('已保存并发布'); });
+$('reloadBtn').addEventListener('click', function(){ loadData(); msg('已重新载入线上数据，未保存的修改已丢弃。', ''); });
+
+/* 任何输入都标记为未保存 */
+document.addEventListener('input', function(e){
+  if (e.target.matches('#panel input[data-p], #panel textarea[data-p]')) setDirty();
+});
+window.addEventListener('beforeunload', function(e){
+  if (DIRTY){ e.preventDefault(); e.returnValue = ''; }
 });
 
-$('reloadBtn').addEventListener('click', function(){ loadData(); msg('已重新载入线上数据，未保存的修改已丢弃。', ''); });
+/* ================= 上传 ================= */
+var upSeq = 0;
+function safeName(name){ return name.replace(/[^\w.\-\u4e00-\u9fa5]+/g, '_') || ('file_' + Date.now()); }
+function fmtSize(n){ return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
+function isImg(name){ return /\.(png|jpe?g|webp|gif|svg|avif)$/i.test(name); }
+function putContents(path, b64, message){
+  return gh('PUT', '/repos/' + ADMIN_CONFIG.OWNER + '/' + ADMIN_CONFIG.REPO + '/contents/' + path,
+    { message: message, content: b64, branch: ADMIN_CONFIG.BRANCH });
+}
+function uploadFile(file, dir, onOk, onFail){
+  if (file.size > 40 * 1024 * 1024){ onFail('超过 40MB，请压缩后重试'); return; }
+  var name = safeName(file.name);
+  var reader = new FileReader();
+  reader.onerror = function(){ onFail('文件读取失败'); };
+  reader.onload = function(e){
+    var b64 = String(e.target.result).split(',')[1];
+    putContents('assets/' + dir + '/' + name, b64, '上传素材 ' + name).then(function(){
+      onOk(name, 'assets/' + dir + '/' + name);
+    }).catch(function(err){
+      if (/sha/i.test(err.message)){
+        var dot = name.lastIndexOf('.');
+        var nn = dot > 0 ? name.slice(0, dot) + '_' + Date.now() + name.slice(dot) : name + '_' + Date.now();
+        putContents('assets/' + dir + '/' + nn, b64, '上传素材 ' + nn).then(function(){
+          onOk(nn, 'assets/' + dir + '/' + nn);
+        }).catch(function(e2){ onFail(e2.message || e2); });
+      } else onFail(err.message || err);
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+/* 项目内上传：截图自动写入 shot 字段；源文件给出可插入的链接 */
+document.addEventListener('change', function(e){
+  var inp = e.target;
+  if (!inp.id || inp.id.indexOf('pick-') !== 0) return;
+  if (!inp.files || !inp.files.length) return;
+  var idx = parseInt(inp.dataset.idx, 10);
+  var kind = inp.dataset.kind;
+  var file = inp.files[0];
+  var st = $('upstate-' + idx);
+  if (!st) return;
+  if (!$('tok').value.trim()){ st.innerHTML = '<span style="color:var(--warn)">请先填写访问令牌</span>'; inp.value = ''; return; }
+  st.textContent = '上传中… ' + fmtSize(file.size);
+  collect();  // 先把当前编辑内容同步进 DATA，避免上传后重建表单丢改动
+  uploadFile(file, kind === 'shot' ? 'projects' : 'files', function(name, rel){
+    if (kind === 'shot'){
+      DATA.projects[idx].shot = '<img src="' + rel + '" alt="' + esc(name) + '" style="width:100%;height:100%;object-fit:cover">';
+    }
+    buildProjects(); fillStatic(); setDirty();
+    var s2 = $('upstate-' + idx);
+    if (s2){
+      s2.innerHTML = kind === 'shot'
+        ? '<span style="color:var(--ok)">截图已上传并写入，记得点保存</span>'
+        : '<span style="color:var(--ok)">已上传 ' + esc(name) + '</span> <button class="cp" data-copy="' +
+          esc('<a href="' + rel + '" download>下载源文件</a>') + '" type="button">复制下载链接</button>' +
+          ' <button class="cp" data-copy="' + esc(rel) + '" type="button">复制路径</button>' +
+          ' <button class="ghost mini" data-insert="' + idx + '" data-rel="' + esc(rel) + '" data-nm="' + esc(name) + '" type="button">插入到结果</button>';
+    }
+    toast('上传成功：' + name, 'ok');
+  }, function(reason){
+    st.innerHTML = '<span style="color:var(--warn)">失败：' + esc(reason) + '</span>';
+  });
+  inp.value = '';
+});
+/* 插入到结果字段 */
+document.addEventListener('click', function(e){
+  var b = e.target.closest('[data-insert]');
+  if (!b) return;
+  collect();
+  var i = parseInt(b.getAttribute('data-insert'), 10);
+  var tag = '<a href="' + b.getAttribute('data-rel') + '" download>' + b.getAttribute('data-nm') + '（源文件下载）</a>';
+  DATA.projects[i].res = (DATA.projects[i].res || '') + ' ' + tag;
+  buildProjects(); fillStatic(); setDirty();
+  toast('已插入到「结果」字段，记得保存', 'ok');
+});
+
+/* 其他文件上传（assets/files/） */
+$('fileInput').addEventListener('change', function(){
+  if (!this.files || !this.files.length) return;
+  if (!$('tok').value.trim()){ msg('请先填写访问令牌再上传。', 'err'); this.value = ''; return; }
+  Array.prototype.forEach.call(this.files, function(f){ otherUpload(f); });
+  this.value = '';
+});
+function otherUpload(file){
+  var id = 'up' + (++upSeq);
+  var name = safeName(file.name);
+  var row = document.createElement('div');
+  row.className = 'item';
+  row.innerHTML = '<div class="ih"><b>' + esc(name) + '</b><span class="sp"></span>' +
+    '<span style="color:var(--dim)">上传中… ' + fmtSize(file.size) + '</span></div>';
+  $('upList').prepend(row);
+  uploadFile(file, 'files', function(nm, rel){
+    var imgTag = '<img src="' + rel + '" alt="' + esc(nm) + '" style="width:100%;height:100%;object-fit:cover">';
+    var dlTag = '<a href="' + rel + '" download>下载源文件</a>';
+    row.innerHTML = '<div class="ih"><b>' + esc(nm) + '</b><span class="sp"></span>' +
+      '<span style="color:var(--ok);font-weight:700">已上线</span></div>' +
+      '<div class="hint"><code>' + esc(rel) + '</code> · ' + fmtSize(file.size) + '</div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+      (isImg(nm)
+        ? '<button class="cp" data-copy="' + esc(imgTag) + '" type="button">复制图片代码</button>'
+        : '<button class="cp" data-copy="' + esc(dlTag) + '" type="button">复制下载链接代码</button>') +
+      '<button class="cp" data-copy="' + esc(rel) + '" type="button">复制路径</button></div>';
+  }, function(reason){
+    row.innerHTML = '<div class="ih"><b>' + esc(name) + '</b><span class="sp"></span>' +
+      '<span style="color:var(--warn);font-weight:700">失败：' + esc(reason) + '</span></div>';
+  });
+}
 
 /* ================= 离线兜底 ================= */
 $('pasteBtn').addEventListener('click', function(){
   var raw = $('pasteJson').value.trim();
   if (!raw) return msg('请先粘贴 data.json 的完整内容。', 'err');
   var d;
-  try { d = JSON.parse(raw); }
-  catch(e){ return msg('不是合法的 JSON：' + e.message, 'err'); }
+  try { d = JSON.parse(raw); } catch (e){ return msg('不是合法的 JSON：' + e.message, 'err'); }
   if (!d.contact) return msg('缺少 contact 字段——请确认粘贴的是完整的 data.json。', 'err');
-  DATA = d;
-  buildAll();
-  fillStatic();
+  DATA = d; buildAll(); fillStatic();
   $('offlineCard').classList.add('hide');
-  msg('解析成功，已进入编辑。注意：当前数据来自粘贴内容，保存时需要网络与令牌。', 'ok');
+  msg('解析成功，已进入编辑。', 'ok');
 });
-$('retryBtn').addEventListener('click', function(){
-  msg('正在重新读取…', '');
-  loadData();
-});
-
-/* ================= 照片 / 源文件上传 ================= */
-var upSeq = 0;
-function safeName(name){
-  var s = name.replace(/[^\w.\-\u4e00-\u9fa5]+/g, '_');
-  return s || ('file_' + Date.now());
-}
-function fmtSize(n){
-  return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
-}
-function isImg(name){ return /\.(png|jpe?g|webp|gif|svg|avif)$/i.test(name); }
-function putContents(path, b64, message){
-  return gh('PUT', '/repos/' + ADMIN_CONFIG.OWNER + '/' + ADMIN_CONFIG.REPO + '/contents/' + path,
-    { message: message, content: b64, branch: ADMIN_CONFIG.BRANCH });
-}
-function uploadOne(file){
-  var MAX = 40 * 1024 * 1024;
-  var name = safeName(file.name);
-  var id = 'up' + (++upSeq);
-  var row = document.createElement('div');
-  row.className = 'item';
-  row.id = id;
-  row.dataset.name = name;
-  row.innerHTML = '<div class="ih"><b>' + esc(name) + '</b><span class="sp"></span>' +
-    '<span style="color:var(--dim)">上传中… ' + fmtSize(file.size) + '</span></div>';
-  $('upList').prepend(row);
-
-  if (file.size > MAX){
-    row.innerHTML = '<div class="ih"><b>' + esc(name) + '</b><span class="sp"></span>' +
-      '<span style="color:var(--warn);font-weight:700">失败：超过 40MB，请压缩后重试</span></div>';
-    return;
-  }
-  var reader = new FileReader();
-  reader.onerror = function(){ upFail(row, '文件读取失败'); };
-  reader.onload = function(e){
-    var b64 = String(e.target.result).split(',')[1];
-    putContents('assets/' + name, b64, '上传素材 ' + name).then(function(){
-      showUpOk(row, name, file.size);
-    }).catch(function(err){
-      if (/sha/i.test(err.message)){
-        // 同名文件已存在 → 自动加时间戳重试
-        var dot = name.lastIndexOf('.');
-        var nn = dot > 0 ? name.slice(0, dot) + '_' + Date.now() + name.slice(dot)
-                         : name + '_' + Date.now();
-        putContents('assets/' + nn, b64, '上传素材 ' + nn).then(function(){
-          showUpOk(row, nn, file.size);
-        }).catch(function(e2){ upFail(row, e2.message || e2); });
-      } else {
-        upFail(row, err.message || err);
-      }
-    });
-  };
-  reader.readAsDataURL(file);
-}
-function showUpOk(row, name, size){
-  var rel = 'assets/' + name;
-  var imgTag = '<img src="' + rel + '" alt="' + name + '" style="width:100%;height:100%;object-fit:cover">';
-  var dlTag = '<a href="' + rel + '" download>下载源文件</a>';
-  var html = '<div class="ih"><b>' + esc(name) + '</b><span class="sp"></span>' +
-    '<span style="color:var(--ok);font-weight:700">已上线</span></div>' +
-    '<div class="hint"><code>' + esc(rel) + '</code> · ' + fmtSize(size) +
-    ' · 已直接提交到仓库，前台立即可用</div>' +
-    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">';
-  if (isImg(name)){
-    html += '<button class="cp" data-copy="' + esc(imgTag) + '" type="button">复制图片代码（粘到项目“截图区”）</button>';
-  } else {
-    html += '<button class="cp" data-copy="' + esc(dlTag) + '" type="button">复制下载链接代码</button>';
-  }
-  html += '<button class="cp" data-copy="' + esc(rel) + '" type="button">复制路径</button></div>';
-  row.innerHTML = html;
-}
-function upFail(row, reason){
-  row.innerHTML = '<div class="ih"><b>' + esc(row.dataset.name || '文件') + '</b><span class="sp"></span>' +
-    '<span style="color:var(--warn);font-weight:700">失败：' + esc(reason) + '</span></div>' +
-    '<div class="hint">检查令牌是否已填、是否有 repo 权限，或稍后重试。</div>';
-}
-$('fileInput').addEventListener('change', function(){
-  if (!this.files || !this.files.length) return;
-  if (!$('tok').value.trim()){
-    msg('请先在上方填写 GitHub 访问令牌，再选择文件上传。', 'err');
-    this.value = '';
-    return;
-  }
-  Array.prototype.forEach.call(this.files, uploadOne);
-  this.value = '';
-});
+$('retryBtn').addEventListener('click', function(){ msg('正在重新读取…', ''); loadData(); });
 
 /* ================= 修改密码 ================= */
 $('pwBtn').addEventListener('click', function(){
@@ -730,7 +796,7 @@ $('pwBtn').addEventListener('click', function(){
   if (!a) return msg('请输入新密码。', 'err');
   if (a !== b) return msg('两次输入不一致。', 'err');
   if (a.length < 8) return msg('密码至少 8 位，建议含大小写、数字与符号。', 'err');
-  msg('正在提交…', '');
+  toast('正在提交…', 'info');
   sha256(a).then(function(hash){
     var path = '/repos/' + ADMIN_CONFIG.OWNER + '/' + ADMIN_CONFIG.REPO + '/contents/' + ADMIN_CONFIG.ADMIN_PATH;
     return gh('GET', path + '?ref=' + ADMIN_CONFIG.BRANCH).then(function(j){
@@ -740,28 +806,46 @@ $('pwBtn').addEventListener('click', function(){
       var next = src.replace(re, "PASS_SHA256: '" + hash + "'");
       if (next === src){
         $('np1').value = ''; $('np2').value = '';
-        return msg('新密码与当前密码相同，无需修改。', '');
+        return 'SAME';
       }
-      return gh('PUT', path, {
-        message: '更新后台管理密码哈希',
-        content: b64enc(next),
-        sha: j.sha,
-        branch: ADMIN_CONFIG.BRANCH
-      });
+      return gh('PUT', path, { message: '更新后台管理密码哈希', content: b64enc(next), sha: j.sha, branch: ADMIN_CONFIG.BRANCH });
     });
-  }).then(function(){
+  }).then(function(r){
+    if (r === 'SAME') return msg('新密码与当前密码相同，无需修改。', '');
     $('np1').value = ''; $('np2').value = '';
     msg('密码已更新并重新发布，下次登录请使用新密码。', 'ok');
   }).catch(function(e){ msg('修改密码失败：' + e.message, 'err'); });
 });
 
+/* ================= 侧栏高亮 ================= */
+(function(){
+  var links = Array.prototype.slice.call($('side').querySelectorAll('a'));
+  links.forEach(function(a){
+    a.addEventListener('click', function(e){
+      e.preventDefault();
+      var t = document.querySelector(a.getAttribute('href'));
+      if (t) t.scrollIntoView({behavior:'smooth', block:'start'});
+      links.forEach(function(x){ x.classList.remove('on'); });
+      a.classList.add('on');
+    });
+  });
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (!en.isIntersecting) return;
+      links.forEach(function(x){ x.classList.toggle('on', x.getAttribute('href') === '#' + en.target.id); });
+    });
+  }, {rootMargin:'-80px 0px -70% 0px'});
+  links.forEach(function(a){
+    var t = document.querySelector(a.getAttribute('href'));
+    if (t) io.observe(t);
+  });
+})();
+
 /* ================= 初始化 ================= */
 $('sitePill').textContent = ADMIN_CONFIG.OWNER + '/' + ADMIN_CONFIG.REPO;
 var savedTok = sessionStorage.getItem('pfTok');
 if (savedTok) $('tok').value = savedTok;
-$('tok').addEventListener('input', function(){
-  sessionStorage.setItem('pfTok', this.value);
-});
+$('tok').addEventListener('input', function(){ sessionStorage.setItem('pfTok', this.value); });
 if (authed) loadData();
 </script>
 </body>
