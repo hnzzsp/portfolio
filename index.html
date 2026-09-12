@@ -1232,6 +1232,10 @@ function collectFromDOM(){
 }
 function projects(){
   if(DATA&&arr(DATA.projects).length) return arr(DATA.projects);
+  /* 数据加载完成后 render() 会把完整数据挂到 window.__pfData；从 DOM 反收集会丢
+     背景/行动/结果/附件等字段，所以优先用它 */
+  var g=window.__pfData;
+  if(g&&arr(g.projects).length) return arr(g.projects);
   return collectFromDOM();
 }
 function shotImg(p){var m=/<img[^>]*src=["']([^"']+)["']/i.exec((p&&p.shot)||'');return m?m[1]:null;}
