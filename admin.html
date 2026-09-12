@@ -121,6 +121,25 @@ footer{border-top:1px solid var(--line);margin-top:40px;padding:20px 0 40px;colo
 
   <div class="msg" id="msg"></div>
 
+  <!-- 数据加载失败时的离线兜底 -->
+  <div class="card hide" id="offlineCard">
+    <h2>离线编辑模式</h2>
+    <p class="hint">
+      常见原因：<br>
+      1. 用 <code>file://</code> 直接双击打开了本页（浏览器禁止页面读取本地文件）——请改用
+      <code>python -m http.server</code> 启动本地服务器，或直接用线上地址打开；<br>
+      2. 在只挂载了单个 HTML 的预览面板里打开——data.json 不在同目录，请改用线上地址；<br>
+      3. 网络不通或 github.io 访问被干扰——稍后重试。<br>
+      当前页面地址：<code id="locInfo"></code><br><br>
+      也可以把本地 <code>site/data.json</code> 的完整内容粘贴到下面，照样进入编辑（保存时仍需网络与令牌）：
+    </p>
+    <textarea id="pasteJson" style="min-height:170px;font-family:var(--mono);font-size:12.5px" placeholder="把 data.json 的完整内容粘贴到这里…"></textarea>
+    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="ghost" type="button" id="pasteBtn">解析并开始编辑</button>
+      <button class="ghost" type="button" id="retryBtn">重新尝试联网读取</button>
+    </div>
+  </div>
+
   <div class="card">
     <h2>GitHub 访问令牌 <small>用于保存时提交文件</small></h2>
     <label for="tok">Personal Access Token（需 repo 权限）</label>
@@ -356,12 +375,34 @@ $('logoutBtn').addEventListener('click', function(){
 
 /* ================= 载入数据 ================= */
 function loadData(){
-  var p = ADMIN_CONFIG.DATA_PATH + '?t=' + Date.now();   // 相对路径：兼容部署在子目录下
-  fetch(p, {cache:'no-store'}).then(function(r){ return r.json(); }).then(function(d){
+  /* file:// 协议下浏览器禁止读取本地文件，直接给出明确指引 */
+  if (location.protocol === 'file:'){
+    offlinePrompt('当前是用 file:// 直接打开的，浏览器禁止页面读取本地数据文件。');
+    return;
+  }
+  var urls = [ADMIN_CONFIG.DATA_PATH + '?t=' + Date.now(), ADMIN_CONFIG.DATA_PATH, './' + ADMIN_CONFIG.DATA_PATH];
+  tryLoad(urls);
+}
+function tryLoad(urls){
+  if (!urls.length){
+    offlinePrompt('无法从服务器读取 data.json（网络失败或文件不在本页同目录）。');
+    return;
+  }
+  fetch(urls.shift(), {cache:'no-store'}).then(function(r){
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function(d){
+    if (!d || !d.contact) throw new Error('数据格式不对');
     DATA = d;
     buildAll();
     fillStatic();
-  }).catch(function(e){ msg('读取 data.json 失败：' + e.message, 'err'); });
+    $('offlineCard').classList.add('hide');
+  }).catch(function(){ tryLoad(urls); });
+}
+function offlinePrompt(reason){
+  $('locInfo').textContent = location.href;
+  $('offlineCard').classList.remove('hide');
+  msg('读取 data.json 失败：' + reason + ' 可在下方“离线编辑模式”粘贴本地 data.json 内容继续编辑，或按“重新尝试联网读取”。', 'err');
 }
 
 /* ================= 表单构建 ================= */
@@ -561,6 +602,25 @@ $('saveBtn').addEventListener('click', function(){
 });
 
 $('reloadBtn').addEventListener('click', function(){ loadData(); msg('已重新载入线上数据，未保存的修改已丢弃。', ''); });
+
+/* ================= 离线兜底 ================= */
+$('pasteBtn').addEventListener('click', function(){
+  var raw = $('pasteJson').value.trim();
+  if (!raw) return msg('请先粘贴 data.json 的完整内容。', 'err');
+  var d;
+  try { d = JSON.parse(raw); }
+  catch(e){ return msg('不是合法的 JSON：' + e.message, 'err'); }
+  if (!d.contact) return msg('缺少 contact 字段——请确认粘贴的是完整的 data.json。', 'err');
+  DATA = d;
+  buildAll();
+  fillStatic();
+  $('offlineCard').classList.add('hide');
+  msg('解析成功，已进入编辑。注意：当前数据来自粘贴内容，保存时需要网络与令牌。', 'ok');
+});
+$('retryBtn').addEventListener('click', function(){
+  msg('正在重新读取…', '');
+  loadData();
+});
 
 /* ================= 修改密码 ================= */
 $('pwBtn').addEventListener('click', function(){
