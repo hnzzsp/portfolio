@@ -164,7 +164,7 @@
   ],
   "projects": [
     {
-      "shot": "<img src=\"assets/projects/shot_1789221375381.png\" alt=\"设计资源聚合站 design-library\" style=\"width:100%;height:100%;object-fit:cover\">",
+      "shot": "TODO：替换为项目截图<br>（建议 4:3，宽度 ≥ 1200px）",
       "title": "设计资源聚合站 design-library",
       "role": "独立开发 · 设计 / 前端 / 部署 · 已公开上线",
       "bg": "个人收藏的设计素材长期散落在浏览器书签里，检索困难、无法分享，也无法作为作品对外展示。",
