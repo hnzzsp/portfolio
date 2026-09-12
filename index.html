@@ -1058,9 +1058,18 @@ body.editing [data-shot]{cursor:pointer}
     if (d.meta && d.meta.updated) set('upd', d.meta.updated);
   }
 
-  fetch('data.json?t=' + Date.now(), {cache:'no-store'})
-    .then(function(r){ return r.ok ? r.json() : null; })
-    .then(render)
+  function loadLocal(){
+    return fetch('data.json?t=' + Date.now(), {cache:'no-store'})
+      .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+  }
+  function loadRemote(){
+    /* 本地读不到（预览面板 / 构建窗口期）→ 公共仓库 API 兜底，无需令牌 */
+    return fetch('https://api.github.com/repos/hnzzsp/portfolio/contents/data.json?ref=main',
+        { headers: { 'Accept': 'application/vnd.github.raw' } })
+      .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+      .then(function(t){ return JSON.parse(t); });
+  }
+  loadLocal().catch(loadRemote).then(render)
     .catch(function(){ /* 加载失败就用 HTML 里的静态内容 */ });
 })();
 </script>
