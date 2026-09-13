@@ -1328,6 +1328,17 @@ body.editing [data-shot]{cursor:pointer}
       .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
       .then(function(t){ return JSON.parse(t); });
   }
+  /* 宿主（生成器内容后台）注入的实时预览数据：有就直接渲染，并监听后续更新 */
+  if (window.__pfPreload && window.__pfPreload.contact){
+    render(window.__pfPreload);
+    window.addEventListener('message', function(e){
+      var d = e && e.data;
+      if (d && d.__pfRenderData && d.__pfRenderData.contact){
+        try{ render(d.__pfRenderData); }catch(err){}
+      }
+    });
+    return;
+  }
   loadLocal().catch(loadRemote).then(render)
     .catch(function(){ /* 加载失败就用 HTML 里的静态内容 */ });
 })();

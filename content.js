@@ -192,13 +192,14 @@ function buildSkills(){
   }).join('');
 }
 /* 已归档的项目附件 chips（只读展示；文件本体可在生成器「图片」页签删除） */
-function attachChips(p){
+function attachChips(p, pi){
   var list = arr(p.files);
   if (!list.length) return '';
-  var chips = list.map(function(f){
+  var chips = list.map(function(f, fi){
     var path = f.rel || f.path || '';
     var nm = f.name || path.split('/').pop();
-    return '<a class="cp" href="' + esc(path) + '" target="_blank" rel="noopener" title="' + esc(path) + '">📎 ' + esc(nm) + '</a>';
+    return '<span class="pfct-afchip"><a class="cp" href="' + esc(path) + '" target="_blank" rel="noopener" title="' + esc(path) + '">📎 ' + esc(nm) + '</a>' +
+      '<button class="danger mini" type="button" data-afdel data-i="' + pi + '" data-fi="' + fi + '" title="移除该附件引用">✕</button></span>';
   }).join(' ');
   return '<div class="hint" style="margin:0 0 10px"><b>项目附件（' + list.length + '）：</b>' + chips + '</div>';
 }
@@ -219,7 +220,7 @@ function buildProjects(){
       '<label>标签（每行一个）</label><textarea data-p="projects.' + i + '.kws" data-type="lines">' + esc(arr(p.kws).join('\n')) + '</textarea>' +
       '<label>截图区 HTML</label><textarea data-p="projects.' + i + '.shot">' + esc(p.shot) + '</textarea>' +
       '<div class="hint" style="margin:2px 0 8px">「上传截图」传<b>图片</b>才会显示为项目封面；「上传源文件」传 PDF / PSD / ZIP 等，会作为<b>附件</b>出现在前台项目详情（可在线预览、下载）。</div>' +
-      attachChips(p) +
+      attachChips(p, i) +
       '<div class="upbox"><div class="row">' +
         '<button class="ghost mini" type="button" data-pick="shot" data-i="' + i + '">上传截图</button>' +
         '<button class="ghost mini" type="button" data-pick="file" data-i="' + i + '">上传源文件</button>' +
@@ -268,6 +269,23 @@ document.addEventListener('click', function(e){
 
   /* 分区/条目保存 */
   if (b.hasAttribute('data-save')){ doSave('已保存并发布'); return; }
+
+  /* 项目附件：移除引用（文件本体保留在仓库，可在生成器「图片」页签删除） */
+  if (b.hasAttribute('data-afdel')){
+    var pi = parseInt(b.getAttribute('data-i'), 10);
+    var fi = parseInt(b.getAttribute('data-fi'), 10);
+    var list = (DATA.projects[pi] || {}).files || [];
+    var f = list[fi];
+    if (!f) return;
+    var fnm = f.name || (f.rel || f.path || '').split('/').pop();
+    if (!confirm('从前台移除附件「' + fnm + '」？\n仅移除展示引用，文件本体仍保留在仓库 assets/ 中，可随时重新添加。')) return;
+    list.splice(fi, 1);
+    DATA.projects[pi].files = list;
+    buildProjects();
+    setDirty();
+    toast('已移除附件「' + fnm + '」，记得保存', 'ok');
+    return;
+  }
 
   /* 项目内上传入口 */
   var pick = b.getAttribute('data-pick');
@@ -631,6 +649,7 @@ $('pfct-tokLong').addEventListener('change', function(){
 });
 loadData();
       return { getData: function(){ return DATA; },
+               collectAll: collect,
                load: loadData,
                save: doSave,
                isDirty: function(){ return DIRTY; } };

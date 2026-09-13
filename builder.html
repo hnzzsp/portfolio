@@ -161,9 +161,30 @@ pre.code{
 
 /* ---------- 内容后台（合并进本站，全宽显示） ---------- */
 #contentPane{display:none}
-body.pf-content .wrap{grid-template-columns:1fr}
+body.pf-content .wrap{grid-template-columns:minmax(0,1fr) minmax(340px,46%);gap:18px;align-items:start}
 body.pf-content .stage,body.pf-content .panel{display:none}
-body.pf-content #contentPane{display:block;padding:16px 0 40px}
+body.pf-content #contentPane{display:block;min-width:0;padding:0 0 40px}
+#contentPv{
+  position:sticky;top:76px;display:none;flex-direction:column;
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface);
+  box-shadow:0 12px 34px rgba(0,0,0,.10);
+}
+body.pf-content #contentPv{display:flex}
+#contentPv .bar{
+  display:flex;align-items:center;gap:10px;padding:9px 12px;
+  border-bottom:1px solid var(--line);background:var(--surface);
+}
+#contentPv .bar b{font-size:12.5px}
+#contentPv .bar .st{font-size:11.5px;color:var(--dim);margin-left:auto}
+#contentPv .bar .st.dirty{color:#d81e05;font-weight:700}
+#contentPv iframe{width:100%;height:calc(100vh - 150px);border:0;background:#fff}
+#contentPv .bar button{font:inherit;font-size:12px;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer}
+#contentPv .bar button:hover{border-color:var(--accent);color:var(--accent)}
+@media (max-width:1080px){
+  body.pf-content .wrap{grid-template-columns:1fr}
+  #contentPv{position:static;order:-1;margin-bottom:16px}
+  #contentPv iframe{height:60vh}
+}
 
 /* ---------- toast / modal ---------- */
 .toast{
@@ -234,6 +255,15 @@ body.pf-content #contentPane{display:block;padding:16px 0 40px}
   </section>
 
   <section id="contentPane" aria-label="内容后台"></section>
+
+  <aside id="contentPv" aria-label="实时预览">
+    <div class="bar">
+      <b>实时预览</b>
+      <button type="button" id="cpvOpen" title="在新窗口打开线上站">线上站 ↗</button>
+      <span class="st" id="cpvState">同步中…</span>
+    </div>
+    <iframe id="cpvFrame" title="实时预览"></iframe>
+  </aside>
 
   <aside class="panel">
     <div class="tabs" id="tabs">
@@ -1315,22 +1345,74 @@ $('saveBtn').addEventListener('click', function(){
       if ($('tabs').querySelector('.on').dataset.tab === 'img') loadImages();
     })
     .catch(function(e){ toast('保存失败：' + e.message + '（多窗口同时保存会导致冲突，请重试）', 'err'); })
+    .then(function(){ if (contentApi && contentApi.isDirty && contentApi.isDirty()) return; cpvDirty = false; cpvState('已同步线上'); })
     .then(function(){ b.disabled = false; syncToolBtns(); });
 });
 
 /* 启动 */
 /* ---------- 内容后台：整合进本站，全宽切换 ---------- */
-var contentApi = null;
+var contentApi = null, cpvFrame = null, cpvTimer = null, cpvDirty = false;
+function cpvState(text, dirty){
+  var el = $('cpvState');
+  if (!el) return;
+  el.textContent = text;
+  el.classList.toggle('dirty', !!dirty);
+}
+/* 把当前 DATA 推给预览 iframe 实时重渲染（不重载页面） */
+function cpvPush(){
+  if (!cpvFrame || !contentApi) return;
+  var d = contentApi.getData();
+  if (!d) return;
+  try{ cpvFrame.contentWindow.postMessage({ __pfRenderData: d }, '*'); }catch(e){}
+}
+function cpvSchedule(){
+  if (!cpvFrame) return;
+  cpvDirty = true;
+  cpvState('改动未保存 ●', true);
+  clearTimeout(cpvTimer);
+  cpvTimer = setTimeout(function(){
+    if (contentApi) contentApi.collectAll();
+    cpvPush();
+  }, 450);
+}
 $('contentBtn').addEventListener('click', function(){
   if (!window.PFContent){ toast('content.js 未加载，请刷新重试', 'err'); return; }
   document.body.classList.add('pf-content');
   if (!contentApi){
     contentApi = window.PFContent.mount($('contentPane'), {
-      onReady: function(){ toast('内容已载入，改完记得点「保存并发布」', 'ok'); }
+      onReady: function(api){
+        /* 表单任何输入 → 防抖后收集 → 推给预览 */
+        var pane = $('contentPane');
+        ['input','change'].forEach(function(ev){
+          pane.addEventListener(ev, function(){ cpvSchedule(); }, true);
+        });
+        toast('内容已载入，右侧可实时预览', 'ok');
+      }
     });
   }
+  /* 用当前线上 index.html + 注入数据生成预览 */
+  buildSource().then(function(html){
+    var d = contentApi.getData();
+    var inject = '<script>window.__pfPreload=' + JSON.stringify(d) + '<' + '/script>';
+    html = html.indexOf('</head>') >= 0
+      ? html.replace('</head>', inject + '</head>')
+      : inject + html;
+    cpvFrame = $('cpvFrame');
+    cpvFrame.setAttribute('srcdoc', html);
+    cpvState('实时同步中');
+    cpvFrame.onload = function(){ cpvPush(); cpvState(cpvDirty ? '改动未保存 ●' : '与编辑内容同步'); };
+  }).catch(function(e){
+    /* 取不到源码就退化为线上页面 */
+    cpvFrame = $('cpvFrame');
+    cpvFrame.removeAttribute('srcdoc');
+    cpvFrame.src = ENV.remote ? (PROD_URL + '?v=' + Date.now()) : (CONFIG.PAGE + '?v=' + Date.now());
+    cpvState('预览线上站');
+  });
   this.classList.add('hide');
   $('backBtn').classList.remove('hide');
+});
+$('cpvOpen').addEventListener('click', function(){
+  window.open(PROD_URL, '_blank', 'noopener');
 });
 $('backBtn').addEventListener('click', function(){
   document.body.classList.remove('pf-content');
