@@ -281,16 +281,24 @@ document.addEventListener('click', function(e){
   if (b.hasAttribute('data-afdel')){
     var pi = parseInt(b.getAttribute('data-i'), 10);
     var fi = parseInt(b.getAttribute('data-fi'), 10);
-    var list = (DATA.projects[pi] || {}).files || [];
+    var proj = DATA.projects[pi]; if (!proj) return;
+    var list = arr(proj.files).slice();
     var f = list[fi];
     if (!f) return;
     var fnm = f.name || (f.rel || f.path || '').split('/').pop();
+    var fpath = f.rel || f.path || '';
     if (!confirm('从前台移除附件「' + fnm + '」？\n仅移除展示引用，文件本体仍保留在仓库 assets/ 中，可随时重新添加。')) return;
     list.splice(fi, 1);
-    DATA.projects[pi].files = list;
+    proj.files = list;
+    /* 同步清理结果字段中的下载链接 */
+    if (fpath && typeof proj.res === 'string'){
+      var re = new RegExp('<a\\b[^>]*href=["\']' + fpath.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '["\'][^>]*>[\\s\\S]*?<\\/a>','gi');
+      proj.res = proj.res.replace(re,'').replace(/\s+/g,' ').trim();
+    }
     buildProjects();
     setDirty();
-    toast('已移除附件「' + fnm + '」，记得保存', 'ok');
+    toast('已移除附件「' + fnm + '」，正在保存…', 'ok');
+    doSave('已移除附件「' + fnm + '」');
     return;
   }
 

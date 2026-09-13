@@ -478,11 +478,13 @@ body.editing [data-shot]{cursor:pointer}
 .pf-file .ic{font-size:13px}
 .pf-filewrap{display:inline-flex;align-items:center;gap:4px}
 .pf-fdel{
-  width:20px;height:20px;border-radius:50%;border:1px solid var(--line);
-  background:var(--surface);color:var(--text-dim);font-size:11px;line-height:1;
-  cursor:pointer;display:grid;place-items:center;padding:0;
+  width:24px;height:24px;border-radius:50%;border:1px solid var(--line);
+  background:var(--surface);color:var(--text-dim);font-size:13px;line-height:1;
+  cursor:pointer;display:grid;place-items:center;padding:0;flex:none;
   transition:border-color .18s,color .18s,background .18s;
+  position:relative;
 }
+.pf-fdel::before{content:'';position:absolute;inset:-6px}
 .pf-fdel:hover{border-color:#c62828;background:#c62828;color:#fff}
 .pf-file small{color:var(--text-dim);font-size:11px}
 .pf-atv{position:fixed;inset:0;z-index:9990;background:rgba(8,10,14,.82);display:flex;align-items:center;justify-content:center;padding:56px 24px;backdrop-filter:blur(3px)}
@@ -1323,8 +1325,8 @@ body.editing [data-shot]{cursor:pointer}
   }
   function loadRemote(){
     /* 本地读不到（预览面板 / 构建窗口期）→ 公共仓库 API 兜底，无需令牌 */
-    return fetch('https://api.github.com/repos/hnzzsp/portfolio/contents/data.json?ref=main',
-        { headers: { 'Accept': 'application/vnd.github.raw' } })
+    return fetch('https://api.github.com/repos/hnzzsp/portfolio/contents/data.json?ref=main&_=' + Date.now(),
+        { cache: 'no-store', headers: { 'Accept': 'application/vnd.github.raw' } })
       .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
       .then(function(t){ return JSON.parse(t); });
   }
@@ -1427,14 +1429,21 @@ function filesHTML(p,pi){
 /* 编辑模式：移除附件引用（文件本体保留在仓库，可在生成器「图片」页签删除） */
 function delAttach(pi,fi){
   if(!needData())return;
-  var list=arr((DATA.projects[pi]||{}).files);
+  var proj=DATA.projects[pi]; if(!proj) return;
+  var list=arr(proj.files).slice();
   var f=list[fi]; if(!f) return;
   var nm=f.name||(f.rel||f.path||'').split('/').pop();
+  var path=f.rel||f.path||'';
   pfConfirm('从前台移除附件「'+nm+'」？\n仅移除展示引用，文件本体仍保留在仓库 assets/ 中，可随时重新添加。','移除')
     .then(function(ok){
       if(!ok) return;
       list.splice(fi,1);
-      DATA.projects[pi].files=list;
+      proj.files=list;
+      /* 同时清理 res 字段里对同文件的下载链接，避免前台仍显示该附件 */
+      if(path && typeof proj.res==='string'){
+        var re=new RegExp('<a\\b[^>]*href=["\']'+path.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'["\'][^>]*>[\\s\\S]*?<\\/a>','gi');
+        proj.res=proj.res.replace(re,'').replace(/\s+/g,' ').trim();
+      }
       commitData('移除项目附件引用：'+nm,renderAll);
     });
 }
@@ -1752,9 +1761,10 @@ function loadEditData(){
   return fetch('data.json?t='+Date.now(),{cache:'no-store'})
     .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
     .catch(function(){
-      return fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/data.json?ref='+BRANCH,
-        {headers:{'Accept':'application/vnd.github.raw'}})
-        .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
+      return fetch('https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/data.json?ref='+BRANCH+'&_='+Date.now(),
+        {cache:'no-store',headers:{'Accept':'application/vnd.github.raw'}})
+        .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
+        .then(function(t){ return JSON.parse(t); });
     })
     .then(function(d){ DATA=d; return d; });
 }
@@ -1877,23 +1887,21 @@ function commitData(msg,cb){
   var tok=getTok();
   if(!tok){toast('未设置 GitHub 令牌，无法保存','err');return;}
   var body={message:msg,branch:BRANCH,content:btoa(unescape(encodeURIComponent(JSON.stringify(DATA,null,2))))};
-  fetch(API+'/repos/'+OWNER+'/'+REPO+'/contents/data.json?ref='+BRANCH,
-    {headers:{'Authorization':'Bearer '+tok,'Accept':'application/vnd.github+json'}})
-    .then(function(r){return r.json();})
-    .then(function(j){ if(j&&j.sha) body.sha=j.sha; })
-    .catch(function(){})
+  /* 取 sha 必须绕过浏览器缓存，否则拿到旧 sha 会导致 422 */
+  function getSha(){
+    return fetch(API+'/repos/'+OWNER+'/'+REPO+'/contents/data.json?ref='+BRANCH+'&_='+Date.now(),
+      {cache:'no-store',headers:{'Authorization':'Bearer '+tok,'Accept':'application/vnd.github+json'}})
+      .then(function(r){return r.json();})
+      .then(function(j){ if(j&&j.sha) return j.sha; throw new Error('取不到 sha'); });
+  }
+  getSha().then(function(sha){ body.sha=sha; })
+    .catch(function(){ body.sha=''; })
     .then(function(){
       /* 关键：PUT 必须带上刚取到的 sha，否则 GitHub 返回 422 "sha wasn't supplied" */
       return putXHR('data.json',body.content,msg,function(){},body.sha)
         .catch(function(err){
           if(/sha|match|422/i.test(err.message)){
-            return fetch(API+'/repos/'+OWNER+'/'+REPO+'/contents/data.json?ref='+BRANCH,
-              {headers:{'Authorization':'Bearer '+tok,'Accept':'application/vnd.github+json'}})
-              .then(function(r){return r.json();})
-              .then(function(j){
-                if(!j||!j.sha) throw new Error('取不到 data.json 的 sha：'+(j&&j.message||'未知'));
-                return putXHR('data.json',body.content,msg,function(){},j.sha);
-              });
+            return getSha().then(function(sha2){ return putXHR('data.json',body.content,msg,function(){},sha2); });
           }
           throw err;
         });
