@@ -346,6 +346,8 @@ footer{padding:38px 0;color:var(--text-dim);font-size:13.5px}
 
 /* ---------- 项目视图模式 ---------- */
 .pv-bar{display:flex;gap:2px;flex-wrap:wrap;margin:0 0 20px;border:1px solid var(--line);width:max-content;max-width:100%;background:var(--surface)}
+.pv-bar.pf-sw{background:var(--bg-soft);border-radius:999px;padding:4px;flex-wrap:nowrap;overflow:hidden}
+.pv-bar.pf-sw .pf-seg{font-size:12.5px;padding:7px 13px}
 .pv-bar button{border:0;background:transparent;font:inherit;font-size:12px;letter-spacing:.05em;padding:7px 13px;cursor:pointer;color:var(--text-dim);transition:.15s}
 .pv-bar button.on{background:var(--text);color:var(--bg);font-weight:700}
 .pv-bar button:hover:not(.on){color:var(--text);background:var(--bg-soft)}
@@ -441,7 +443,7 @@ body.editing [data-shot]{cursor:pointer}
 
 @media (max-width:640px){
   .pv-bar{width:100%}
-  .pv-bar button{flex:1;padding:8px 4px}
+  .pv-bar.pf-sw .pf-seg{flex:1 1 auto;padding:8px 4px}
   .pv-list .row{grid-template-columns:40px 1fr;row-gap:2px}
   .pv-list .role{grid-column:2;text-align:left}
   .pv-car .nav{width:32px;height:32px}
@@ -474,6 +476,14 @@ body.editing [data-shot]{cursor:pointer}
 }
 .pf-file:hover{border-color:var(--accent);color:var(--accent)}
 .pf-file .ic{font-size:13px}
+.pf-filewrap{display:inline-flex;align-items:center;gap:4px}
+.pf-fdel{
+  width:20px;height:20px;border-radius:50%;border:1px solid var(--line);
+  background:var(--surface);color:var(--text-dim);font-size:11px;line-height:1;
+  cursor:pointer;display:grid;place-items:center;padding:0;
+  transition:border-color .18s,color .18s,background .18s;
+}
+.pf-fdel:hover{border-color:#c62828;background:#c62828;color:#fff}
 .pf-file small{color:var(--text-dim);font-size:11px}
 .pf-atv{position:fixed;inset:0;z-index:9990;background:rgba(8,10,14,.82);display:flex;align-items:center;justify-content:center;padding:56px 24px;backdrop-filter:blur(3px)}
 .pf-atv .bd{display:flex;align-items:center;justify-content:center;max-width:100%;max-height:100%}
@@ -552,6 +562,7 @@ body.editing [data-shot]{cursor:pointer}
 @media (min-width:1200px){
   .pf-rail{display:flex}
   .pf-swatch{display:flex}
+  #themeBtn{display:none}          /* 风格入口由右侧快捷栏接管 */
   .hdr .nav{display:none}          /* 左侧 rail 顶替顶部横向导航 */
   .hdr-tools{margin-left:auto}
 }
@@ -1384,21 +1395,37 @@ function rDetail(list){
       '<div class="proj-body"><h3>'+p.title+'</h3><p class="proj-role">'+(p.role||'')+'</p>'+
       '<ul class="star">'+(p.bg?'<li><dt>背景</dt><dd>'+p.bg+'</dd></li>':'')+
       (p.act?'<li><dt>行动</dt><dd>'+p.act+'</dd></li>':'')+
-      (p.res?'<li><dt>结果</dt><dd>'+p.res+'</dd></li>':'')+'</ul>'+kws+filesHTML(p)+'</div></article>';
+      (p.res?'<li><dt>结果</dt><dd>'+p.res+'</dd></li>':'')+'</ul>'+kws+filesHTML(p,i)+'</div></article>';
   }).join('');
 }
 /* 项目附件（源文件：PDF / PSD / ZIP 等）：后台「上传源文件」自动归档到这里 */
-function filesHTML(p){
+function filesHTML(p,pi){
   var list=arr(p.files);
   if(!list.length) return '';
   var items=list.map(function(f,fi){
     var path=f.rel||f.path||''; if(!path) return '';
     var nm=f.name||path.split('/').pop();
     var icon=/\.pdf$/i.test(path)?'📄':(/\.(zip|rar|7z)$/i.test(path)?'🗜️':'📎');
-    return '<button type="button" class="pf-file" data-af="'+esc(path)+'" title="点击在线预览">'+
-      '<span class="ic">'+icon+'</span>'+esc(nm)+(f.size?'<small>'+fmtKB(f.size)+'</small>':'')+'</button>';
+    return '<span class="pf-filewrap"><button type="button" class="pf-file" data-af="'+esc(path)+'" title="点击在线预览">'+
+      '<span class="ic">'+icon+'</span>'+esc(nm)+(f.size?'<small>'+fmtKB(f.size)+'</small>':'')+'</button>'+
+      (EDIT?'<button type="button" class="pf-fdel" data-fdel="'+fi+'" aria-label="移除附件" title="从附件中移除">✕</button>':'')+
+      '</span>';
   }).join('');
-  return '<div class="pf-files"><b>附件 / 源文件</b><span class="tip">点击可在线预览</span>'+items+'</div>';
+  return '<div class="pf-files"><b>附件 / 源文件</b><span class="tip">点击可在线预览'+(EDIT?' · ✕ 移除引用':'')+'</span>'+items+'</div>';
+}
+/* 编辑模式：移除附件引用（文件本体保留在仓库，可在生成器「图片」页签删除） */
+function delAttach(pi,fi){
+  if(!needData())return;
+  var list=arr((DATA.projects[pi]||{}).files);
+  var f=list[fi]; if(!f) return;
+  var nm=f.name||(f.rel||f.path||'').split('/').pop();
+  pfConfirm('从前台移除附件「'+nm+'」？\n仅移除展示引用，文件本体仍保留在仓库 assets/ 中，可随时重新添加。','移除')
+    .then(function(ok){
+      if(!ok) return;
+      list.splice(fi,1);
+      DATA.projects[pi].files=list;
+      commitData('移除项目附件引用：'+nm,renderAll);
+    });
 }
 function fmtKB(n){
   if(n>=1024*1024) return (n/1024/1024).toFixed(1)+' MB';
@@ -1468,24 +1495,94 @@ function renderAll(){
 }
 
 /* ---------- 模式切换条 ---------- */
+/* 项目展示模式滑块：与顶部视图滑块同一套交互（点击 / 拖拽吸附） */
 function buildBar(){
   var el=$('js-projects'); if(!el) return;
-  var bar=document.createElement('div'); bar.className='pv-bar'; bar.setAttribute('role','tablist');
-  bar.innerHTML=MODES.map(function(m){
-    return '<button type="button" role="tab" data-mode="'+m[0]+'"'+(m[0]===MODE?' class="on"':'')+'>'+m[1]+'</button>';
+  var bar=document.createElement('div'); bar.className='pv-bar pf-sw'; bar.setAttribute('role','tablist');
+  bar.innerHTML='<span class="pf-knob" aria-hidden="true"></span>'+MODES.map(function(m){
+    return '<button type="button" class="pf-seg" role="tab" data-mode="'+m[0]+'"'+(m[0]===MODE?' data-on="1"':'')+'>'+m[1]+'</button>';
   }).join('');
   el.parentNode.insertBefore(bar,el);
-  bar.addEventListener('click',function(e){
-    var b=e.target.closest?e.target.closest('[data-mode]'):null; if(!b) return;
-    MODE=b.dataset.mode;
+  var knob=bar.querySelector('.pf-knob');
+  var segEls=Array.prototype.slice.call(bar.querySelectorAll('.pf-seg'));
+
+  function mark(ix){
+    segEls.forEach(function(b,i){ b.classList.toggle('on',i===ix); b.setAttribute('aria-selected',String(i===ix)); });
+  }
+  function setKnob(ix){
+    var s=segEls[ix]; if(!s||!s.offsetWidth) return;
+    knob.style.width=s.offsetWidth+'px';
+    knob.style.transform='translateX('+s.offsetLeft+'px)';
+  }
+  function setMode(v){
+    MODE=v;
     try{localStorage.setItem(VIEW_KEY,MODE);}catch(err){}
-    Array.prototype.forEach.call(bar.children,function(x){x.classList.toggle('on',x.dataset.mode===MODE);});
+    mark(idxOfMode(v)); setKnob(idxOfMode(v));
     renderAll();
+  }
+  function idxOfMode(v){ for(var i=0;i<MODES.length;i++) if(MODES[i][0]===v) return i; return 0; }
+
+  segEls.forEach(function(b,ix){
+    b.addEventListener('click',function(){
+      if(suppressPv) return;
+      if(MODES[ix][0]===MODE) return;
+      setMode(MODES[ix][0]);
+    });
   });
+
+  /* 拖拽：指针捕获会吞 click，统一在 pointerup 里判定 */
+  var drag=null,dragMoved=false,suppressPv=0;
+  function pd(e){
+    if(e.button) return;
+    var i=idxOfMode(MODE), s=segEls[i];
+    var hit=e.target&&e.target.closest?e.target.closest('.pf-seg'):null;
+    drag={x0:e.clientX,base:s.offsetLeft,w:s.offsetWidth,idx:i,seg:hit?hit.dataset.mode:null};
+    dragMoved=false;
+    bar.classList.add('dragging');
+    try{ bar.setPointerCapture(e.pointerId); }catch(err){}
+  }
+  function pm(e){
+    if(!drag) return;
+    var dx=e.clientX-drag.x0;
+    if(Math.abs(dx)>4) dragMoved=true;
+    var maxL=bar.clientWidth-8-drag.w;
+    knob.style.transform='translateX('+Math.min(Math.max(drag.base+dx,0),Math.max(0,maxL))+'px)';
+  }
+  function pu(e){
+    if(!drag) return;
+    var dx=(e.clientX||0)-drag.x0, d=drag; drag=null;
+    bar.classList.remove('dragging');
+    if(!dragMoved){
+      setKnob(idxOfMode(MODE));
+      if(d.seg && d.seg!==MODE){ suppressPv=Date.now(); setMode(d.seg); }
+      return;
+    }
+    var cx=d.base+dx+d.w/2, best=0, bd=Infinity;
+    segEls.forEach(function(s,ix){
+      var c=s.offsetLeft+s.offsetWidth/2, diff=Math.abs(c-cx);
+      if(diff<bd){ bd=diff; best=ix; }
+    });
+    setTimeout(function(){ suppressPv=0; },60);
+    if(MODES[best][0]!==MODE) setMode(MODES[best][0]);
+  }
+  if(window.PointerEvent){
+    bar.addEventListener('pointerdown',pd);
+    bar.addEventListener('pointermove',pm);
+    bar.addEventListener('pointerup',pu);
+    bar.addEventListener('pointercancel',pu);
+  }else{
+    bar.addEventListener('mousedown',pd);
+    window.addEventListener('mousemove',pm);
+    window.addEventListener('mouseup',pu);
+  }
+  setKnob(idxOfMode(MODE));
+  window.addEventListener('load',function(){ setKnob(idxOfMode(MODE)); });
+  bar._pvSync=function(){ mark(idxOfMode(MODE)); setKnob(idxOfMode(MODE)); };
 }
 function setBar(){
   var bar=document.querySelector('.pv-bar'); if(!bar) return;
-  Array.prototype.forEach.call(bar.children,function(x){x.classList.toggle('on',x.dataset.mode===MODE);});
+  Array.prototype.forEach.call(bar.querySelectorAll('.pf-seg'),function(x){x.classList.toggle('on',x.dataset.mode===MODE);});
+  if(bar._pvSync) bar._pvSync();
 }
 
 /* ---------- 灯箱 ---------- */
@@ -1551,6 +1648,12 @@ function bindOnce(){
   var el=$('js-projects'); if(!el||el.dataset.pfBound) return;
   el.dataset.pfBound='1';
   el.addEventListener('click',function(e){
+    var fd=e.target.closest?e.target.closest('[data-fdel]'):null;
+    if(fd){
+      var card=fd.closest('[data-card]');
+      if(card) delAttach(+card.dataset.card,+fd.dataset.fdel);
+      return;
+    }
     var af=e.target.closest?e.target.closest('.pf-file'):null;
     if(af){attachView(af.dataset.af);return;}
     var carBtn=e.target.closest?e.target.closest('[data-car]'):null;
@@ -1934,7 +2037,7 @@ function idxOf(v){ for(var i=0;i<VIEWS.length;i++){ if(VIEWS[i][0]===v) return i
 function setKnob(i){
   var s=segs()[i]; if(!s||!s.offsetWidth) return;
   knob.style.width=s.offsetWidth+'px';
-  knob.style.transform='translateX('+(s.offsetLeft-4)+'px)';
+  knob.style.transform='translateX('+s.offsetLeft+'px)';
 }
 function markOn(i){
   segs().forEach(function(b,ix){
@@ -2067,7 +2170,7 @@ function pd(e){
   if(e.button){ return; }
   var i=idxOf(cur), s=segs()[i];
   var hit=e.target&&e.target.closest?e.target.closest('.pf-seg'):null;
-  drag={x0:e.clientX, base:s.offsetLeft-4, w:s.offsetWidth, idx:i, seg:hit?hit.dataset.v:null};
+  drag={x0:e.clientX, base:s.offsetLeft, w:s.offsetWidth, idx:i, seg:hit?hit.dataset.v:null};
   dragMoved=false;
   sw.classList.add('dragging');
   try{ sw.setPointerCapture(e.pointerId); }catch(err){}
@@ -2092,7 +2195,7 @@ function pu(e){
   }
   var cx=d.base+dx+d.w/2, best=0, bd=Infinity;
   segs().forEach(function(s,ix){
-    var c=s.offsetLeft-4+s.offsetWidth/2, diff=Math.abs(c-cx);
+    var c=s.offsetLeft+s.offsetWidth/2, diff=Math.abs(c-cx);
     if(diff<bd){ bd=diff; best=ix; }
   });
   apply(VIEWS[best][0]);
