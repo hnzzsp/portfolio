@@ -660,12 +660,96 @@ body.editing [data-shot]{cursor:pointer}
   "alumniOf": {"@type": "CollegeOrUniversity", "name": "视觉传达设计 · 大专在读"}
 }
 </script>
+<!-- ============ 新增样式：分类筛选 / 案例弹层 / 导出面板 / 品牌字标 ============ -->
+<style>
+.brand .mk{
+  display:inline-grid;place-items:center;width:26px;height:26px;margin-right:9px;
+  background:var(--accent);color:var(--accent-ink,#fff);font-weight:800;font-size:14px;
+  border-radius:6px;letter-spacing:0;flex:0 0 auto;
+}
+.pf-hidden{display:none!important}
+
+/* 分类筛选栏 */
+.pf-filter{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 24px}
+.pf-filter-lb{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-dim);font-weight:700;margin-right:4px}
+.pf-chip{
+  display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border:1px solid var(--line);
+  background:var(--surface);color:var(--text);border-radius:999px;cursor:pointer;font-size:13px;
+  font-family:var(--font-body);transition:border-color .18s,color .18s,background .18s,transform .12s;
+}
+.pf-chip i{font-style:normal;font-size:11px;color:var(--text-dim);background:var(--bg-soft);border-radius:999px;padding:1px 7px}
+.pf-chip:hover{transform:translateY(-1px);border-color:var(--accent)}
+.pf-chip.on{background:var(--accent);color:var(--accent-ink,#fff);border-color:var(--accent)}
+.pf-chip.on i{background:rgba(255,255,255,.25);color:var(--accent-ink,#fff)}
+
+/* 案例详情弹层（右侧抽屉式） */
+.pf-case{position:fixed;inset:0;z-index:9990;display:none}
+.pf-case.on{display:block}
+.pf-case-mask{position:absolute;inset:0;background:rgba(8,10,14,.62);backdrop-filter:blur(4px)}
+.pf-case-panel{
+  position:absolute;top:0;right:0;height:100%;width:min(720px,100%);background:var(--bg);
+  box-shadow:-24px 0 60px rgba(0,0,0,.28);display:flex;flex-direction:column;
+  animation:pfCaseIn .28s cubic-bezier(.2,.7,.2,1);
+}
+@keyframes pfCaseIn{from{transform:translateX(40px);opacity:.4}to{transform:none;opacity:1}}
+.pf-case-x{position:absolute;top:14px;right:14px;z-index:2;width:38px;height:38px;border:1px solid var(--line);
+  background:var(--surface);color:var(--text);border-radius:50%;font-size:16px;cursor:pointer;display:grid;place-items:center}
+.pf-case-x:hover{border-color:var(--accent);color:var(--accent)}
+.pf-case-scroll{overflow:auto;padding:46px clamp(20px,5vw,56px) 64px;height:100%}
+.cs-head{margin-bottom:22px}
+.cs-cat{display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+  color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:3px 11px;margin-bottom:14px}
+.cs-head h2{font-size:clamp(24px,4vw,34px);line-height:1.15;margin:0 0 8px;letter-spacing:-.01em}
+.cs-role{color:var(--text-dim);font-size:14px;margin:0}
+.cs-cover{margin:6px 0 22px;border-radius:var(--radius);overflow:hidden;background:var(--bg-soft);aspect-ratio:16/9;min-height:160px;display:grid;place-items:center;color:var(--text-dim);font-size:13px}
+.cs-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.cs-meta{display:flex;flex-wrap:wrap;gap:18px 30px;padding:16px 0;margin:0 0 6px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.cs-meta div{min-width:90px}
+.cs-meta dt{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px}
+.cs-meta dd{margin:0;font-size:14px;font-weight:600}
+.cs-sec{margin:24px 0}
+.cs-sec h4{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin:0 0 10px;font-weight:700}
+.cs-sec>div{font-size:15px;line-height:1.75;color:var(--text)}
+.cs-sec .kws{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:0}
+.cs-sec .kws li{font-size:12.5px;padding:5px 11px;border:1px solid var(--line);border-radius:999px;color:var(--text-dim)}
+.cs-gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.cs-gallery img{width:100%;border-radius:10px;display:block;background:var(--bg-soft)}
+@media (max-width:560px){.cs-gallery{grid-template-columns:1fr}}
+.cs-open{margin-top:16px;display:inline-block;font-family:var(--font-body);font-size:13.5px;font-weight:700;
+  color:var(--accent);background:none;border:0;padding:0;cursor:pointer}
+.cs-open::after{content:" →"}
+.cs-open:hover{text-decoration:underline}
+
+/* 导出面板 */
+.pf-export{position:relative}
+.pf-export .pf-exp-panel{
+  position:absolute;top:calc(100% + 10px);right:0;width:250px;background:var(--surface);border:1px solid var(--line);
+  border-radius:12px;padding:8px;box-shadow:0 18px 44px rgba(0,0,0,.2);display:none;z-index:60;
+}
+.pf-export.on .pf-exp-panel{display:block}
+.pf-exp-panel button{display:flex;width:100%;align-items:center;gap:10px;padding:11px 12px;border:0;background:transparent;
+  color:var(--text);font-size:13.5px;text-align:left;cursor:pointer;border-radius:8px;font-family:var(--font-body)}
+.pf-exp-panel button:hover{background:var(--bg-soft)}
+.pf-exp-panel .sep{height:1px;background:var(--line);margin:6px 4px}
+.pf-exp-panel .hint{font-size:11.5px;color:var(--text-dim);padding:4px 12px 8px;line-height:1.5}
+.pf-exp-panel b{font-weight:700;color:var(--text)}
+
+/* 卡片可点击提示 */
+.proj,.pv-grid .card,.pv-list .row,.pv-tl .node,.pv-car .slide{cursor:pointer}
+.pf-vhint{opacity:.9}
+
+@media print{
+  .pf-case,.pf-export,.pf-filter,.pf-vbar,.iconbtn,.pf-cmp,.pf-editbar,.pf-shotov,.pf-uphint,.pf-drop{display:none!important}
+  body{overflow:visible!important}
+  #js-projects .proj{break-inside:avoid}
+}
+</style>
 </head>
 <body>
 
 <header class="hdr">
   <div class="wrap hdr-in">
-    <a class="brand" href="#top"><span class="dot" aria-hidden="true"></span>SUN · PORTFOLIO</a>
+    <a class="brand" href="#top"><span class="mk" aria-hidden="true">S</span>SUN · PORTFOLIO</a>
     <nav class="nav" id="nav" aria-label="主导航">
       <a href="#about">简介</a>
       <a href="#skills">技能专长</a>
@@ -674,14 +758,24 @@ body.editing [data-shot]{cursor:pointer}
       <a href="#contact">联系方式</a>
     </nav>
     <div class="hdr-tools">
-      <button class="iconbtn" id="themeBtn" style="width:auto;padding:0 15px" aria-haspopup="true" aria-expanded="false" title="切换视觉风格">◐<span class="lbl">风格</span></button>
+      <div class="pf-export" id="pfExport">
+        <button class="iconbtn" id="exportBtn" style="width:auto;padding:0 13px" aria-haspopup="true" aria-expanded="false" title="分享 / 导出作品集">⤓<span class="lbl" style="margin-left:6px">导出</span></button>
+        <div class="pf-exp-panel" id="pfExpPanel" role="menu">
+          <button type="button" data-act="copy">🔗 复制分享链接</button>
+          <button type="button" data-act="json">⬇ 下载作品集数据（JSON）</button>
+          <div class="sep"></div>
+          <button type="button" data-act="pdf">🖨 导出 PDF（作品集）</button>
+          <p class="hint">JSON 含全部作品与联系方式，可用于<b>备份或重新导入</b>；PDF 是给 HR 的静态文件。</p>
+        </div>
+      </div>
+      <button class="iconbtn" id="themeBtn" style="width:auto;padding:0 15px" aria-haspopup="true" aria-expanded="false" title="切换视觉风格（仅本机预览）">◐<span class="lbl">风格</span></button>
       <button class="iconbtn burger" id="burger" aria-label="打开菜单" aria-expanded="false">☰</button>
     </div>
   </div>
 </header>
 
 <div class="theme-pop" id="themePop" role="radiogroup" aria-label="视觉风格">
-  <h4>视觉风格</h4>
+  <h4>配色预览（仅本机）</h4>
   <button class="trow" data-set="swiss" role="radio" aria-checked="true">
     <span class="tsw"><i style="background:#fff"></i><i style="background:#111"></i><i style="background:#d81e05"></i></span>
     <span class="tname">瑞士国际主义<small>栅格秩序 · 大字标题 · 红黑<br>设计公司 / 品牌广告</small></span>
@@ -710,7 +804,7 @@ body.editing [data-shot]{cursor:pointer}
   <!-- ============ 视图切换滑块（作品集 / 个人简历 / 产品着陆页） ============ -->
   <div class="pf-vbar" id="pfVbar">
     <div class="pf-vbar-in">
-      <span class="lb">视图</span>
+      <span class="lb">主视图</span>
       <div class="pf-sw" id="pfSw" role="tablist" aria-label="页面视图切换">
         <span class="pf-knob" id="pfKnob" aria-hidden="true"></span>
         <button type="button" class="pf-seg on" data-v="portfolio" role="tab" aria-selected="true">作品集</button>
@@ -718,7 +812,7 @@ body.editing [data-shot]{cursor:pointer}
         <button type="button" class="pf-seg" data-v="landing" role="tab" aria-selected="false">产品着陆页</button>
       </div>
       <select class="pf-vsel hide" id="pfVstyle" title="该视图的配色风格"></select>
-      <span class="pf-vhint" id="pfVhint">拖动滑块或点击标签切换 · 简历与着陆页由同一份数据实时生成</span>
+      <span class="pf-vhint" id="pfVhint">「作品集」是主页面；「个人简历 / 产品着陆页」是同一份数据的另两种呈现，方便 HR 按习惯查看</span>
       <button type="button" class="pf-vbtn hide" id="pfVprint">打印 / 存 PDF</button>
     </div>
   </div>
@@ -1388,7 +1482,7 @@ var OWNER='hnzzsp',REPO='portfolio',BRANCH='main',API='https://api.github.com';
 var MODE='detail';
 try{ var sv=localStorage.getItem(VIEW_KEY); if(sv) MODE=sv; }catch(e){}
 if(!MODES.some(function(m){return m[0]===MODE;})) MODE='detail';
-var DATA=null,FRESH={},LB={open:false,list:[],i:0},CAR={i:0},preMode=null;
+var DATA=null,FRESH={},LB={open:false,list:[],i:0},CAR={i:0},preMode=null,currentCat='all';
 var EDIT=/(^|[?&])edit=1/.test(location.search)||/edit=1/.test(location.hash);
 
 function $(id){return document.getElementById(id);}
@@ -1432,12 +1526,14 @@ function rDetail(list){
     var shSrc=shotImg(p);
     if(shSrc&&FRESH[shSrc]) sh=sh.split(shSrc).join(FRESH[shSrc]);
     if(shSrc) sh=sh.replace(/<img/i,'<img data-pi="'+i+'"');
-    return '<article class="proj" data-card="'+i+'">'+
+    return '<article class="proj" data-card="'+i+'" data-cat="'+esc(p.category||'未分类')+'">'+
       '<div class="shot" data-shot="'+i+'">'+sh+'</div>'+
       '<div class="proj-body"><h3>'+p.title+'</h3><p class="proj-role">'+(p.role||'')+'</p>'+
       '<ul class="star">'+(p.bg?'<li><dt>背景</dt><dd>'+p.bg+'</dd></li>':'')+
       (p.act?'<li><dt>行动</dt><dd>'+p.act+'</dd></li>':'')+
-      (p.res?'<li><dt>结果</dt><dd>'+p.res+'</dd></li>':'')+'</ul>'+kws+filesHTML(p,i)+'</div></article>';
+      (p.res?'<li><dt>结果</dt><dd>'+p.res+'</dd></li>':'')+'</ul>'+kws+
+      '<button type="button" class="cs-open" data-goto="'+i+'">查看完整案例</button>'+
+      filesHTML(p,i)+'</div></article>';
   }).join('');
 }
 /* 项目附件（源文件：PDF / PSD / ZIP 等）：后台「上传源文件」自动归档到这里 */
@@ -1500,13 +1596,13 @@ function attachView(path){
 }
 function rList(list){
   return '<div class="pv-list">'+list.map(function(p,i){
-    return '<div class="row" data-goto="'+i+'" data-card="'+i+'"><span class="num">0'+(i+1)+
+    return '<div class="row" data-goto="'+i+'" data-card="'+i+'" data-cat="'+esc(p.category||'未分类')+'"><span class="num">0'+(i+1)+
       '</span><h3>'+p.title+'</h3><span class="role">'+plain(p.role)+'</span></div>';
   }).join('')+'</div>';
 }
 function rGrid(list){
   return '<div class="pv-grid">'+list.map(function(p,i){
-    return '<article class="card" data-card="'+i+'" data-goto="'+i+'">'+
+    return '<article class="card" data-card="'+i+'" data-goto="'+i+'" data-cat="'+esc(p.category||'未分类')+'">'+
       '<div class="th" data-shot="'+i+'">'+shotHTML(p,i)+'</div>'+
       '<div class="cap"><h3>'+p.title+'</h3><p>'+plain(p.role)+'</p></div></article>';
   }).join('')+'</div>';
@@ -1514,7 +1610,7 @@ function rGrid(list){
 function rCar(list){
   CAR.i=0;
   return '<div class="pv-car" id="pfCar"><div class="track" id="pfTrack">'+list.map(function(p,i){
-    return '<div class="slide"><div class="im" data-shot="'+i+'">'+shotHTML(p,i)+'</div>'+
+    return '<div class="slide" data-card="'+i+'" data-cat="'+esc(p.category||'未分类')+'"><div class="im" data-shot="'+i+'">'+shotHTML(p,i)+'</div>'+
       '<div class="cap"><h3>'+p.title+'</h3><p>'+plain(p.role)+'</p></div></div>';
   }).join('')+'</div>'+
   '<button class="nav prev" type="button" data-car="-1" aria-label="上一个">‹</button>'+
@@ -1526,7 +1622,7 @@ function rTl(list){
     var src=shotImg(p); if(src&&FRESH[src]) src=FRESH[src];
     var th=(src||EDIT)?'<div class="minithumb" data-shot="'+i+'">'+
       (src?'<img src="'+esc(src)+'" alt="" data-pi="'+i+'" loading="lazy" decoding="async">':'')+'</div>':'';
-    return '<div class="node" data-card="'+i+'">'+th+'<h3>'+p.title+'</h3><p class="role">'+plain(p.role)+'</p>'+
+    return '<div class="node" data-card="'+i+'" data-cat="'+esc(p.category||'未分类')+'">'+th+'<h3>'+p.title+'</h3><p class="role">'+plain(p.role)+'</p>'+
       (p.res?'<p class="res">'+p.res+'</p>':'')+'</div>';
   }).join('')+'</div>';
 }
@@ -1540,8 +1636,106 @@ function renderMode(){
   else el.innerHTML=rDetail(list);
 }
 function renderAll(){
-  renderMode(); bindEdit(); ensureCmpToggle();
+  renderMode(); buildFilterBar(); applyFilter(); bindEdit(); ensureCmpToggle();
 }
+
+/* ---------- 分类筛选栏 ---------- */
+function buildFilterBar(){
+  var el=$('js-projects'); if(!el) return;
+  var box=$('pfFilter');
+  if(!box){
+    box=document.createElement('div'); box.className='pf-filter'; box.id='pfFilter';
+    box.setAttribute('aria-label','作品分类筛选');
+    el.parentNode.insertBefore(box, el);
+  }
+  var cats={};
+  arr(projects()).forEach(function(p){ var c=p.category||'未分类'; cats[c]=(cats[c]||0)+1; });
+  var keys=['all'].concat(Object.keys(cats));
+  box.innerHTML='<span class="pf-filter-lb">分类</span>'+keys.map(function(c){
+    var label=c==='all'?'全部':c;
+    var n=c==='all'?arr(projects()).length:cats[c];
+    return '<button type="button" class="pf-chip'+(c===currentCat?' on':'')+'" data-cat="'+esc(c)+'">'+esc(label)+'<i>'+n+'</i></button>';
+  }).join('');
+  Array.prototype.forEach.call(box.querySelectorAll('.pf-chip'), function(b){
+    b.addEventListener('click', function(){
+      currentCat=b.dataset.cat;
+      Array.prototype.forEach.call(box.querySelectorAll('.pf-chip'), function(x){
+        x.classList.toggle('on', x.dataset.cat===currentCat);
+      });
+      applyFilter();
+    });
+  });
+}
+function applyFilter(){
+  var el=$('js-projects'); if(!el) return;
+  Array.prototype.forEach.call(el.querySelectorAll('[data-card]'), function(card){
+    var match=currentCat==='all' || card.getAttribute('data-cat')===currentCat;
+    card.classList.toggle('pf-hidden', !match);
+  });
+}
+
+/* ---------- 案例详情弹层（可复用模板，数据驱动，便于批量导入） ---------- */
+function caseStudyHTML(p){
+  if(!p) return '';
+  var cat=p.category||'未分类';
+  var kws=arr(p.kws).length?'<ul class="kws">'+arr(p.kws).map(function(k){return '<li>'+esc(k)+'</li>';}).join('')+'</ul>':'';
+  var meta=[];
+  if(p.year) meta.push(['年份',esc(p.year)]);
+  if(p.client) meta.push(['客户 / 课程',esc(p.client)]);
+  if(p.role) meta.push(['角色',esc(p.role)]);
+  var metaHTML=meta.length?'<dl class="cs-meta">'+meta.map(function(m){return '<div><dt>'+m[0]+'</dt><dd>'+m[1]+'</dd></div>';}).join('')+'</dl>':'';
+  var shSrc=shotImg(p);
+  var cover=shSrc
+    ? '<div class="cs-cover"><img src="'+esc(shSrc)+'" alt="'+esc(plain(p.title))+'" loading="lazy" decoding="async"></div>'
+    : '<div class="cs-cover">暂无封面图</div>';
+  var sec=function(t,v){ return v?'<section class="cs-sec"><h4>'+t+'</h4><div>'+v+'</div></section>':''; };
+  var gallery='';
+  if(arr(p.gallery).length){
+    gallery='<section class="cs-sec"><h4>作品图集</h4><div class="cs-gallery">'+arr(p.gallery).map(function(g){
+      return '<img src="'+esc(g)+'" alt="'+esc(plain(p.title))+'" loading="lazy" decoding="async">';
+    }).join('')+'</div></section>';
+  }
+  var files=EDIT?filesHTML(p,-1):filesHTML(p,-1);
+  var filesSec=files?'<section class="cs-sec"><h4>附件 / 源文件</h4>'+files+'</section>':'';
+  return '<header class="cs-head">'+
+      '<span class="cs-cat">'+esc(cat)+'</span>'+
+      '<h2>'+esc(p.title)+'</h2>'+
+      (p.role?'<p class="cs-role">'+esc(p.role)+'</p>':'')+'</header>'+
+    cover+metaHTML+
+    sec('背景',p.bg)+sec('过程 / 行动',p.act)+sec('成果',p.res)+
+    gallery+
+    (kws?'<section class="cs-sec"><h4>关键词</h4>'+kws+'</section>':'')+
+    filesSec;
+}
+function openCase(i){
+  var p=projects()[i]; if(!p) return;
+  var ov=$('pfCase');
+  if(!ov){
+    ov=document.createElement('div'); ov.className='pf-case'; ov.id='pfCase';
+    ov.setAttribute('aria-hidden','true');
+    ov.innerHTML='<div class="pf-case-mask"></div>'+
+      '<div class="pf-case-panel" role="dialog" aria-modal="true" aria-label="案例详情">'+
+      '<button type="button" class="pf-case-x" aria-label="关闭">✕</button>'+
+      '<div class="pf-case-scroll" id="pfCaseBody"></div></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', function(e){
+      if(e.target===ov || e.target.classList.contains('pf-case-mask') || e.target.classList.contains('pf-case-x')) closeCase();
+    });
+    ov.querySelector('.pf-case-scroll').addEventListener('click', function(e){
+      var f=e.target.closest?e.target.closest('.pf-file'):null;
+      if(f){ attachView(f.dataset.af); }
+    });
+    document.addEventListener('keydown', caseKey);
+  }
+  $('pfCaseBody').innerHTML=caseStudyHTML(p);
+  ov.classList.add('on'); ov.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+}
+function closeCase(){
+  var ov=$('pfCase'); if(ov){ ov.classList.remove('on'); ov.setAttribute('aria-hidden','true'); }
+  document.body.style.overflow='';
+}
+function caseKey(e){ if(e.key==='Escape') closeCase(); }
 
 /* ---------- 模式切换条 ---------- */
 /* 项目展示模式滑块：与顶部视图滑块同一套交互（点击 / 拖拽吸附） */
@@ -1712,7 +1906,12 @@ function bindOnce(){
     var img=e.target.closest?e.target.closest('img[data-pi]'):null;
     if(img){openLb(+img.dataset.pi);return;}
     var row=e.target.closest?e.target.closest('[data-goto]'):null;
-    if(row){gotoDetail(+row.dataset.goto);}
+    if(row){openCase(+row.dataset.goto);return;}
+    /* 非编辑模式下，点击卡片任意位置打开案例详情；编辑模式交给上传 / 删除逻辑 */
+    if(!EDIT){
+      var card=e.target.closest?e.target.closest('[data-card]'):null;
+      if(card){ openCase(+card.dataset.card); return; }
+    }
   });
   var tx=0;
   el.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});
@@ -2018,9 +2217,57 @@ function ensureCmpToggle(){
   });
 }
 
+/* ---------- 分享 / 导出 ---------- */
+function buildExportPanel(){
+  var box=$('pfExport'), btn=$('exportBtn'), panel=$('pfExpPanel');
+  if(!box||!btn||!panel||box.dataset.built) return;
+  box.dataset.built='1';
+  function toggle(on){
+    if(box.classList.contains('on')===!!on) return;
+    box.classList.toggle('on', !!on);
+    btn.setAttribute('aria-expanded', on?'true':'false');
+  }
+  btn.addEventListener('click', function(e){ e.stopPropagation(); toggle(!box.classList.contains('on')); });
+  document.addEventListener('click', function(e){ if(box.classList.contains('on') && !box.contains(e.target)) toggle(false); });
+  Array.prototype.forEach.call(panel.querySelectorAll('button'), function(b){
+    b.addEventListener('click', function(){
+      var act=b.dataset.act;
+      if(act==='copy') copyShare();
+      else if(act==='json') downloadData();
+      else if(act==='pdf') window.print();
+      toggle(false);
+    });
+  });
+}
+function getExportData(){
+  if(DATA && DATA.projects) return DATA;
+  if(window.__pfData) return window.__pfData;
+  return null;
+}
+function downloadData(){
+  var d=getExportData();
+  if(!d){ toast('数据尚未加载，无法导出','err'); return; }
+  var blob=new Blob([JSON.stringify(d,null,2)], {type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a'); a.href=url; a.download='portfolio-data.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+  toast('已导出作品集数据（含全部作品与联系方式）','ok');
+}
+function copyShare(){
+  var u=location.href;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(u).then(function(){ toast('分享链接已复制','ok'); },
+      function(){ toast('复制失败，请手动复制地址栏链接','err'); });
+  } else {
+    toast('当前环境不支持自动复制，请手动复制','err');
+  }
+}
+
 /* ---------- 启动 ---------- */
 buildBar();
 bindOnce();
+buildExportPanel();
 window.__pfRendered=function(){renderAll();};
 renderAll();
 if(EDIT){
