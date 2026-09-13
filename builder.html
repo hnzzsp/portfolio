@@ -399,7 +399,12 @@ function refreshTokState(){
 function gh(method, path, body){
   var token = getTok();
   if (!token) return Promise.reject(new Error('请先设置 GitHub 访问令牌'));
+  /* GET 加时间戳绕过浏览器缓存：删除后刷新列表 / 取 sha 拿到旧数据的根因 */
+  if (method === 'GET'){
+    path += (path.indexOf('?') < 0 ? '?' : '&') + '_=' + Date.now();
+  }
   return fetch(CONFIG.API + path, {
+    cache: 'no-store',
     method: method,
     headers: {
       'Authorization': 'Bearer ' + token,
@@ -762,6 +767,11 @@ function deleteAsset(btn, x){
     })
     .then(function(changed){
       if (changed) toast('data.json 引用已同步清理', 'ok');
+      /* 内容后台模块持有一份独立 DATA，必须重新载入，否则它下次保存会把旧引用写回去 */
+      if (contentApi) return contentApi.load().then(function(){ cpvPush(); return changed; });
+      return changed;
+    })
+    .then(function(changed){
       switchType(STATE.type);   // 刷新预览与源码
     })
     .catch(function(e){
@@ -774,6 +784,7 @@ function deleteAsset(btn, x){
 function syncDataAfterDelete(path){
   var raw = JSON.stringify(DATA || {});
   if (raw.indexOf(path) === -1) return Promise.resolve(false);
+  var dirty = false;
   var imgRe = new RegExp('<img[^>]*src=["\'][^"\']*' + path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '[^"\']*["\'][^>]*>', 'gi');
   var aRe = new RegExp('<a\\b[^>]*href=["\']' + path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '["\'][^>]*>[\\s\\S]*?<\\/a>', 'gi');
   function clean(s){
@@ -797,6 +808,12 @@ function syncDataAfterDelete(path){
       p.shot = 'TODO：替换为项目截图<br>（建议 4:3，宽度 ≥ 1200px，先压缩到 500KB 内）';
     }
     ['bg', 'act', 'res', 'title', 'role'].forEach(function(k){ p[k] = clean(p[k]); });
+    /* 附件数组：按路径移除对应条目 */
+    if (Array.isArray(p.files)){
+      var n0 = p.files.length;
+      p.files = p.files.filter(function(f){ return (f.rel || f.path) !== path; });
+      if (p.files.length !== n0) dirty = true;
+    }
   });
   ['about', 'profile'].forEach(function(sec){
     if (!DATA[sec]) return;
@@ -810,7 +827,7 @@ function syncDataAfterDelete(path){
     });
   });
   var next = JSON.stringify(DATA, null, 2);
-  if (next === JSON.stringify(JSON.parse(raw), null, 2)) return Promise.resolve(false);
+  if (next === JSON.stringify(JSON.parse(raw), null, 2) && !dirty) return Promise.resolve(false);
   var b64 = btoa(unescape(encodeURIComponent(next)));
   return putDataJson('清理已删除素材的引用：' + path)
     .then(function(){ return true; })
@@ -1345,7 +1362,7 @@ $('saveBtn').addEventListener('click', function(){
       if ($('tabs').querySelector('.on').dataset.tab === 'img') loadImages();
     })
     .catch(function(e){ toast('保存失败：' + e.message + '（多窗口同时保存会导致冲突，请重试）', 'err'); })
-    .then(function(){ if (contentApi && contentApi.isDirty && contentApi.isDirty()) return; cpvDirty = false; cpvState('已同步线上'); })
+    .then(function(){ if (contentApi && contentApi.isDirty && contentApi.isDirty()) return; cpvDirty = false; cpvState('已同步线上'); cpvPush(); })
     .then(function(){ b.disabled = false; syncToolBtns(); });
 });
 
@@ -1359,11 +1376,18 @@ function cpvState(text, dirty){
   el.classList.toggle('dirty', !!dirty);
 }
 /* 把当前 DATA 推给预览 iframe 实时重渲染（不重载页面） */
-function cpvPush(){
+function cpvPush(keepScroll){
   if (!cpvFrame || !contentApi) return;
   var d = contentApi.getData();
   if (!d) return;
-  try{ cpvFrame.contentWindow.postMessage({ __pfRenderData: d }, '*'); }catch(e){}
+  try{
+    cpvFrame.contentWindow.postMessage({ __pfRenderData: d }, '*');
+    if (!keepScroll){
+      setTimeout(function(){
+        try{ cpvFrame.contentWindow.scrollTo(0, 0); }catch(e){}
+      }, 80);
+    }
+  }catch(e){}
 }
 function cpvSchedule(){
   if (!cpvFrame) return;
