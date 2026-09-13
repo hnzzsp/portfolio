@@ -159,6 +159,12 @@ pre.code{
 .pf-view .cap a{color:#7ee787;font-size:12.5px}
 .pf-view .th{cursor:zoom-in}
 
+/* ---------- 内容后台（合并进本站，全宽显示） ---------- */
+#contentPane{display:none}
+body.pf-content .wrap{grid-template-columns:1fr}
+body.pf-content .stage,body.pf-content .panel{display:none}
+body.pf-content #contentPane{display:block;padding:16px 0 40px}
+
 /* ---------- toast / modal ---------- */
 .toast{
   position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);z-index:200;
@@ -192,7 +198,9 @@ pre.code{
   <div class="acts">
     <span id="tokState" class="pill no">令牌未设置</span>
     <button type="button" id="tokBtn">设置令牌</button>
-    <a class="btn" href="admin.html">内容后台 ↗</a>
+    <button type="button" class="btn" id="contentBtn">内容后台</button>
+    <button type="button" class="btn hide" id="backBtn">← 返回生成器</button>
+    <a class="btn" href="admin.html" title="独立后台入口（同一套模块）">后台独立页 ↗</a>
     <a class="btn" href="./" target="_blank" rel="noopener">查看线上站 ↗</a>
   </div>
 </header>
@@ -224,6 +232,8 @@ pre.code{
       <iframe id="pv" title="站点预览" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"></iframe>
     </div>
   </section>
+
+  <section id="contentPane" aria-label="内容后台"></section>
 
   <aside class="panel">
     <div class="tabs" id="tabs">
@@ -295,6 +305,7 @@ pre.code{
 </div>
 
 <script src="views.js"></script>
+<script src="content.js"></script>
 <script>
 (function(){
 'use strict';
@@ -1308,6 +1319,27 @@ $('saveBtn').addEventListener('click', function(){
 });
 
 /* 启动 */
+/* ---------- 内容后台：整合进本站，全宽切换 ---------- */
+var contentApi = null;
+$('contentBtn').addEventListener('click', function(){
+  if (!window.PFContent){ toast('content.js 未加载，请刷新重试', 'err'); return; }
+  document.body.classList.add('pf-content');
+  if (!contentApi){
+    contentApi = window.PFContent.mount($('contentPane'), {
+      onReady: function(){ toast('内容已载入，改完记得点「保存并发布」', 'ok'); }
+    });
+  }
+  this.classList.add('hide');
+  $('backBtn').classList.remove('hide');
+});
+$('backBtn').addEventListener('click', function(){
+  document.body.classList.remove('pf-content');
+  this.classList.add('hide');
+  $('contentBtn').classList.remove('hide');
+  /* 后台可能改过数据，回到生成器时重新载入并刷新预览 */
+  switchType(STATE.type);
+});
+
 refreshTokState();
 loadData().then(function(){ switchType('portfolio'); })
   .catch(function(){ switchType('portfolio'); });
