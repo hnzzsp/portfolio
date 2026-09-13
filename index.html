@@ -1420,7 +1420,7 @@ function projects(){
 function shotImg(p){var m=/<img[^>]*src=["']([^"']+)["']/i.exec((p&&p.shot)||'');return m?m[1]:null;}
 function shotHTML(p,i){
   var src=shotImg(p); if(src&&FRESH[src]) src=FRESH[src];
-  if(src) return '<img src="'+esc(src)+'" alt="'+esc(plain(p.title))+'" data-pi="'+i+'" loading="lazy">';
+  if(src) return '<img src="'+esc(src)+'" alt="'+esc(plain(p.title))+'" data-pi="'+i+'" loading="lazy" decoding="async">';
   return '<div class="ph">暂无截图</div>';
 }
 
@@ -1525,7 +1525,7 @@ function rTl(list){
   return '<div class="pv-tl">'+list.map(function(p,i){
     var src=shotImg(p); if(src&&FRESH[src]) src=FRESH[src];
     var th=(src||EDIT)?'<div class="minithumb" data-shot="'+i+'">'+
-      (src?'<img src="'+esc(src)+'" alt="" data-pi="'+i+'" loading="lazy">':'')+'</div>':'';
+      (src?'<img src="'+esc(src)+'" alt="" data-pi="'+i+'" loading="lazy" decoding="async">':'')+'</div>':'';
     return '<div class="node" data-card="'+i+'">'+th+'<h3>'+p.title+'</h3><p class="role">'+plain(p.role)+'</p>'+
       (p.res?'<p class="res">'+p.res+'</p>':'')+'</div>';
   }).join('')+'</div>';
