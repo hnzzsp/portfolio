@@ -2145,6 +2145,9 @@ function apply(v){
   /* 通知其它模块（章节导航 spy 等）：视图变了，页面在顶部时不会产生 scroll 事件。
      放在 toStage/toNative 之后，spy 才能读到最新的视图状态 */
   try{ window.dispatchEvent(new CustomEvent('pf-view-change')); }catch(e){}
+  /* 切换视图 = 打开一份新内容，统一回到顶部，
+     避免沿用上一个视图的滚动位置（看起来像「简历也跟着滑了」） */
+  try{ window.scrollTo(0,0); }catch(e){ window.scrollTo(0,0); }
 }
 
 /* ---- 点击 ---- */
@@ -2154,7 +2157,6 @@ segs().forEach(function(b){
     if(Date.now()-suppressClick<500) return;
     if(b.dataset.v===cur && cur==='portfolio') return;
     apply(b.dataset.v);
-    scrollToBar();
   });
   b.addEventListener('keydown',function(e){
     if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight') return;
@@ -2190,7 +2192,7 @@ function pu(e){
   if(!dragMoved){
     /* 没位移 = 单击某一档（指针捕获会吃掉 click，所以在这里直接切） */
     setKnob(idxOf(cur));
-    if(d.seg && d.seg!==cur){ suppressClick=Date.now(); apply(d.seg); scrollToBar(); }
+    if(d.seg && d.seg!==cur){ suppressClick=Date.now(); apply(d.seg); }
     return;
   }
   var cx=d.base+dx+d.w/2, best=0, bd=Infinity;
