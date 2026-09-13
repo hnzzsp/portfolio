@@ -615,7 +615,7 @@ body.editing [data-shot]{cursor:pointer}
 .pf-vstage{display:none;opacity:0;transform:translateY(12px);transition:opacity .32s ease,transform .32s ease}
 .pf-vstage.on{display:block}
 .pf-vstage.show{opacity:1;transform:none}
-.pf-vstage iframe{width:100%;border:0;display:block;min-height:78vh;background:transparent}
+.pf-vstage iframe{width:100%;height:100%;border:0;display:block;background:transparent}
 .pf-native{transition:opacity .26s ease,transform .26s ease}
 .pf-native.out{opacity:0;transform:translateY(10px)}
 .pf-native.gone{display:none}
@@ -2061,6 +2061,7 @@ function toNative(){
   setTimeout(function(){
     if(cur==='portfolio'){
       stage.classList.remove('on');
+      try{ window.scrollTo(0,savedScroll||0); }catch(e){ window.scrollTo(0,savedScroll||0); }
       try{ window.dispatchEvent(new CustomEvent('pf-view-change')); }catch(e){}
     }
   },320);
@@ -2069,7 +2070,11 @@ function toNative(){
     requestAnimationFrame(function(){ natives.forEach(function(el){ el.classList.remove('out'); }); });
   });
 }
+var savedScroll=0;
 function toStage(){
+  savedScroll=window.pageYOffset;          /* 记住作品集阅读位置，切回来时恢复 */
+  try{ window.scrollTo(0,0); }catch(e){ window.scrollTo(0,0); }
+  fitStage();
   natives.forEach(function(el){ el.classList.add('out'); });
   setTimeout(function(){ if(cur!=='portfolio') natives.forEach(function(el){ el.classList.add('gone'); }); },280);
   stage.classList.add('on');
@@ -2102,15 +2107,15 @@ function buildSrc(){
     : window.PFV.tplLanding(data, style.landing, false);
 }
 var hTimer=null;
-function syncH(){
-  if(cur==='portfolio') return;
-  try{
-    var d=frame.contentDocument;
-    if(!d||!d.body) return;
-    var h=Math.max(d.body.scrollHeight, d.documentElement.scrollHeight);
-    frame.style.height=(h+48)+'px';
-  }catch(e){}
+/* 简历 / 着陆页放进固定高度的独立滚动区：iframe 内部自己滚，
+   与作品集的页面滚动互不影响（各视图记住各自位置） */
+function fitStage(){
+  if(cur==='portfolio'||!stage.classList.contains('on')) return;
+  var r=bar.getBoundingClientRect();
+  var h=window.innerHeight-r.bottom;
+  stage.style.height=Math.max(320,h)+'px';
 }
+function syncH(){ fitStage(); }
 frame.addEventListener('load',function(){
   loadTip.style.display='none';
   syncH();
@@ -2118,10 +2123,11 @@ frame.addEventListener('load',function(){
   hTimer=setTimeout(syncH,400);
   setTimeout(syncH,1200);
 });
-window.addEventListener('resize',syncH);
+window.addEventListener('resize',function(){ fitStage(); syncH(); });
 window.addEventListener('message',function(e){
   var m=e.data;
-  if(m && m.type==='pf-h' && cur!=='portfolio') frame.style.height=(m.v+48)+'px';
+  /* 固定高度模式下高度消息只触发舞台重算，不再撑高 iframe（滚动在 iframe 内部） */
+  if(m && m.type==='pf-h' && cur!=='portfolio') fitStage();
 });
 
 /* ---- 切换 ---- */
@@ -2145,9 +2151,6 @@ function apply(v){
   /* 通知其它模块（章节导航 spy 等）：视图变了，页面在顶部时不会产生 scroll 事件。
      放在 toStage/toNative 之后，spy 才能读到最新的视图状态 */
   try{ window.dispatchEvent(new CustomEvent('pf-view-change')); }catch(e){}
-  /* 切换视图 = 打开一份新内容，统一回到顶部，
-     避免沿用上一个视图的滚动位置（看起来像「简历也跟着滑了」） */
-  try{ window.scrollTo(0,0); }catch(e){ window.scrollTo(0,0); }
 }
 
 /* ---- 点击 ---- */
