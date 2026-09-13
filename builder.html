@@ -1097,6 +1097,7 @@ function uploadOne(file){
               DATA.projects[ix].files.push({ name: name, rel: path, size: file.size });
             }
             putDataJson((tgt === 'shot' ? '项目截图：' : '项目附件：') + path).then(function(){
+              if (contentApi) contentApi.load();
               st.innerHTML = '<span class="ok">已写入第 ' + (ix + 1) + ' 个项目' +
                 (tgt === 'file' ? '附件' : '卡') + '</span> · <code>' + esc(path) + '</code>';
               toast('上传成功并写入项目：' + name, 'ok');
@@ -1108,6 +1109,7 @@ function uploadOne(file){
           }
           st.innerHTML = '<span class="ok">已上线' + (written ? '并写入数据' : '') + '</span> · <code>' + esc(path) + '</code>';
           toast('上传成功：' + name, 'ok');
+          if (contentApi) contentApi.load();
           if (written) switchType(STATE.type);   /* 重新生成源码与预览 */
           if ($('tabs').querySelector('.on').dataset.tab === 'img') loadImages();
         });
@@ -1404,6 +1406,9 @@ $('contentBtn').addEventListener('click', function(){
   document.body.classList.add('pf-content');
   if (!contentApi){
     contentApi = window.PFContent.mount($('contentPane'), {
+      onSaved: function(){
+        loadData().then(function(){ switchType(STATE.type); });
+      },
       onReady: function(api){
         /* 表单任何输入 → 防抖后收集 → 推给预览 */
         var pane = $('contentPane');
