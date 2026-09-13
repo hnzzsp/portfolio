@@ -2143,7 +2143,10 @@ function apply(v){
     loadTip.textContent='正在生成'+(v==='resume'?'简历':'着陆页')+'视图…';
     loadData().then(function(){
       if(cur!==v) return;
-      frame.srcdoc=buildSrc();
+      var html=buildSrc();
+      /* 内容没变就不重设 srcdoc：iframe 不重载，简历/着陆页内部的滚动位置得以保留 */
+      if(frame.getAttribute('srcdoc')===html) return;
+      frame.srcdoc=html;
     }).catch(function(err){
       loadTip.textContent='数据加载失败（'+err.message+'），请稍后重试或点击标签重新切换';
     });
