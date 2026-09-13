@@ -169,7 +169,7 @@
       "role": "独立开发 · 设计 / 前端 / 部署 · 已公开上线",
       "bg": "个人收藏的设计素材长期散落在浏览器书签里，检索困难、无法分享，也无法作为作品对外展示。",
       "act": "设计信息架构与检索动线，确定卡片式栅格与响应式断点；用 HTML/CSS 实现静态站点；写脚本从 Edge 书签自动同步数据；因网络限制改用 <b>GitHub REST API 做增量发布</b>，绕开不可用的 git push，每次同步只产生 1 个 commit。",
-      "res": "站点公开可访问（<a href=\"https://hnzzsp.github.io/design-library/\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">hnzzsp.github.io/design-library ↗</a>），移动端与桌面端均可用；后续维护只需本地改文件 + 一条命令发布。 ",
+      "res": "站点公开可访问（<a href=\"https://hnzzsp.github.io/design-library/\" target=\"_blank\" rel=\"noopener\" style=\"color:var(--accent)\">hnzzsp.github.io/design-library ↗</a>），移动端与桌面端均可用；后续维护只需本地改文件 + 一条命令发布。 <a href=\"assets/files/9-10_1789220366651.pdf\" download>9-10_1789220366651.pdf（源文件下载）</a>",
       "kws": [
         "信息架构",
         "响应式前端",
@@ -259,7 +259,7 @@
     }
   ],
   "contact": {
-    "email": "hnzzsp@163.com",
+    "email": "hnzzsp@163.com11",
     "phone": "15238076886",
     "wechat": "JIAXIN-V_U",
     "city": "河南 · 郑州（可远程 / 可到岗）",
